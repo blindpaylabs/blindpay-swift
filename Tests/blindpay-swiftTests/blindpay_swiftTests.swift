@@ -1,3 +1,10 @@
+//
+//  blindpay_swiftTests.swift
+//  blindpay-swift
+//
+//  Created by Eric Viana on 30/10/25.
+//
+
 import Testing
 @testable import blindpay_swift
 
