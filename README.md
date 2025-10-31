@@ -18,16 +18,11 @@ Or add it via Xcode:
 
 1. File → Add Packages...
 2. Enter the repository URL: `https://github.com/blindpaylabs/blindpay-swift.git`
-3. Select the version and add to your target
-
-## Requirements
-
-- iOS 15.0+ / macOS 12.0+ / tvOS 15.0+ / watchOS 8.0+
-- Swift 5.9+
+3. Select the version and add it to your target
 
 ## Authentication
 
-To get started, you will need both your API key and your instance id, you can obtain your API key and instance id from the Blindpay dashboard [https://app.blindpay.com/instances/{instanceId}/api-keys](https://app.blindpay.com/instances/{instanceId}/api-keys)
+To get started, you will need both your API key and your instance ID, you can obtain your API key and instance ID from the Blindpay dashboard [https://app.blindpay.com/instances/<instance_id>/api-keys](https://app.blindpay.com/instances/<instance_id>/api-keys)
 
 ```swift
 import blindpay_swift
@@ -39,7 +34,7 @@ let blindpay = BlindPay(
 ```
 
 > [!NOTE]  
-> All api calls are going to use the provided api key and instance id
+> All API calls are going to use the provided API key and instance ID
 
 ## Quick Start
 
@@ -101,16 +96,14 @@ do {
     let response = try await blindpay.available.getRails()
 
     if let error = response.error {
-        // Handle error
         print("API Error: \(error.message)")
         return
     }
 
     if let data = response.data {
-        print("Success:", data) // fully typed
+        print("Success:", data)
     }
 } catch {
-    // Handle network or decoding errors
     print("Error: \(error)")
 }
 ```
@@ -122,8 +115,8 @@ For detailed API documentation, visit:
 
 ## Support
 
-- 📧 Email: [gabriel@blindpay.com](mailto:gabriel@blindpay.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/blindpaylabs/blindpay-swift/issues)
+- Email: [eric@blindpay.com](mailto:eric@blindpay.com)
+- Issues: [GitHub Issues](https://github.com/blindpaylabs/blindpay-swift/issues)
 
 ## License
 
