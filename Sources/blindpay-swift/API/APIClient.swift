@@ -33,9 +33,20 @@ internal final class APIClient: Sendable {
     func request<T: Codable>(
         endpoint: String,
         method: HTTPMethod = .get,
-        body: (any Codable)? = nil
+        body: (any Codable)? = nil,
+        queryParameters: [String: String]? = nil
     ) async throws -> APIResponse<T> {
-        guard let url = URL(string: "\(configuration.baseURL)\(endpoint)") else {
+        var urlString = "\(configuration.baseURL)\(endpoint)"
+        
+        if let queryParameters = queryParameters, !queryParameters.isEmpty {
+            var components = URLComponents(string: urlString)
+            components?.queryItems = queryParameters.map { key, value in
+                URLQueryItem(name: key, value: value)
+            }
+            urlString = components?.url?.absoluteString ?? urlString
+        }
+        
+        guard let url = URL(string: urlString) else {
             throw BlindPayError.invalidURL
         }
         
@@ -55,10 +66,21 @@ internal final class APIClient: Sendable {
         let decoder = JSONDecoder()
         
         if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-            return try decoder.decode(APIResponse<T>.self, from: data)
+            if let apiResponse = try? decoder.decode(APIResponse<T>.self, from: data) {
+                return apiResponse
+            }
+            
+            if let directData = try? decoder.decode(T.self, from: data) {
+                return APIResponse<T>(data: directData, error: nil)
+            }
+            
+            throw BlindPayError.decodingError(NSError(domain: "BlindPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to decode response"]))
         } else {
             if let errorResponse = try? decoder.decode(APIResponse<EmptyResponse>.self, from: data) {
                 return APIResponse<T>(data: nil, error: errorResponse.error)
+            } else if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let message = errorDict["message"] as? String {
+                return APIResponse<T>(data: nil, error: APIError(message: message))
             } else {
                 throw BlindPayError.httpError(statusCode: httpResponse.statusCode)
             }

@@ -16,10 +16,20 @@ let package = Package(
             name: "blindpay-swift",
             targets: ["blindpay-swift"]
         ),
+        .executable(
+            name: "GetRails",
+            targets: ["GetRails"]
+        ),
     ],
     targets: [
         .target(
             name: "blindpay-swift"
+        ),
+        .executableTarget(
+            name: "GetRails",
+            dependencies: ["blindpay-swift"],
+            path: "Examples",
+            sources: ["GetRails.swift"]
         ),
         .testTarget(
             name: "blindpay-swiftTests",

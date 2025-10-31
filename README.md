@@ -15,6 +15,7 @@ dependencies: [
 ```
 
 Or add it via Xcode:
+
 1. File → Add Packages...
 2. Enter the repository URL: `https://github.com/blindpaylabs/blindpay-swift.git`
 3. Select the version and add to your target
@@ -50,14 +51,14 @@ func getAvailableRails() async {
         apiKey: "your-api-key-here",
         instanceId: "your-instance-id-here"
     )
-    
+
     do {
         let response = try await blindpay.available.getRails()
-        
+
         if let error = response.error {
             throw NSError(domain: "BlindPay", code: -1, userInfo: [NSLocalizedDescriptionKey: error.message])
         }
-        
+
         if let data = response.data {
             print("Rails: ", data)
         }
@@ -97,14 +98,14 @@ This SDK uses a consistent error handling pattern. Always check for errors:
 
 ```swift
 do {
-    let response = try await blindpay.payins.list()
-    
+    let response = try await blindpay.available.getRails()
+
     if let error = response.error {
         // Handle error
         print("API Error: \(error.message)")
         return
     }
-    
+
     if let data = response.data {
         print("Success:", data) // fully typed
     }
@@ -115,6 +116,7 @@ do {
 ```
 
 For detailed API documentation, visit:
+
 - [Blindpay API documentation](https://blindpay.com/docs/getting-started/overview)
 - [API Reference](https://api.blindpay.com/reference)
 
@@ -128,4 +130,3 @@ For detailed API documentation, visit:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Made with ❤️ by the [Blindpay](https://blindpay.com) team
-

@@ -15,9 +15,6 @@ public final class BlindPay: Sendable {
     /// Available payment rails service
     public let available: AvailableService
     
-    /// Pay-ins service
-    public let payins: PayinsService
-    
     /// Initialize the BlindPay client
     /// - Parameters:
     ///   - apiKey: Your BlindPay API key
@@ -26,7 +23,6 @@ public final class BlindPay: Sendable {
     public init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
         self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration)
         self.available = AvailableService(apiClient: apiClient)
-        self.payins = PayinsService(apiClient: apiClient)
     }
 }
 
