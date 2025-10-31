@@ -23,6 +23,7 @@ internal final class APIClient: Sendable {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.httpAdditionalHeaders = [
             "Content-Type": "application/json",
+            "User-Agent": "BlindPay-Swift-SDK/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
             "X-API-Key": apiKey,
             "X-Instance-Id": instanceId
         ]
@@ -66,22 +67,25 @@ internal final class APIClient: Sendable {
         let decoder = JSONDecoder()
         
         if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-            if let apiResponse = try? decoder.decode(APIResponse<T>.self, from: data) {
-                return apiResponse
+            do {
+                return try decoder.decode(APIResponse<T>.self, from: data)
+            } catch {
+                do {
+                    let directData = try decoder.decode(T.self, from: data)
+                    return APIResponse<T>(data: directData, error: nil)
+                } catch {
+                    throw BlindPayError.decodingError(error)
+                }
             }
-            
-            if let directData = try? decoder.decode(T.self, from: data) {
-                return APIResponse<T>(data: directData, error: nil)
-            }
-            
-            throw BlindPayError.decodingError(NSError(domain: "BlindPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to decode response"]))
         } else {
-            if let errorResponse = try? decoder.decode(APIResponse<EmptyResponse>.self, from: data) {
+            do {
+                let errorResponse = try decoder.decode(APIResponse<EmptyResponse>.self, from: data)
                 return APIResponse<T>(data: nil, error: errorResponse.error)
-            } else if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let message = errorDict["message"] as? String {
-                return APIResponse<T>(data: nil, error: APIError(message: message))
-            } else {
+            } catch {
+                if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let message = errorDict["message"] as? String {
+                    return APIResponse<T>(data: nil, error: APIError(message: message))
+                }
                 throw BlindPayError.httpError(statusCode: httpResponse.statusCode)
             }
         }
