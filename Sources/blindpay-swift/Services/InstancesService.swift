@@ -13,9 +13,13 @@ public final class InstancesService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
     
+    /// API keys management service
+    public let apiKeys: ApiKeysService
+    
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
+        self.apiKeys = ApiKeysService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Retrieves all members of the instance
