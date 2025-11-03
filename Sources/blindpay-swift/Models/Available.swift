@@ -7,6 +7,34 @@
 
 import Foundation
 
+// MARK: - Enums
+
+/// Payment rail type
+public enum Rail: String, Codable, Sendable {
+    case wire = "wire"
+    case ach = "ach"
+    case pix = "pix"
+    case speiBitso = "spei_bitso"
+    case transfersBitso = "transfers_bitso"
+    case achCopBitso = "ach_cop_bitso"
+    case internationalSwift = "international_swift"
+    case rtp = "rtp"
+}
+
+/// Bank account type
+public enum BankAccountType: String, Codable, Sendable {
+    case checking = "checking"
+    case savings = "savings"
+}
+
+/// Account class type
+public enum AccountClass: String, Codable, Sendable {
+    case individual = "individual"
+    case business = "business"
+}
+
+// MARK: - Rail Response
+
 /// Represents an available payment rail
 public struct RailResponse: Codable, Sendable, Equatable {
     /// Display name of the rail (e.g., "Domestic Wire")
