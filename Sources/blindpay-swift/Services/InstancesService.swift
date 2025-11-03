@@ -41,5 +41,58 @@ public final class InstancesService: Sendable {
             method: .get
         )
     }
+    
+    /// Updates the instance with new data
+    ///
+    /// This method updates the instance's name and optionally sets a redirect URL
+    /// for receiver invites.
+    ///
+    /// - Parameter data: The update data containing the instance name and optional redirect URL
+    /// - Returns: An `APIResponse` with a void response indicating success
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let updateData = UpdateInstanceInput(
+    ///     name: "My Updated Instance",
+    ///     receiverInviteRedirectUrl: "https://example.com/redirect"
+    /// )
+    /// let response = try await blindPay.instances.update(data: updateData)
+    /// if let error = response.error {
+    ///     print("Error: \(error.message)")
+    /// } else {
+    ///     print("Instance updated successfully")
+    /// }
+    /// ```
+    public func update(data: UpdateInstanceInput) async throws -> APIResponse<VoidResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)",
+            method: .put,
+            body: data
+        )
+    }
+    
+    /// Deletes the instance
+    ///
+    /// This method permanently deletes the instance. This action cannot be undone.
+    ///
+    /// - Returns: An `APIResponse` with a void response indicating success
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.instances.delete()
+    /// if let error = response.error {
+    ///     print("Error: \(error.message)")
+    /// } else {
+    ///     print("Instance deleted successfully")
+    /// }
+    /// ```
+    public func delete() async throws -> APIResponse<VoidResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)",
+            method: .delete
+        )
+    }
 }
 

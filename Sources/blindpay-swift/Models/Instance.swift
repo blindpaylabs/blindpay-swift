@@ -79,3 +79,27 @@ public struct InstanceMember: Codable, Sendable, Equatable {
 /// Response type for instance members query
 public typealias InstanceMembersResponse = [InstanceMember]
 
+/// Input for updating an instance
+public struct UpdateInstanceInput: Codable, Sendable {
+    /// Name of the instance
+    public let name: String
+    
+    /// Optional redirect URL for receiver invites
+    public let receiverInviteRedirectUrl: String?
+    
+    public init(name: String, receiverInviteRedirectUrl: String? = nil) {
+        self.name = name
+        self.receiverInviteRedirectUrl = receiverInviteRedirectUrl
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case receiverInviteRedirectUrl = "receiver_invite_redirect_url"
+    }
+}
+
+/// Empty response type for void operations
+public struct VoidResponse: Codable, Sendable {
+    public init() {}
+}
+
