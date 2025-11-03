@@ -19,11 +19,15 @@ public final class InstancesService: Sendable {
     /// Partner fees management service
     public let partnerFees: PartnerFeesService
     
+    /// Quotes management service
+    public let quotes: QuotesService
+    
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
         self.apiKeys = ApiKeysService(apiClient: apiClient, instanceId: instanceId)
         self.partnerFees = PartnerFeesService(apiClient: apiClient, instanceId: instanceId)
+        self.quotes = QuotesService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Retrieves all members of the instance
