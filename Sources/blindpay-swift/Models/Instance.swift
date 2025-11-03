@@ -98,6 +98,16 @@ public struct UpdateInstanceInput: Codable, Sendable {
     }
 }
 
+/// Input for updating a member's role
+public struct UpdateMemberRoleInput: Codable, Sendable {
+    /// The new role to assign to the member
+    public let role: InstanceMemberRole
+    
+    public init(role: InstanceMemberRole) {
+        self.role = role
+    }
+}
+
 /// Empty response type for void operations
 public struct VoidResponse: Codable, Sendable {
     public init() {}

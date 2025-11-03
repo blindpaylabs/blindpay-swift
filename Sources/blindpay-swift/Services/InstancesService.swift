@@ -94,5 +94,60 @@ public final class InstancesService: Sendable {
             method: .delete
         )
     }
+    
+    /// Deletes a member from the instance
+    ///
+    /// This method permanently removes a member from the instance.
+    ///
+    /// - Parameter memberId: The unique identifier of the member to delete
+    /// - Returns: An `APIResponse` with a void response indicating success
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.instances.deleteMember(memberId: "member_123")
+    /// if let error = response.error {
+    ///     print("Error: \(error.message)")
+    /// } else {
+    ///     print("Member deleted successfully")
+    /// }
+    /// ```
+    public func deleteMember(memberId: String) async throws -> APIResponse<VoidResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
+            method: .delete
+        )
+    }
+    
+    /// Updates a member's role in the instance
+    ///
+    /// This method changes the role assigned to a specific member.
+    ///
+    /// - Parameters:
+    ///   - memberId: The unique identifier of the member
+    ///   - role: The new role to assign to the member
+    /// - Returns: An `APIResponse` with a void response indicating success
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.instances.updateMemberRole(
+    ///     memberId: "member_123",
+    ///     role: .admin
+    /// )
+    /// if let error = response.error {
+    ///     print("Error: \(error.message)")
+    /// } else {
+    ///     print("Member role updated successfully")
+    /// }
+    /// ```
+    public func updateMemberRole(memberId: String, role: InstanceMemberRole) async throws -> APIResponse<VoidResponse> {
+        let updateInput = UpdateMemberRoleInput(role: role)
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
+            method: .put,
+            body: updateInput
+        )
+    }
 }
 
