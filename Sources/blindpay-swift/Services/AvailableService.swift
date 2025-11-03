@@ -36,5 +36,35 @@ public final class AvailableService: Sendable {
     public func getRails() async throws -> APIResponse<[RailResponse]> {
         return try await apiClient.request(endpoint: "/v1/available/rails", method: .get)
     }
+    
+    /// Retrieves bank detail fields required for a specific payment rail
+    ///
+    /// This method fetches the configuration and requirements for bank detail fields
+    /// needed to process payments using the specified rail. Each field includes
+    /// validation rules, display labels, and optional predefined values.
+    ///
+    /// - Parameter rail: The payment rail identifier (e.g., "wire", "ach", "pix")
+    /// - Returns: An `APIResponse` containing an array of `BankDetailField` objects
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.available.getBankDetails(rail: "wire")
+    /// if let fields = response.data {
+    ///     for field in fields {
+    ///         print("\(field.label): required=\(field.required), key=\(field.key)")
+    ///         if let items = field.items {
+    ///             print("  Options: \(items.map { $0.label }.joined(separator: ", "))")
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    public func getBankDetails(rail: String) async throws -> APIResponse<BankDetailResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/available/bank-details",
+            method: .get,
+            queryParameters: ["rail": rail]
+        )
+    }
 }
 
