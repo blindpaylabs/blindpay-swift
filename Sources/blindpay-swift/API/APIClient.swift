@@ -24,6 +24,7 @@ internal final class APIClient: Sendable {
         sessionConfiguration.httpAdditionalHeaders = [
             "Content-Type": "application/json",
             "User-Agent": "BlindPay-Swift-SDK/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
+            "Authorization": "Bearer \(apiKey)",
             "X-API-Key": apiKey,
             "X-Instance-Id": instanceId
         ]
@@ -68,7 +69,14 @@ internal final class APIClient: Sendable {
         
         if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
             do {
-                return try decoder.decode(APIResponse<T>.self, from: data)
+                let apiResponse = try decoder.decode(APIResponse<T>.self, from: data)
+                // If APIResponse decoded but both data and error are nil,
+                // the response was likely direct data, so try direct decode
+                if apiResponse.data == nil && apiResponse.error == nil {
+                    let directData = try decoder.decode(T.self, from: data)
+                    return APIResponse<T>(data: directData, error: nil)
+                }
+                return apiResponse
             } catch {
                 do {
                     let directData = try decoder.decode(T.self, from: data)
