@@ -39,13 +39,13 @@ public enum AccountClass: String, Codable, Sendable {
 public struct RailResponse: Codable, Sendable, Equatable {
     /// Display name of the rail (e.g., "Domestic Wire")
     public let label: String
-    
+
     /// Rail identifier (e.g., "wire", "ach", "pix")
     public let value: String
-    
+
     /// Country code where this rail is available (e.g., "US", "BR", "MX")
     public let country: String
-    
+
     public init(label: String, value: String, country: String) {
         self.label = label
         self.value = value
@@ -90,7 +90,8 @@ public enum BankDetailKey: String, Codable, Sendable {
     case swiftBeneficiaryAddressLine2 = "swift_beneficiary_address_line_2"
     case swiftBeneficiaryCountry = "swift_beneficiary_country"
     case swiftBeneficiaryCity = "swift_beneficiary_city"
-    case swiftBeneficiaryStateProvinceRegion = "swift_beneficiary_state_province_region"
+    case swiftBeneficiaryStateProvinceRegion =
+        "swift_beneficiary_state_province_region"
     case swiftBeneficiaryPostalCode = "swift_beneficiary_postal_code"
     case swiftBankName = "swift_bank_name"
     case swiftBankAddressLine1 = "swift_bank_address_line_1"
@@ -99,8 +100,10 @@ public enum BankDetailKey: String, Codable, Sendable {
     case swiftBankCity = "swift_bank_city"
     case swiftBankStateProvinceRegion = "swift_bank_state_province_region"
     case swiftBankPostalCode = "swift_bank_postal_code"
-    case swiftIntermediaryBankSwiftCodeBic = "swift_intermediary_bank_swift_code_bic"
-    case swiftIntermediaryBankAccountNumberIban = "swift_intermediary_bank_account_number_iban"
+    case swiftIntermediaryBankSwiftCodeBic =
+        "swift_intermediary_bank_swift_code_bic"
+    case swiftIntermediaryBankAccountNumberIban =
+        "swift_intermediary_bank_account_number_iban"
     case swiftIntermediaryBankName = "swift_intermediary_bank_name"
     case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
 }
@@ -109,19 +112,19 @@ public enum BankDetailKey: String, Codable, Sendable {
 public struct BankDetailItem: Codable, Sendable, Equatable {
     /// Display label for the item
     public let label: String
-    
+
     /// Value for the item
     public let value: String
-    
+
     /// Whether this item is currently active
     public let isActive: Bool?
-    
+
     public init(label: String, value: String, isActive: Bool? = nil) {
         self.label = label
         self.value = value
         self.isActive = isActive
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case label
         case value
@@ -133,20 +136,26 @@ public struct BankDetailItem: Codable, Sendable, Equatable {
 public struct BankDetailField: Codable, Sendable, Equatable {
     /// Display label for the field
     public let label: String
-    
+
     /// Regular expression pattern for validation
     public let regex: String
-    
+
     /// Key identifier for this field
     public let key: BankDetailKey
-    
+
     /// Optional array of predefined items/options for this field
     public let items: [BankDetailItem]?
-    
+
     /// Whether this field is required
     public let required: Bool
-    
-    public init(label: String, regex: String, key: BankDetailKey, items: [BankDetailItem]? = nil, required: Bool) {
+
+    public init(
+        label: String,
+        regex: String,
+        key: BankDetailKey,
+        items: [BankDetailItem]? = nil,
+        required: Bool
+    ) {
         self.label = label
         self.regex = regex
         self.key = key
@@ -158,3 +167,61 @@ public struct BankDetailField: Codable, Sendable, Equatable {
 /// Response type for bank details query
 public typealias BankDetailResponse = [BankDetailField]
 
+// MARK: - Swift Code Response
+
+/// Represents bank details for a SWIFT code
+public struct SwiftCodeResponse: Codable, Sendable, Equatable {
+    /// Unique identifier for the bank
+    public let id: String
+
+    /// Bank name
+    public let bank: String
+
+    /// City where the bank is located
+    public let city: String
+
+    /// Branch name or identifier
+    public let branch: String
+
+    /// SWIFT/BIC code
+    public let swiftCode: String
+
+    /// Link to SWIFT code information
+    public let swiftCodeLink: String
+
+    /// Country code
+    public let country: String
+
+    /// Country slug identifier
+    public let countrySlug: String
+
+    /// Bank address
+    public let address: String
+
+    /// Postal code
+    public let postcode: String
+
+    public init(
+        id: String,
+        bank: String,
+        city: String,
+        branch: String,
+        swiftCode: String,
+        swiftCodeLink: String,
+        country: String,
+        countrySlug: String,
+        address: String,
+        postcode: String
+    ) {
+        self.id = id
+        self.bank = bank
+        self.city = city
+        self.branch = branch
+        self.swiftCode = swiftCode
+        self.swiftCodeLink = swiftCodeLink
+        self.country = country
+        self.countrySlug = countrySlug
+        self.address = address
+        self.postcode = postcode
+    }
+}

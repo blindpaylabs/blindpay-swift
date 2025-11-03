@@ -11,11 +11,11 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 public final class AvailableService: Sendable {
     private let apiClient: APIClient
-    
+
     init(apiClient: APIClient) {
         self.apiClient = apiClient
     }
-    
+
     /// Retrieves all available payment rails
     ///
     /// This method fetches a list of all payment rails that are available for use,
@@ -34,9 +34,12 @@ public final class AvailableService: Sendable {
     /// }
     /// ```
     public func getRails() async throws -> APIResponse<[RailResponse]> {
-        return try await apiClient.request(endpoint: "/v1/available/rails", method: .get)
+        return try await apiClient.request(
+            endpoint: "/v1/available/rails",
+            method: .get
+        )
     }
-    
+
     /// Retrieves bank detail fields required for a specific payment rail
     ///
     /// This method fetches the configuration and requirements for bank detail fields
@@ -59,12 +62,41 @@ public final class AvailableService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getBankDetails(rail: String) async throws -> APIResponse<BankDetailResponse> {
+    public func getBankDetails(rail: String) async throws -> APIResponse<
+        BankDetailResponse
+    > {
         return try await apiClient.request(
             endpoint: "/v1/available/bank-details",
             method: .get,
             queryParameters: ["rail": rail]
         )
     }
-}
 
+    /// Retrieves bank information for a specific SWIFT code
+    ///
+    /// This method fetches bank details associated with the given SWIFT/BIC code,
+    /// including bank name, address, city, branch, and other relevant information.
+    ///
+    /// - Parameter swift: The SWIFT/BIC code to look up (e.g., "CHASUS33")
+    ///   Must be exactly 8 characters, containing only uppercase letters and numbers.
+    /// - Returns: An `APIResponse` containing an array of `SwiftCodeResponse` objects
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.available.getSwiftCode(swift: "CHASUS33")
+    /// if let swiftCodes = response.data {
+    ///     for swiftCode in swiftCodes {
+    ///         print("\(swiftCode.bank) - \(swiftCode.city), \(swiftCode.country)")
+    ///     }
+    /// }
+    /// ```
+    public func getSwiftCode(swift: String) async throws -> APIResponse<
+        [SwiftCodeResponse]
+    > {
+        return try await apiClient.request(
+            endpoint: "/v1/available/swift/\(swift)",
+            method: .get
+        )
+    }
+}
