@@ -20,13 +20,16 @@ public enum PayinStatus: String, Codable, Sendable {
 
 /// Payment method for payin
 public enum PaymentMethod: String, Codable, Sendable {
+  case ach = "ach"
+  case wire = "wire"
   case pix = "pix"
+  case spei = "spei"
 }
 
 /// Payin type
 public enum PayinType: String, Codable, Sendable {
   case individual = "individual"
-  case company = "company"
+  case business = "business"
 }
 
 // MARK: - Tracking Types
@@ -421,7 +424,7 @@ public struct Payin: Codable, Sendable, Equatable {
   public let receiverAmount: Int?
 
   /// Token
-  public let token: String?
+  public let token: StablecoinToken?
 
   /// Partner fee amount
   public let partnerFeeAmount: Int?
@@ -430,13 +433,13 @@ public struct Payin: Codable, Sendable, Equatable {
   public let totalFeeAmount: Double?
 
   /// Commercial quotation
-  public let commercialQuotation: Int?
+  public let commercialQuotation: Double?
 
   /// BlindPay quotation
-  public let blindpayQuotation: Int?
+  public let blindpayQuotation: Double?
 
   /// Currency
-  public let currency: String?
+  public let currency: Currency?
 
   /// Billing fee
   public let billingFee: Int?
@@ -448,7 +451,7 @@ public struct Payin: Codable, Sendable, Equatable {
   public let address: String?
 
   /// Network
-  public let network: String?
+  public let network: Network?
 
   /// BlindPay bank details
   public let blindpayBankDetails: BlindPayBankDetails?
@@ -476,16 +479,16 @@ public struct Payin: Codable, Sendable, Equatable {
     paymentMethod: PaymentMethod? = nil,
     senderAmount: Int? = nil,
     receiverAmount: Int? = nil,
-    token: String? = nil,
+    token: StablecoinToken? = nil,
     partnerFeeAmount: Int? = nil,
     totalFeeAmount: Double? = nil,
-    commercialQuotation: Int? = nil,
-    blindpayQuotation: Int? = nil,
-    currency: String? = nil,
+    commercialQuotation: Double? = nil,
+    blindpayQuotation: Double? = nil,
+    currency: Currency? = nil,
     billingFee: Int? = nil,
     name: String? = nil,
     address: String? = nil,
-    network: String? = nil,
+    network: Network? = nil,
     blindpayBankDetails: BlindPayBankDetails? = nil
   ) {
     self.id = id
@@ -709,34 +712,34 @@ public struct CreatePayinResponse: Codable, Sendable {
   public let clabe: String?
 
   /// Complete tracking information
-  public let trackingComplete: PayinTrackingComplete?
+  public let trackingComplete: PayinTrackingComplete
 
   /// Payment tracking information
-  public let trackingPayment: PayinTrackingPayment?
+  public let trackingPayment: PayinTrackingPayment
 
   /// Transaction tracking information
-  public let trackingTransaction: PayinTrackingTransaction?
+  public let trackingTransaction: PayinTrackingTransaction
 
   /// Partner fee tracking information
   public let trackingPartnerFee: PayinTrackingPartnerFee?
 
   /// BlindPay bank details
-  public let blindpayBankDetails: BlindPayBankDetails?
+  public let blindpayBankDetails: BlindPayBankDetails
 
   /// Receiver ID
-  public let receiverId: String
+  public let receiverId: String?
 
   /// Receiver amount
-  public let receiverAmount: Int
+  public let receiverAmount: Int?
 
   /// Payment method
-  public let paymentMethod: PaymentMethod
+  public let paymentMethod: PaymentMethod?
 
   /// Billing fee
-  public let billingFee: Int
+  public let billingFee: Int?
 
   /// Sender amount
-  public let senderAmount: Int
+  public let senderAmount: Int?
 
   public init(
     id: String,
@@ -744,16 +747,16 @@ public struct CreatePayinResponse: Codable, Sendable {
     pixCode: String? = nil,
     memoCode: String? = nil,
     clabe: String? = nil,
-    trackingComplete: PayinTrackingComplete? = nil,
-    trackingPayment: PayinTrackingPayment? = nil,
-    trackingTransaction: PayinTrackingTransaction? = nil,
+    trackingComplete: PayinTrackingComplete,
+    trackingPayment: PayinTrackingPayment,
+    trackingTransaction: PayinTrackingTransaction,
     trackingPartnerFee: PayinTrackingPartnerFee? = nil,
-    blindpayBankDetails: BlindPayBankDetails? = nil,
-    receiverId: String,
-    receiverAmount: Int,
-    paymentMethod: PaymentMethod,
-    billingFee: Int,
-    senderAmount: Int
+    blindpayBankDetails: BlindPayBankDetails,
+    receiverId: String? = nil,
+    receiverAmount: Int? = nil,
+    paymentMethod: PaymentMethod? = nil,
+    billingFee: Int? = nil,
+    senderAmount: Int? = nil
   ) {
     self.id = id
     self.status = status

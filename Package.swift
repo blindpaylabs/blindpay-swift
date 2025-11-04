@@ -23,7 +23,8 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "blindpay-swift"
+            name: "blindpay-swift",
+            path: "Sources/blindpay-swift"
         ),
         .executableTarget(
             name: "GetRails",
