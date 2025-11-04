@@ -25,6 +25,9 @@ public final class InstancesService: Sendable {
     /// Webhook endpoints management service
     public let webhookEndpoints: WebhookEndpointsService
     
+    /// Payins management service
+    public let payins: PayinsService
+    
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -32,6 +35,7 @@ public final class InstancesService: Sendable {
         self.partnerFees = PartnerFeesService(apiClient: apiClient, instanceId: instanceId)
         self.quotes = QuotesService(apiClient: apiClient, instanceId: instanceId)
         self.webhookEndpoints = WebhookEndpointsService(apiClient: apiClient, instanceId: instanceId)
+        self.payins = PayinsService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Retrieves all members of the instance
