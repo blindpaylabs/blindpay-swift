@@ -28,6 +28,9 @@ public final class InstancesService: Sendable {
     /// Payins management service
     public let payins: PayinsService
     
+    /// Terms of service management service
+    public let termsOfService: TermsOfServiceService
+    
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -36,6 +39,7 @@ public final class InstancesService: Sendable {
         self.quotes = QuotesService(apiClient: apiClient, instanceId: instanceId)
         self.webhookEndpoints = WebhookEndpointsService(apiClient: apiClient, instanceId: instanceId)
         self.payins = PayinsService(apiClient: apiClient, instanceId: instanceId)
+        self.termsOfService = TermsOfServiceService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Retrieves all members of the instance
