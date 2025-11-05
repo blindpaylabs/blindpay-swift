@@ -2,7 +2,7 @@
 //  PayinsService.swift
 //  blindpay-swift
 //
-//  Created by Eric Viana on 03/11/25.
+//  Created by Eric Viana on 05/11/25.
 //
 
 import Foundation
@@ -13,9 +13,13 @@ public final class PayinsService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
     
+    /// Payin quotes management service
+    public let quotes: PayinQuotesService
+    
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
+        self.quotes = PayinQuotesService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Lists all payins for the instance
