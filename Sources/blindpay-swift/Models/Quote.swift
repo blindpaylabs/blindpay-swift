@@ -28,6 +28,8 @@ public enum Network: String, Codable, Sendable {
     case stellar = "stellar"
     case stellarTestnet = "stellar_testnet"
     case tron = "tron"
+    case solana = "solana"
+    case solanaDevnet = "solana_devnet"
 }
 
 /// Stablecoin token

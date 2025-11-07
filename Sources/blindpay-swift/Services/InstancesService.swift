@@ -177,5 +177,135 @@ public final class InstancesService: Sendable {
             body: updateInput
         )
     }
+    
+    /// Creates an asset trustline for a Stellar wallet
+    ///
+    /// This method creates an asset trustline transaction that needs to be signed and submitted.
+    ///
+    /// - Parameter data: The input data containing the wallet address
+    /// - Returns: An `APIResponse` containing the XDR transaction envelope
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = CreateAssetTrustlineInput(address: "GABC...XYZ")
+    /// let response = try await blindPay.instances.createAssetTrustline(data: input)
+    /// if let result = response.data {
+    ///     print("XDR: \(result.xdr)")
+    /// }
+    /// ```
+    public func createAssetTrustline(data: CreateAssetTrustlineInput) async throws -> APIResponse<CreateAssetTrustlineResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/create-asset-trustline",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Mints USDB on Stellar
+    ///
+    /// This method mints USDB tokens on the Stellar network for the specified address.
+    ///
+    /// - Parameter data: The input data containing the address, amount, and optional signed XDR
+    /// - Returns: An `APIResponse` containing the success status
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = MintUsdbStellarInput(
+    ///     address: "GABC...XYZ",
+    ///     amount: "1000",
+    ///     signedXdr: "AAA...Zey8y0A"
+    /// )
+    /// let response = try await blindPay.instances.mintUsdbStellar(data: input)
+    /// if let result = response.data {
+    ///     print("Success: \(result.success)")
+    /// }
+    /// ```
+    public func mintUsdbStellar(data: MintUsdbStellarInput) async throws -> APIResponse<MintUsdbStellarResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/mint-usdb-stellar",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Mints USDB on Solana Devnet
+    ///
+    /// This method mints USDB tokens on the Solana Devnet for the specified address.
+    ///
+    /// - Parameter data: The input data containing the address and amount
+    /// - Returns: An `APIResponse` containing the success status, signature, and optional error
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = MintUsdbSolanaInput(
+    ///     address: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+    ///     amount: "1000"
+    /// )
+    /// let response = try await blindPay.instances.mintUsdbSolana(data: input)
+    /// if let result = response.data {
+    ///     print("Success: \(result.success)")
+    ///     if let signature = result.signature {
+    ///         print("Signature: \(signature)")
+    ///     }
+    /// }
+    /// ```
+    public func mintUsdbSolana(data: MintUsdbSolanaInput) async throws -> APIResponse<MintUsdbSolanaResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/mint-usdb-solana",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Prepares a Solana delegate transaction
+    ///
+    /// This method prepares a transaction for delegating tokens on Solana.
+    ///
+    /// - Parameter data: The input data containing the amount, owner address, and token address
+    /// - Returns: An `APIResponse` containing the success status and transaction string
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = PrepareDelegateSolanaInput(
+    ///     amount: "1000",
+    ///     ownerAddress: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+    ///     tokenAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+    /// )
+    /// let response = try await blindPay.instances.prepareDelegateSolana(data: input)
+    /// if let result = response.data {
+    ///     print("Success: \(result.success)")
+    ///     if let transaction = result.transaction {
+    ///         print("Transaction: \(transaction)")
+    ///     }
+    /// }
+    /// ```
+    public func prepareDelegateSolana(data: PrepareDelegateSolanaInput) async throws -> APIResponse<PrepareDelegateSolanaResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/prepare-delegate-solana",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Gets a receiver service for a specific receiver ID
+    ///
+    /// This method returns a service instance for managing resources associated with a specific receiver,
+    /// such as blockchain wallets.
+    ///
+    /// - Parameter receiverId: The unique identifier of the receiver
+    /// - Returns: A `ReceiversService` instance for the specified receiver
+    ///
+    /// Example:
+    /// ```swift
+    /// let receiversService = blindPay.instances.receivers(receiverId: "re_123")
+    /// let wallets = try await receiversService.blockchainWallets.list()
+    /// ```
+    public func receivers(receiverId: String) -> ReceiversService {
+        return ReceiversService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
+    }
 }
 
