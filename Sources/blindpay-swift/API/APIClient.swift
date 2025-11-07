@@ -88,14 +88,17 @@ internal final class APIClient: Sendable {
         } else {
             do {
                 let errorResponse = try decoder.decode(APIResponse<EmptyResponse>.self, from: data)
-                return APIResponse<T>(data: nil, error: errorResponse.error)
-            } catch {
-                if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let message = errorDict["message"] as? String {
-                    return APIResponse<T>(data: nil, error: APIError(message: message))
+                if let error = errorResponse.error {
+                    return APIResponse<T>(data: nil, error: error)
                 }
-                throw BlindPayError.httpError(statusCode: httpResponse.statusCode)
+            } catch {
+                throw BlindPayError.decodingError(error)
             }
+            if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let message = errorDict["message"] as? String {
+                return APIResponse<T>(data: nil, error: APIError(message: message))
+            }
+            throw BlindPayError.httpError(statusCode: httpResponse.statusCode)
         }
     }
 }

@@ -28,6 +28,9 @@ public final class InstancesService: Sendable {
     /// Payins management service
     public let payins: PayinsService
     
+    /// Payouts management service
+    public let payouts: PayoutsService
+    
     /// Terms of service management service
     public let termsOfService: TermsOfServiceService
     
@@ -39,6 +42,7 @@ public final class InstancesService: Sendable {
         self.quotes = QuotesService(apiClient: apiClient, instanceId: instanceId)
         self.webhookEndpoints = WebhookEndpointsService(apiClient: apiClient, instanceId: instanceId)
         self.payins = PayinsService(apiClient: apiClient, instanceId: instanceId)
+        self.payouts = PayoutsService(apiClient: apiClient, instanceId: instanceId)
         self.termsOfService = TermsOfServiceService(apiClient: apiClient, instanceId: instanceId)
     }
     

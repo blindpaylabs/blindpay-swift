@@ -329,6 +329,15 @@ public struct GetFxRateInput: Codable, Sendable {
         case to
         case requestAmount = "request_amount"
     }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(currencyType, forKey: .currencyType)
+        try container.encode(from, forKey: .from)
+        try container.encode(to, forKey: .to)
+        // Convert to integer smallest unit (100 = 1.00)
+        try container.encode(Int(requestAmount * 100), forKey: .requestAmount)
+    }
 }
 
 /// Response for getting FX rate
