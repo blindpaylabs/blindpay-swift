@@ -68,6 +68,14 @@ internal final class APIClient: Sendable {
         let decoder = JSONDecoder()
         
         if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
+            // Check if response is null (either as NSNull or as the string "null")
+            if data.count == 4, let dataString = String(data: data, encoding: .utf8), dataString == "null" {
+                return APIResponse<T>(data: nil, error: nil)
+            }
+            if let jsonObject = try? JSONSerialization.jsonObject(with: data), jsonObject is NSNull {
+                return APIResponse<T>(data: nil, error: nil)
+            }
+            
             do {
                 let apiResponse = try decoder.decode(APIResponse<T>.self, from: data)
                 // If APIResponse decoded but both data and error are nil,
