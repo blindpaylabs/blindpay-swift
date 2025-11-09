@@ -291,6 +291,39 @@ public final class InstancesService: Sendable {
         )
     }
     
+    /// Creates a new receiver
+    ///
+    /// This method creates a new receiver with the specified information. Receivers can be individuals or businesses,
+    /// and require various KYC information depending on the KYC type selected.
+    ///
+    /// - Parameter data: The input data containing receiver information, KYC details, and optional documents
+    /// - Returns: An `APIResponse` containing the created receiver ID
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = CreateReceiverInput(
+    ///     country: .us,
+    ///     email: "email@example.com",
+    ///     kycType: .standard,
+    ///     type: .individual,
+    ///     firstName: "John",
+    ///     lastName: "Doe",
+    ///     taxId: "536804398"
+    /// )
+    /// let response = try await blindPay.instances.createReceiver(data: input)
+    /// if let receiver = response.data {
+    ///     print("Created receiver: \(receiver.id)")
+    /// }
+    /// ```
+    public func createReceiver(data: CreateReceiverInput) async throws -> APIResponse<CreateReceiverResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/receivers",
+            method: .post,
+            body: data
+        )
+    }
+    
     /// Gets a receiver service for a specific receiver ID
     ///
     /// This method returns a service instance for managing resources associated with a specific receiver,
