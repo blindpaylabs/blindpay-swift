@@ -452,6 +452,86 @@ public final class InstancesService: Sendable {
         )
     }
     
+    /// Gets receiver limits
+    ///
+    /// This method retrieves the current payin and payout limits for a receiver.
+    ///
+    /// - Parameter id: The unique identifier of the receiver
+    /// - Returns: An `APIResponse` containing the receiver limits
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.instances.getReceiverLimits(id: "re_123456789012345")
+    /// if let limits = response.data {
+    ///     print("Payin daily: \(limits.limits.payin.daily)")
+    ///     print("Payout monthly: \(limits.limits.payout.monthly)")
+    /// }
+    /// ```
+    public func getReceiverLimits(id: String) async throws -> APIResponse<ReceiverLimitsResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/limits/receivers/\(id)",
+            method: .get
+        )
+    }
+    
+    /// Requests a limit increase for a receiver
+    ///
+    /// This method submits a request to increase the transaction limits for a receiver.
+    /// A supporting document is required.
+    ///
+    /// - Parameters:
+    ///   - receiverId: The unique identifier of the receiver
+    ///   - data: The input data containing the requested limits and supporting document
+    /// - Returns: An `APIResponse` containing the limit increase request ID
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = RequestLimitIncreaseInput(
+    ///     perTransaction: 100000,
+    ///     daily: 200000,
+    ///     monthly: 1000000,
+    ///     supportingDocumentType: .individualBankStatement,
+    ///     supportingDocumentFile: "https://example.com/document.pdf"
+    /// )
+    /// let response = try await blindPay.instances.requestLimitIncrease(receiverId: "re_123", data: input)
+    /// if let result = response.data {
+    ///     print("Request ID: \(result.id)")
+    /// }
+    /// ```
+    public func requestLimitIncrease(receiverId: String, data: RequestLimitIncreaseInput) async throws -> APIResponse<RequestLimitIncreaseResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Lists limit increase requests for a receiver
+    ///
+    /// This method retrieves all limit increase requests for a specific receiver.
+    ///
+    /// - Parameter receiverId: The unique identifier of the receiver
+    /// - Returns: An `APIResponse` containing an array of limit increase requests
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.instances.listLimitIncreaseRequests(receiverId: "re_123456789012345")
+    /// if let requests = response.data {
+    ///     for request in requests {
+    ///         print("Request \(request.id): \(request.status.rawValue)")
+    ///     }
+    /// }
+    /// ```
+    public func listLimitIncreaseRequests(receiverId: String) async throws -> APIResponse<[LimitIncreaseRequest]> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
+            method: .get
+        )
+    }
+    
     /// Gets a receiver service for a specific receiver ID
     ///
     /// This method returns a service instance for managing resources associated with a specific receiver,
