@@ -20,12 +20,16 @@ public final class ReceiversService: Sendable {
     /// Virtual accounts management service
     public let virtualAccounts: VirtualAccountsService
     
+    /// Bank accounts management service
+    public let bankAccounts: BankAccountsService
+    
     init(apiClient: APIClient, instanceId: String, receiverId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
         self.receiverId = receiverId
         self.blockchainWallets = BlockchainWalletsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
         self.virtualAccounts = VirtualAccountsService(apiClient: apiClient, instanceId: instanceId)
+        self.bankAccounts = BankAccountsService(apiClient: apiClient, instanceId: instanceId)
     }
 }
 
