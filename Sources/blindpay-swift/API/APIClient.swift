@@ -23,10 +23,8 @@ internal final class APIClient: Sendable {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.httpAdditionalHeaders = [
             "Content-Type": "application/json",
-            "User-Agent": "BlindPay-Swift-SDK/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
+            "User-Agent": "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
             "Authorization": "Bearer \(apiKey)",
-            "X-API-Key": apiKey,
-            "X-Instance-Id": instanceId
         ]
         
         self.session = URLSession(configuration: sessionConfiguration)
