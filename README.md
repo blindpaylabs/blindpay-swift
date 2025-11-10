@@ -4,7 +4,7 @@
 [![twitter](https://img.shields.io/twitter/follow/blindpaylabs?style=social)](https://twitter.com/intent/follow?screen_name=blindpaylabs)
 [![Version](https://img.shields.io/github/v/release/blindpaylabs/blindpay-swift?include_prereleases)](https://github.com/blindpaylabs/blindpay-swift/releases)
 
-The official Swift SDK for [Blindpay](https://blindpay.com) - Global payments infrastructure made simple.
+The official Swift SDK for [BlindPay](https://blindpay.com) - Global payments infrastructure made simple.
 
 ## Installation
 
@@ -26,7 +26,7 @@ Or add it via Xcode:
 
 ## Authentication
 
-To get started, you will need both your API key and your instance ID, you can obtain your API key and instance ID from the Blindpay dashboard [https://app.blindpay.com/instances/<instance_id>/api-keys](https://app.blindpay.com/instances/<instance_id>/api-keys)
+To get started, you will need both your API key and your instance ID, you can obtain your API key and instance ID from the BlindPay dashboard [https://app.blindpay.com/instances/<instance_id>/api-keys](https://app.blindpay.com/instances/<instance_id>/api-keys)
 
 ```swift
 import blindpay_swift
@@ -114,7 +114,7 @@ do {
 
 For detailed API documentation, visit:
 
-- [Blindpay API documentation](https://blindpay.com/docs/getting-started/overview)
+- [BlindPay API documentation](https://blindpay.com/docs/getting-started/overview)
 - [API Reference](https://api.blindpay.com/reference)
 
 ## Support
@@ -126,4 +126,4 @@ For detailed API documentation, visit:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Made with ❤️ by the [Blindpay](https://blindpay.com) team
+Made with ❤️ by the [BlindPay](https://blindpay.com) team
