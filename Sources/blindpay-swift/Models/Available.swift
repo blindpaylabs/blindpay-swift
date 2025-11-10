@@ -14,6 +14,7 @@ public enum Rail: String, Codable, Sendable {
     case wire = "wire"
     case ach = "ach"
     case pix = "pix"
+    case pixSafe = "pix_safe"
     case speiBitso = "spei_bitso"
     case transfersBitso = "transfers_bitso"
     case achCopBitso = "ach_cop_bitso"

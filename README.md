@@ -48,7 +48,7 @@ func getAvailableRails() async {
     )
 
     do {
-        let response = try await blindpay.available.getRails()
+        let response = try await blindpay.getRails()
 
         if let error = response.error {
             throw NSError(domain: "BlindPay", code: -1, userInfo: [NSLocalizedDescriptionKey: error.message])
@@ -93,7 +93,7 @@ This SDK uses a consistent error handling pattern. Always check for errors:
 
 ```swift
 do {
-    let response = try await blindpay.available.getRails()
+    let response = try await blindpay.getRails()
 
     if let error = response.error {
         print("API Error: \(error.message)")

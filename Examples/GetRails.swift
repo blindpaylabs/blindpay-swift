@@ -30,7 +30,7 @@ struct GetRails {
         print("🔍 Testing getRails endpoint...\n")
         
         do {
-            let response = try await client.available.getRails()
+            let response = try await client.getRails()
             
             if let error = response.error {
                 print("❌ Error: \(error.message)")
