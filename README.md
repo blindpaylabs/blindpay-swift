@@ -29,7 +29,7 @@ Or add it via Xcode:
 To get started, you will need both your API key and your instance ID, you can obtain your API key and instance ID from the BlindPay dashboard [https://app.blindpay.com/instances/<instance_id>/api-keys](https://app.blindpay.com/instances/<instance_id>/api-keys)
 
 ```swift
-import blindpay_swift
+import BlindPay
 
 let blindpay = BlindPay(
     apiKey: "your-api-key-here",

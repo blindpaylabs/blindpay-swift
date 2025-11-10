@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import blindpay_swift
+@testable import BlindPay
 
 struct ConfigurationTests {
     @Test func defaultConfiguration() {

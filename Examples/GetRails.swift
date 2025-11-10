@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import blindpay_swift
+import BlindPay
 
 @main
 struct GetRails {

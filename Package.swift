@@ -13,8 +13,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "blindpay-swift",
-            targets: ["blindpay-swift"]
+            name: "BlindPay",
+            targets: ["BlindPay"]
         ),
         .executable(
             name: "GetRails",
@@ -23,18 +23,18 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "blindpay-swift",
-            path: "Sources/blindpay-swift"
+            name: "BlindPay",
+            path: "Sources/BlindPay"
         ),
         .executableTarget(
             name: "GetRails",
-            dependencies: ["blindpay-swift"],
+            dependencies: ["BlindPay"],
             path: "Examples",
             sources: ["GetRails.swift"]
         ),
         .testTarget(
             name: "blindpay-swiftTests",
-            dependencies: ["blindpay-swift"]
+            dependencies: ["BlindPay"]
         ),
     ]
 )
