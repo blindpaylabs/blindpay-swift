@@ -13,6 +13,12 @@ public final class BlindPay: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
     
+    /// Available service for querying payment rails and bank details
+    public let available: AvailableService
+    
+    /// Instances service for managing instance members and settings
+    public let instances: InstancesService
+    
     /// Initialize the BlindPay client
     /// - Parameters:
     ///   - apiKey: Your BlindPay API key
@@ -21,6 +27,8 @@ public final class BlindPay: Sendable {
     public init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
         self.instanceId = instanceId
         self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration)
+        self.available = AvailableService(apiClient: apiClient)
+        self.instances = InstancesService(apiClient: apiClient, instanceId: instanceId)
     }
     
     // MARK: - Available Service Methods
