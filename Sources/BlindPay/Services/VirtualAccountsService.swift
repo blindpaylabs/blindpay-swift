@@ -74,35 +74,6 @@ public final class VirtualAccountsService: Sendable {
         )
     }
     
-    /// Retrieves the virtual account for a receiver
-    ///
-    /// - Deprecated: This method is deprecated. Use `list(receiverId:)` to get all virtual accounts or `get(receiverId:id:)` to get a specific one by ID.
-    ///
-    /// This method fetches the virtual account associated with the specified receiver.
-    /// For backward compatibility, this calls `list()` and returns the first virtual account.
-    ///
-    /// - Parameter receiverId: The unique identifier of the receiver
-    /// - Returns: An `APIResponse` containing the virtual account
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").virtualAccounts.get(receiverId: "re_123")
-    /// if let virtualAccount = response.data {
-    ///     print("Virtual Account ID: \(virtualAccount.id)")
-    ///     print("Token: \(virtualAccount.token.rawValue)")
-    ///     print("ACH Account: \(virtualAccount.us.ach.accountNumber)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "Use list(receiverId:) to get all virtual accounts or get(receiverId:id:) to get a specific one by ID")
-    public func get(receiverId: String) async throws -> APIResponse<VirtualAccountResponse> {
-        let listResponse = try await list(receiverId: receiverId)
-        if let accounts = listResponse.data, let firstAccount = accounts.first {
-            return APIResponse<VirtualAccountResponse>(data: firstAccount, error: nil)
-        }
-        return APIResponse<VirtualAccountResponse>(data: nil, error: nil)
-    }
-    
     /// Creates a new virtual account for a receiver
     ///
     /// This method creates a new virtual account with the specified banking partner, blockchain wallet, and token.
