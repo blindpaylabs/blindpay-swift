@@ -28,7 +28,7 @@ public final class ReceiversService: Sendable {
         self.instanceId = instanceId
         self.receiverId = receiverId
         self.blockchainWallets = BlockchainWalletsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
-        self.virtualAccounts = VirtualAccountsService(apiClient: apiClient, instanceId: instanceId)
+        self.virtualAccounts = VirtualAccountsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
         self.bankAccounts = BankAccountsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
     }
 }

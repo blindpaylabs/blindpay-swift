@@ -13,6 +13,12 @@ public final class BlindPay: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
     
+    /// Available service for querying payment rails and bank details
+    public let available: AvailableService
+    
+    /// Instances service for managing instance members and settings
+    public let instances: InstancesService
+    
     /// Initialize the BlindPay client
     /// - Parameters:
     ///   - apiKey: Your BlindPay API key
@@ -21,6 +27,8 @@ public final class BlindPay: Sendable {
     public init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
         self.instanceId = instanceId
         self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration)
+        self.available = AvailableService(apiClient: apiClient)
+        self.instances = InstancesService(apiClient: apiClient, instanceId: instanceId)
     }
     
     // MARK: - Available Service Methods
@@ -1381,6 +1389,36 @@ public final class BlindPay: Sendable {
         )
     }
     
+    /// Creates a new payout on Solana
+    ///
+    /// This method creates a new payout transaction on the Solana blockchain
+    /// using a previously created quote.
+    ///
+    /// - Parameter data: The input data containing the quote ID, sender wallet address, and optional signed transaction
+    /// - Returns: An `APIResponse` containing the created payout details
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = CreatePayoutSolanaInput(
+    ///     quoteId: "qu_123",
+    ///     senderWalletAddress: "0x123...890",
+    ///     signedTransaction: "AAA...Zey8y0A"
+    /// )
+    /// let response = try await blindPay.createPayoutSolana(data: input)
+    /// if let payout = response.data {
+    ///     print("Created payout: \(payout.id)")
+    ///     print("Status: \(payout.status.rawValue)")
+    /// }
+    /// ```
+    public func createPayoutSolana(data: CreatePayoutSolanaInput) async throws -> APIResponse<CreatePayoutResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/solana",
+            method: .post,
+            body: data
+        )
+    }
+    
     /// Authorizes a token on Stellar wallet
     ///
     /// This method authorizes a token on a Stellar wallet before creating a payout.
@@ -1403,6 +1441,33 @@ public final class BlindPay: Sendable {
     public func authorizeStellar(data: AuthorizeStellarInput) async throws -> APIResponse<AuthorizeStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar/authorize",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Authorizes a token on Solana wallet
+    ///
+    /// This method prepares a delegation transaction for a Solana wallet before creating a payout.
+    ///
+    /// - Parameter data: The input data containing the quote ID and sender wallet address
+    /// - Returns: An `APIResponse` containing the serialized transaction
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = AuthorizeSolanaInput(
+    ///     quoteId: "qu_123",
+    ///     senderWalletAddress: "0x123...890"
+    /// )
+    /// let response = try await blindPay.authorizeSolana(data: input)
+    /// if let result = response.data {
+    ///     print("Serialized transaction: \(result.serializedTransaction)")
+    /// }
+    /// ```
+    public func authorizeSolana(data: AuthorizeSolanaInput) async throws -> APIResponse<AuthorizeSolanaResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/solana/authorize",
             method: .post,
             body: data
         )

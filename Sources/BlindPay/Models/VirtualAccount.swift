@@ -7,6 +7,30 @@
 
 import Foundation
 
+// MARK: - Banking Partner
+
+/// Banking partner for virtual accounts
+public enum BankingPartner: String, Codable, Sendable {
+    case jpmorgan = "jpmorgan"
+    case citi = "citi"
+}
+
+// MARK: - Blockchain Wallet Reference
+
+/// Blockchain wallet reference embedded in virtual account responses
+public struct BlockchainWalletRef: Codable, Sendable, Equatable {
+    /// Blockchain network
+    public let network: Network
+    
+    /// Wallet address
+    public let address: String
+    
+    public init(network: Network, address: String) {
+        self.network = network
+        self.address = address
+    }
+}
+
 // MARK: - Virtual Account Account Type
 
 /// Represents the account type for a virtual account
@@ -196,32 +220,50 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
     /// Unique identifier for the virtual account
     public let id: String
     
-    /// Token (USDC, USDT, or USDB)
-    public let token: StablecoinToken
+    /// Banking partner
+    public let bankingPartner: BankingPartner
+    
+    /// KYC status (optional)
+    public let kycStatus: KYCStatus?
     
     /// US account details
     public let us: VirtualAccountUS
     
+    /// Token (USDC, USDT, or USDB)
+    public let token: StablecoinToken
+    
     /// Blockchain wallet ID (optional)
     public let blockchainWalletId: String?
     
+    /// Blockchain wallet reference (optional)
+    public let blockchainWallet: BlockchainWalletRef?
+    
     public init(
         id: String,
-        token: StablecoinToken,
+        bankingPartner: BankingPartner,
+        kycStatus: KYCStatus? = nil,
         us: VirtualAccountUS,
-        blockchainWalletId: String? = nil
+        token: StablecoinToken,
+        blockchainWalletId: String? = nil,
+        blockchainWallet: BlockchainWalletRef? = nil
     ) {
         self.id = id
-        self.token = token
+        self.bankingPartner = bankingPartner
+        self.kycStatus = kycStatus
         self.us = us
+        self.token = token
         self.blockchainWalletId = blockchainWalletId
+        self.blockchainWallet = blockchainWallet
     }
     
     enum CodingKeys: String, CodingKey {
         case id
-        case token
+        case bankingPartner = "banking_partner"
+        case kycStatus = "kyc_status"
         case us
+        case token
         case blockchainWalletId = "blockchain_wallet_id"
+        case blockchainWallet = "blockchain_wallet"
     }
 }
 
@@ -229,6 +271,9 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
 
 /// Response type for getting a virtual account
 public typealias VirtualAccountResponse = VirtualAccount
+
+/// Response type for listing virtual accounts
+public typealias VirtualAccountsResponse = [VirtualAccount]
 
 /// Response type for creating a virtual account
 public typealias CreateVirtualAccountResponse = VirtualAccount
@@ -247,20 +292,25 @@ public struct UpdateVirtualAccountResponse: Codable, Sendable, Equatable {
 
 /// Input for creating a virtual account
 public struct CreateVirtualAccountInput: Codable, Sendable {
-    /// Blockchain wallet ID
-    public let blockchainWalletId: String
+    /// Banking partner
+    public let bankingPartner: BankingPartner
     
     /// Token (USDC, USDT, or USDB)
     public let token: StablecoinToken
     
-    public init(blockchainWalletId: String, token: StablecoinToken) {
-        self.blockchainWalletId = blockchainWalletId
+    /// Blockchain wallet ID
+    public let blockchainWalletId: String
+    
+    public init(bankingPartner: BankingPartner, token: StablecoinToken, blockchainWalletId: String) {
+        self.bankingPartner = bankingPartner
         self.token = token
+        self.blockchainWalletId = blockchainWalletId
     }
     
     enum CodingKeys: String, CodingKey {
-        case blockchainWalletId = "blockchain_wallet_id"
+        case bankingPartner = "banking_partner"
         case token
+        case blockchainWalletId = "blockchain_wallet_id"
     }
 }
 

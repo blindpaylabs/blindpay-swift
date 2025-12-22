@@ -856,6 +856,20 @@ public struct AuthorizeStellarResponse: Codable, Sendable {
   }
 }
 
+/// Response for authorizing Solana token
+public struct AuthorizeSolanaResponse: Codable, Sendable {
+  /// Serialized transaction
+  public let serializedTransaction: String
+
+  public init(serializedTransaction: String) {
+    self.serializedTransaction = serializedTransaction
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case serializedTransaction = "serialized_transaction"
+  }
+}
+
 // MARK: - Input Types
 
 /// Input parameters for listing payouts
@@ -971,8 +985,51 @@ public struct CreatePayoutStellarInput: Codable, Sendable {
   }
 }
 
+/// Input for creating a payout on Solana
+public struct CreatePayoutSolanaInput: Codable, Sendable {
+  /// Quote ID
+  public let quoteId: String
+
+  /// Sender wallet address
+  public let senderWalletAddress: String
+
+  /// Signed transaction (optional)
+  public let signedTransaction: String?
+
+  public init(quoteId: String, senderWalletAddress: String, signedTransaction: String? = nil) {
+    self.quoteId = quoteId
+    self.senderWalletAddress = senderWalletAddress
+    self.signedTransaction = signedTransaction
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case quoteId = "quote_id"
+    case senderWalletAddress = "sender_wallet_address"
+    case signedTransaction = "signed_transaction"
+  }
+}
+
 /// Input for authorizing Stellar token
 public struct AuthorizeStellarInput: Codable, Sendable {
+  /// Quote ID
+  public let quoteId: String
+
+  /// Sender wallet address
+  public let senderWalletAddress: String
+
+  public init(quoteId: String, senderWalletAddress: String) {
+    self.quoteId = quoteId
+    self.senderWalletAddress = senderWalletAddress
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case quoteId = "quote_id"
+    case senderWalletAddress = "sender_wallet_address"
+  }
+}
+
+/// Input for authorizing Solana token
+public struct AuthorizeSolanaInput: Codable, Sendable {
   /// Quote ID
   public let quoteId: String
 

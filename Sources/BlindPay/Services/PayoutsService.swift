@@ -154,6 +154,36 @@ public final class PayoutsService: Sendable {
         )
     }
     
+    /// Creates a new payout on Solana
+    ///
+    /// This method creates a new payout transaction on the Solana blockchain
+    /// using a previously created quote.
+    ///
+    /// - Parameter data: The input data containing the quote ID, sender wallet address, and optional signed transaction
+    /// - Returns: An `APIResponse` containing the created payout details
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = CreatePayoutSolanaInput(
+    ///     quoteId: "qu_123",
+    ///     senderWalletAddress: "0x123...890",
+    ///     signedTransaction: "AAA...Zey8y0A"
+    /// )
+    /// let response = try await blindPay.instances.payouts.createSolana(data: input)
+    /// if let payout = response.data {
+    ///     print("Created payout: \(payout.id)")
+    ///     print("Status: \(payout.status.rawValue)")
+    /// }
+    /// ```
+    public func createSolana(data: CreatePayoutSolanaInput) async throws -> APIResponse<CreatePayoutResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/solana",
+            method: .post,
+            body: data
+        )
+    }
+    
     /// Authorizes a token on Stellar wallet
     ///
     /// This method authorizes a token on a Stellar wallet before creating a payout.
@@ -176,6 +206,33 @@ public final class PayoutsService: Sendable {
     public func authorizeStellar(data: AuthorizeStellarInput) async throws -> APIResponse<AuthorizeStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar/authorize",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Authorizes a token on Solana wallet
+    ///
+    /// This method prepares a delegation transaction for a Solana wallet before creating a payout.
+    ///
+    /// - Parameter data: The input data containing the quote ID and sender wallet address
+    /// - Returns: An `APIResponse` containing the serialized transaction
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = AuthorizeSolanaInput(
+    ///     quoteId: "qu_123",
+    ///     senderWalletAddress: "0x123...890"
+    /// )
+    /// let response = try await blindPay.instances.payouts.authorizeSolana(data: input)
+    /// if let result = response.data {
+    ///     print("Serialized transaction: \(result.serializedTransaction)")
+    /// }
+    /// ```
+    public func authorizeSolana(data: AuthorizeSolanaInput) async throws -> APIResponse<AuthorizeSolanaResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/solana/authorize",
             method: .post,
             body: data
         )
