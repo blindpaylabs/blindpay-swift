@@ -4,7 +4,7 @@
 [![twitter](https://img.shields.io/twitter/follow/blindpaylabs?style=social)](https://twitter.com/intent/follow?screen_name=blindpaylabs)
 [![Version](https://img.shields.io/github/v/release/blindpaylabs/blindpay-swift?include_prereleases)](https://github.com/blindpaylabs/blindpay-swift/releases)
 
-The official Swift SDK for [BlindPay](https://blindpay.com) - Global payments infrastructure made simple.
+The official Swift SDK for [BlindPay](https://blindpay.com) - Stablecoin API for global payments.
 
 ## Installation
 
