@@ -13,6 +13,7 @@ import Foundation
 public enum BankingPartner: String, Codable, Sendable {
     case jpmorgan = "jpmorgan"
     case citi = "citi"
+    case hsbc = "hsbc"
 }
 
 // MARK: - Blockchain Wallet Reference
@@ -294,23 +295,28 @@ public struct UpdateVirtualAccountResponse: Codable, Sendable, Equatable {
 public struct CreateVirtualAccountInput: Codable, Sendable {
     /// Banking partner
     public let bankingPartner: BankingPartner
-    
+
     /// Token (USDC, USDT, or USDB)
     public let token: StablecoinToken
-    
+
     /// Blockchain wallet ID
     public let blockchainWalletId: String
-    
-    public init(bankingPartner: BankingPartner, token: StablecoinToken, blockchainWalletId: String) {
+
+    /// Signed agreement ID (optional)
+    public let signedAgreementId: String?
+
+    public init(bankingPartner: BankingPartner, token: StablecoinToken, blockchainWalletId: String, signedAgreementId: String? = nil) {
         self.bankingPartner = bankingPartner
         self.token = token
         self.blockchainWalletId = blockchainWalletId
+        self.signedAgreementId = signedAgreementId
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case bankingPartner = "banking_partner"
         case token
         case blockchainWalletId = "blockchain_wallet_id"
+        case signedAgreementId = "signed_agreement_id"
     }
 }
 

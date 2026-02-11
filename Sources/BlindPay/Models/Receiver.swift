@@ -75,6 +75,7 @@ public enum PurposeOfTransactions: String, Codable, Sendable {
     case personalOrLivingExpenses = "personal_or_living_expenses"
     case personalTransactions = "personal_transactions"
     case investment = "investment"
+    case receiveSalary = "receive_salary"
     case other = "other"
 }
 
@@ -85,6 +86,110 @@ public enum OwnerRole: String, Codable, Sendable {
     case beneficialOwner = "beneficial_owner"
     case authorizedSigner = "authorized_signer"
     case other = "other"
+}
+
+// MARK: - Account Purpose
+
+/// Account purpose
+public enum AccountPurpose: String, Codable, Sendable {
+    case charitableDonations = "charitable_donations"
+    case ecommerceRetailPayments = "ecommerce_retail_payments"
+    case investmentPurposes = "investment_purposes"
+    case businessExpenses = "business_expenses"
+    case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
+    case personalOrLivingExpenses = "personal_or_living_expenses"
+    case protectWealth = "protect_wealth"
+    case purchaseGoodsAndServices = "purchase_goods_and_services"
+    case receivePaymentsForGoodsAndServices = "receive_payments_for_goods_and_services"
+    case taxOptimization = "tax_optimization"
+    case thirdPartyMoneyTransmission = "third_party_money_transmission"
+    case other = "other"
+    case payroll = "payroll"
+    case treasuryManagement = "treasury_management"
+}
+
+// MARK: - Business Type
+
+/// Legal structure of a business
+public enum ReceiverBusinessType: String, Codable, Sendable {
+    case corporation = "corporation"
+    case llc = "llc"
+    case partnership = "partnership"
+    case soleProprietorship = "sole_proprietorship"
+    case trust = "trust"
+    case nonProfit = "non_profit"
+}
+
+// MARK: - Business Industry
+
+/// NAICS industry code
+public enum BusinessIndustry: String, Codable, Sendable {
+    case naics541511 = "541511"
+    case naics541512 = "541512"
+    case naics541519 = "541519"
+    case naics518210 = "518210"
+    case naics511210 = "511210"
+    case naics541611 = "541611"
+    case naics541618 = "541618"
+    case naics541330 = "541330"
+    case naics541990 = "541990"
+    case naics522110 = "522110"
+    case naics523110 = "523110"
+    case naics523920 = "523920"
+    case naics423430 = "423430"
+    case naics423690 = "423690"
+    case naics423110 = "423110"
+    case naics423830 = "423830"
+    case naics423840 = "423840"
+    case naics423510 = "423510"
+    case naics424210 = "424210"
+    case naics424690 = "424690"
+    case naics424990 = "424990"
+    case naics454110 = "454110"
+    case naics334111 = "334111"
+    case naics334118 = "334118"
+    case naics325412 = "325412"
+    case naics339112 = "339112"
+    case naics336111 = "336111"
+    case naics336390 = "336390"
+    case naics551112 = "551112"
+    case naics561499 = "561499"
+    case naics488510 = "488510"
+    case naics484121 = "484121"
+    case naics493110 = "493110"
+    case naics424410 = "424410"
+    case naics424480 = "424480"
+    case naics315990 = "315990"
+    case naics313110 = "313110"
+    case naics213112 = "213112"
+    case naics517110 = "517110"
+    case naics541214 = "541214"
+}
+
+// MARK: - Estimated Annual Revenue
+
+/// Estimated annual revenue range
+public enum EstimatedAnnualRevenue: String, Codable, Sendable {
+    case range0to99999 = "0_99999"
+    case range100000to999999 = "100000_999999"
+    case range1000000to9999999 = "1000000_9999999"
+    case range10000000to49999999 = "10000000_49999999"
+    case range50000000to249999999 = "50000000_249999999"
+    case range2500000000Plus = "2500000000_plus"
+}
+
+// MARK: - Source of Wealth
+
+/// Source of wealth
+public enum SourceOfWealth: String, Codable, Sendable {
+    case businessDividendsOrProfits = "business_dividends_or_profits"
+    case investments = "investments"
+    case assetSales = "asset_sales"
+    case clientInvestorContributions = "client_investor_contributions"
+    case gambling = "gambling"
+    case charitableContributions = "charitable_contributions"
+    case inheritance = "inheritance"
+    case affiliateOrRoyaltyIncome = "affiliate_or_royalty_income"
 }
 
 // MARK: - Owner
@@ -138,7 +243,19 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
     
     /// ID document back file URL (optional)
     public let idDocBackFile: String?
-    
+
+    /// Proof of address document type (optional)
+    public let proofOfAddressDocType: ProofOfAddressDocType?
+
+    /// Proof of address document file URL (optional)
+    public let proofOfAddressDocFile: String?
+
+    /// Ownership percentage (optional)
+    public let ownershipPercentage: Double?
+
+    /// Title (optional)
+    public let title: String?
+
     public init(
         id: String? = nil,
         firstName: String,
@@ -155,7 +272,11 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
         idDocCountry: Country,
         idDocType: IDDocType,
         idDocFrontFile: String,
-        idDocBackFile: String? = nil
+        idDocBackFile: String? = nil,
+        proofOfAddressDocType: ProofOfAddressDocType? = nil,
+        proofOfAddressDocFile: String? = nil,
+        ownershipPercentage: Double? = nil,
+        title: String? = nil
     ) {
         self.id = id
         self.firstName = firstName
@@ -173,8 +294,12 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
         self.idDocType = idDocType
         self.idDocFrontFile = idDocFrontFile
         self.idDocBackFile = idDocBackFile
+        self.proofOfAddressDocType = proofOfAddressDocType
+        self.proofOfAddressDocFile = proofOfAddressDocFile
+        self.ownershipPercentage = ownershipPercentage
+        self.title = title
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case firstName = "first_name"
@@ -192,6 +317,10 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
         case idDocType = "id_doc_type"
         case idDocFrontFile = "id_doc_front_file"
         case idDocBackFile = "id_doc_back_file"
+        case proofOfAddressDocType = "proof_of_address_doc_type"
+        case proofOfAddressDocFile = "proof_of_address_doc_file"
+        case ownershipPercentage = "ownership_percentage"
+        case title
     }
 }
 
@@ -309,7 +438,28 @@ public struct CreateReceiverInput: Codable, Sendable {
     
     /// Terms of service ID (optional)
     public let tosId: String?
-    
+
+    /// Account purpose (optional)
+    public let accountPurpose: AccountPurpose?
+
+    /// Business description (optional)
+    public let businessDescription: String?
+
+    /// Business industry (optional)
+    public let businessIndustry: BusinessIndustry?
+
+    /// Business type (optional)
+    public let businessType: ReceiverBusinessType?
+
+    /// Estimated annual revenue (optional)
+    public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
+
+    /// Publicly traded (optional)
+    public let publiclyTraded: Bool?
+
+    /// Source of wealth (optional)
+    public let sourceOfWealth: SourceOfWealth?
+
     public init(
         country: Country,
         email: String,
@@ -347,7 +497,14 @@ public struct CreateReceiverInput: Codable, Sendable {
         purposeOfTransactions: PurposeOfTransactions? = nil,
         purposeOfTransactionsExplanation: String? = nil,
         isFbo: Bool? = nil,
-        tosId: String? = nil
+        tosId: String? = nil,
+        accountPurpose: AccountPurpose? = nil,
+        businessDescription: String? = nil,
+        businessIndustry: BusinessIndustry? = nil,
+        businessType: ReceiverBusinessType? = nil,
+        estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
+        publiclyTraded: Bool? = nil,
+        sourceOfWealth: SourceOfWealth? = nil
     ) {
         self.country = country
         self.email = email
@@ -386,8 +543,15 @@ public struct CreateReceiverInput: Codable, Sendable {
         self.purposeOfTransactionsExplanation = purposeOfTransactionsExplanation
         self.isFbo = isFbo
         self.tosId = tosId
+        self.accountPurpose = accountPurpose
+        self.businessDescription = businessDescription
+        self.businessIndustry = businessIndustry
+        self.businessType = businessType
+        self.estimatedAnnualRevenue = estimatedAnnualRevenue
+        self.publiclyTraded = publiclyTraded
+        self.sourceOfWealth = sourceOfWealth
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case country
         case email
@@ -426,6 +590,13 @@ public struct CreateReceiverInput: Codable, Sendable {
         case purposeOfTransactionsExplanation = "purpose_of_transactions_explanation"
         case isFbo = "is_fbo"
         case tosId = "tos_id"
+        case accountPurpose = "account_purpose"
+        case businessDescription = "business_description"
+        case businessIndustry = "business_industry"
+        case businessType = "business_type"
+        case estimatedAnnualRevenue = "estimated_annual_revenue"
+        case publiclyTraded = "publicly_traded"
+        case sourceOfWealth = "source_of_wealth"
     }
 }
 
@@ -664,7 +835,28 @@ public struct Receiver: Codable, Sendable, Equatable {
     
     /// Whether TOS is accepted
     public let isTosAccepted: Bool?
-    
+
+    /// Account purpose
+    public let accountPurpose: AccountPurpose?
+
+    /// Business description
+    public let businessDescription: String?
+
+    /// Business industry
+    public let businessIndustry: BusinessIndustry?
+
+    /// Business type
+    public let businessType: ReceiverBusinessType?
+
+    /// Estimated annual revenue
+    public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
+
+    /// Publicly traded
+    public let publiclyTraded: Bool?
+
+    /// Source of wealth
+    public let sourceOfWealth: SourceOfWealth?
+
     public init(
         id: String,
         type: ReceiverType,
@@ -712,7 +904,14 @@ public struct Receiver: Codable, Sendable, Equatable {
         createdAt: String,
         updatedAt: String,
         limit: ReceiverLimits? = nil,
-        isTosAccepted: Bool? = nil
+        isTosAccepted: Bool? = nil,
+        accountPurpose: AccountPurpose? = nil,
+        businessDescription: String? = nil,
+        businessIndustry: BusinessIndustry? = nil,
+        businessType: ReceiverBusinessType? = nil,
+        estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
+        publiclyTraded: Bool? = nil,
+        sourceOfWealth: SourceOfWealth? = nil
     ) {
         self.id = id
         self.type = type
@@ -761,8 +960,15 @@ public struct Receiver: Codable, Sendable, Equatable {
         self.updatedAt = updatedAt
         self.limit = limit
         self.isTosAccepted = isTosAccepted
+        self.accountPurpose = accountPurpose
+        self.businessDescription = businessDescription
+        self.businessIndustry = businessIndustry
+        self.businessType = businessType
+        self.estimatedAnnualRevenue = estimatedAnnualRevenue
+        self.publiclyTraded = publiclyTraded
+        self.sourceOfWealth = sourceOfWealth
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case type
@@ -811,6 +1017,13 @@ public struct Receiver: Codable, Sendable, Equatable {
         case updatedAt = "updated_at"
         case limit
         case isTosAccepted = "is_tos_accepted"
+        case accountPurpose = "account_purpose"
+        case businessDescription = "business_description"
+        case businessIndustry = "business_industry"
+        case businessType = "business_type"
+        case estimatedAnnualRevenue = "estimated_annual_revenue"
+        case publiclyTraded = "publicly_traded"
+        case sourceOfWealth = "source_of_wealth"
     }
 }
 
@@ -818,11 +1031,11 @@ public struct Receiver: Codable, Sendable, Equatable {
 
 /// Input for updating a receiver
 public struct UpdateReceiverInput: Codable, Sendable {
-    /// Country code
-    public let country: Country
-    
-    /// Email address
-    public let email: String
+    /// Country code (optional)
+    public let country: Country?
+
+    /// Email address (optional)
+    public let email: String?
     
     /// Address line 1 (optional)
     public let addressLine1: String?
@@ -868,10 +1081,7 @@ public struct UpdateReceiverInput: Codable, Sendable {
     
     /// IP address (optional)
     public let ipAddress: String?
-    
-    /// Whether this is an FBO account (optional)
-    public let isFbo: Bool?
-    
+
     /// Last name (optional)
     public let lastName: String?
     
@@ -922,10 +1132,31 @@ public struct UpdateReceiverInput: Codable, Sendable {
     
     /// Website (optional)
     public let website: String?
-    
+
+    /// Account purpose (optional)
+    public let accountPurpose: AccountPurpose?
+
+    /// Business description (optional)
+    public let businessDescription: String?
+
+    /// Business industry (optional)
+    public let businessIndustry: BusinessIndustry?
+
+    /// Business type (optional)
+    public let businessType: ReceiverBusinessType?
+
+    /// Estimated annual revenue (optional)
+    public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
+
+    /// Publicly traded (optional)
+    public let publiclyTraded: Bool?
+
+    /// Source of wealth (optional)
+    public let sourceOfWealth: SourceOfWealth?
+
     public init(
-        country: Country,
-        email: String,
+        country: Country? = nil,
+        email: String? = nil,
         addressLine1: String? = nil,
         addressLine2: String? = nil,
         alternateName: String? = nil,
@@ -941,7 +1172,6 @@ public struct UpdateReceiverInput: Codable, Sendable {
         imageUrl: String? = nil,
         incorporationDocFile: String? = nil,
         ipAddress: String? = nil,
-        isFbo: Bool? = nil,
         lastName: String? = nil,
         legalName: String? = nil,
         owners: [ReceiverOwner]? = nil,
@@ -958,7 +1188,14 @@ public struct UpdateReceiverInput: Codable, Sendable {
         stateProvinceRegion: String? = nil,
         taxId: String? = nil,
         tosId: String? = nil,
-        website: String? = nil
+        website: String? = nil,
+        accountPurpose: AccountPurpose? = nil,
+        businessDescription: String? = nil,
+        businessIndustry: BusinessIndustry? = nil,
+        businessType: ReceiverBusinessType? = nil,
+        estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
+        publiclyTraded: Bool? = nil,
+        sourceOfWealth: SourceOfWealth? = nil
     ) {
         self.country = country
         self.email = email
@@ -977,7 +1214,6 @@ public struct UpdateReceiverInput: Codable, Sendable {
         self.imageUrl = imageUrl
         self.incorporationDocFile = incorporationDocFile
         self.ipAddress = ipAddress
-        self.isFbo = isFbo
         self.lastName = lastName
         self.legalName = legalName
         self.owners = owners
@@ -995,8 +1231,15 @@ public struct UpdateReceiverInput: Codable, Sendable {
         self.taxId = taxId
         self.tosId = tosId
         self.website = website
+        self.accountPurpose = accountPurpose
+        self.businessDescription = businessDescription
+        self.businessIndustry = businessIndustry
+        self.businessType = businessType
+        self.estimatedAnnualRevenue = estimatedAnnualRevenue
+        self.publiclyTraded = publiclyTraded
+        self.sourceOfWealth = sourceOfWealth
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case country
         case email
@@ -1015,7 +1258,6 @@ public struct UpdateReceiverInput: Codable, Sendable {
         case imageUrl = "image_url"
         case incorporationDocFile = "incorporation_doc_file"
         case ipAddress = "ip_address"
-        case isFbo = "is_fbo"
         case lastName = "last_name"
         case legalName = "legal_name"
         case owners
@@ -1033,6 +1275,13 @@ public struct UpdateReceiverInput: Codable, Sendable {
         case taxId = "tax_id"
         case tosId = "tos_id"
         case website
+        case accountPurpose = "account_purpose"
+        case businessDescription = "business_description"
+        case businessIndustry = "business_industry"
+        case businessType = "business_type"
+        case estimatedAnnualRevenue = "estimated_annual_revenue"
+        case publiclyTraded = "publicly_traded"
+        case sourceOfWealth = "source_of_wealth"
     }
 }
 
