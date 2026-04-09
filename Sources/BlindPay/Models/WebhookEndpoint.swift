@@ -14,6 +14,23 @@ public enum WebhookEvent: String, Codable, Sendable {
     case bankAccountNew = "bankAccount.new"
     case payoutNew = "payout.new"
     case payoutUpdate = "payout.update"
+    case payoutComplete = "payout.complete"
+    case payoutPartnerFee = "payout.partnerFee"
+    case blockchainWalletNew = "blockchainWallet.new"
+    case payinNew = "payin.new"
+    case payinUpdate = "payin.update"
+    case payinComplete = "payin.complete"
+    case payinPartnerFee = "payin.partnerFee"
+    case tosAccept = "tos.accept"
+    case limitIncreaseNew = "limitIncrease.new"
+    case limitIncreaseUpdate = "limitIncrease.update"
+    case virtualAccountNew = "virtualAccount.new"
+    case virtualAccountComplete = "virtualAccount.complete"
+    case transferNew = "transfer.new"
+    case transferUpdate = "transfer.update"
+    case transferComplete = "transfer.complete"
+    case walletNew = "wallet.new"
+    case walletInbound = "wallet.inbound"
 }
 
 /// Represents a webhook endpoint

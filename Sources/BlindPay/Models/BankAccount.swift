@@ -354,157 +354,176 @@ public typealias CreateBankAccountResponse = BankAccount
 public struct CreateBankAccountInput: Codable, Sendable {
     /// Bank account name
     public let name: String
-    
+
     /// Bank account type (rail)
     public let type: Rail
-    
+
     /// Account class (individual or business)
     public let accountClass: AccountClass?
-    
+
     /// Account number
     public let accountNumber: String?
-    
+
     /// Account type (checking or savings)
     public let accountType: BankAccountType?
-    
+
+    /// Recipient relationship
+    public let recipientRelationship: RecipientRelationship?
+
     /// ACH COP bank account
     public let achCopBankAccount: String?
-    
+
     /// ACH COP bank code
     public let achCopBankCode: String?
-    
+
     /// ACH COP beneficiary first name
     public let achCopBeneficiaryFirstName: String?
-    
+
     /// ACH COP beneficiary last name
     public let achCopBeneficiaryLastName: String?
-    
+
     /// ACH COP document ID
     public let achCopDocumentId: String?
-    
+
     /// ACH COP document type
     public let achCopDocumentType: AchCopDocumentType?
-    
+
     /// ACH COP email
     public let achCopEmail: String?
-    
+
     /// Address line 1
     public let addressLine1: String?
-    
+
     /// Address line 2
     public let addressLine2: String?
-    
+
     /// Beneficiary name
     public let beneficiaryName: String?
-    
+
     /// City
     public let city: String?
-    
+
     /// Country code
     public let country: Country?
-    
+
     /// Postal code
     public let postalCode: String?
-    
+
     /// PIX key
     public let pixKey: String?
-    
+
     /// PIX Safe bank code
     public let pixSafeBankCode: String?
-    
+
     /// PIX Safe branch code
     public let pixSafeBranchCode: String?
-    
+
     /// PIX Safe CPF/CNPJ
     public let pixSafeCpfCnpj: String?
-    
+
     /// Routing number
     public let routingNumber: String?
-    
+
     /// SPEI CLABE
     public let speiClabe: String?
-    
+
     /// SPEI institution code
     public let speiInstitutionCode: String?
-    
+
     /// SPEI protocol
     public let speiProtocol: SpeiProtocol?
-    
+
     /// State/province/region
     public let stateProvinceRegion: String?
-    
+
     /// SWIFT account holder name
     public let swiftAccountHolderName: String?
-    
+
     /// SWIFT account number IBAN
     public let swiftAccountNumberIban: String?
-    
+
     /// SWIFT bank address line 1
     public let swiftBankAddressLine1: String?
-    
+
     /// SWIFT bank address line 2
     public let swiftBankAddressLine2: String?
-    
+
     /// SWIFT bank city
     public let swiftBankCity: String?
-    
+
     /// SWIFT bank country
     public let swiftBankCountry: Country?
-    
+
     /// SWIFT bank name
     public let swiftBankName: String?
-    
+
     /// SWIFT bank postal code
     public let swiftBankPostalCode: String?
-    
+
     /// SWIFT bank state/province/region
     public let swiftBankStateProvinceRegion: String?
-    
+
     /// SWIFT beneficiary address line 1
     public let swiftBeneficiaryAddressLine1: String?
-    
+
     /// SWIFT beneficiary address line 2
     public let swiftBeneficiaryAddressLine2: String?
-    
+
     /// SWIFT beneficiary city
     public let swiftBeneficiaryCity: String?
-    
+
     /// SWIFT beneficiary country
     public let swiftBeneficiaryCountry: Country?
-    
+
     /// SWIFT beneficiary postal code
     public let swiftBeneficiaryPostalCode: String?
-    
+
     /// SWIFT beneficiary state/province/region
     public let swiftBeneficiaryStateProvinceRegion: String?
-    
+
     /// SWIFT code BIC
     public let swiftCodeBic: String?
-    
+
+    /// SWIFT payment code (required for PK, PH, KE, JP, IN, ID, CN, CH, BH)
+    public let swiftPaymentCode: String?
+
     /// SWIFT intermediary bank account number IBAN
     public let swiftIntermediaryBankAccountNumberIban: String?
-    
+
     /// SWIFT intermediary bank country
     public let swiftIntermediaryBankCountry: Country?
-    
+
     /// SWIFT intermediary bank name
     public let swiftIntermediaryBankName: String?
-    
+
     /// SWIFT intermediary bank SWIFT code BIC
     public let swiftIntermediaryBankSwiftCodeBic: String?
-    
+
     /// Transfers account
     public let transfersAccount: String?
-    
+
     /// Transfers type
     public let transfersType: TransfersType?
-    
+
+    /// Business industry (NAICS code, required when account_class is business)
+    public let businessIndustry: String?
+
+    /// Phone number (required for certain countries)
+    public let phoneNumber: String?
+
+    /// Tax ID (required for certain countries)
+    public let taxId: String?
+
+    /// Date of birth
+    public let dateOfBirth: String?
+
     public init(
         name: String,
         type: Rail,
         accountClass: AccountClass? = nil,
         accountNumber: String? = nil,
         accountType: BankAccountType? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
         achCopBankAccount: String? = nil,
         achCopBankCode: String? = nil,
         achCopBeneficiaryFirstName: String? = nil,
@@ -543,18 +562,24 @@ public struct CreateBankAccountInput: Codable, Sendable {
         swiftBeneficiaryPostalCode: String? = nil,
         swiftBeneficiaryStateProvinceRegion: String? = nil,
         swiftCodeBic: String? = nil,
+        swiftPaymentCode: String? = nil,
         swiftIntermediaryBankAccountNumberIban: String? = nil,
         swiftIntermediaryBankCountry: Country? = nil,
         swiftIntermediaryBankName: String? = nil,
         swiftIntermediaryBankSwiftCodeBic: String? = nil,
         transfersAccount: String? = nil,
-        transfersType: TransfersType? = nil
+        transfersType: TransfersType? = nil,
+        businessIndustry: String? = nil,
+        phoneNumber: String? = nil,
+        taxId: String? = nil,
+        dateOfBirth: String? = nil
     ) {
         self.name = name
         self.type = type
         self.accountClass = accountClass
         self.accountNumber = accountNumber
         self.accountType = accountType
+        self.recipientRelationship = recipientRelationship
         self.achCopBankAccount = achCopBankAccount
         self.achCopBankCode = achCopBankCode
         self.achCopBeneficiaryFirstName = achCopBeneficiaryFirstName
@@ -593,20 +618,26 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.swiftBeneficiaryPostalCode = swiftBeneficiaryPostalCode
         self.swiftBeneficiaryStateProvinceRegion = swiftBeneficiaryStateProvinceRegion
         self.swiftCodeBic = swiftCodeBic
+        self.swiftPaymentCode = swiftPaymentCode
         self.swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban
         self.swiftIntermediaryBankCountry = swiftIntermediaryBankCountry
         self.swiftIntermediaryBankName = swiftIntermediaryBankName
         self.swiftIntermediaryBankSwiftCodeBic = swiftIntermediaryBankSwiftCodeBic
         self.transfersAccount = transfersAccount
         self.transfersType = transfersType
+        self.businessIndustry = businessIndustry
+        self.phoneNumber = phoneNumber
+        self.taxId = taxId
+        self.dateOfBirth = dateOfBirth
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case name
         case type
         case accountClass = "account_class"
         case accountNumber = "account_number"
         case accountType = "account_type"
+        case recipientRelationship = "recipient_relationship"
         case achCopBankAccount = "ach_cop_bank_account"
         case achCopBankCode = "ach_cop_bank_code"
         case achCopBeneficiaryFirstName = "ach_cop_beneficiary_first_name"
@@ -645,12 +676,17 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case swiftBeneficiaryPostalCode = "swift_beneficiary_postal_code"
         case swiftBeneficiaryStateProvinceRegion = "swift_beneficiary_state_province_region"
         case swiftCodeBic = "swift_code_bic"
+        case swiftPaymentCode = "swift_payment_code"
         case swiftIntermediaryBankAccountNumberIban = "swift_intermediary_bank_account_number_iban"
         case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
         case swiftIntermediaryBankName = "swift_intermediary_bank_name"
         case swiftIntermediaryBankSwiftCodeBic = "swift_intermediary_bank_swift_code_bic"
         case transfersAccount = "transfers_account"
         case transfersType = "transfers_type"
+        case businessIndustry = "business_industry"
+        case phoneNumber = "phone_number"
+        case taxId = "tax_id"
+        case dateOfBirth = "date_of_birth"
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -659,6 +695,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
         try container.encode(type, forKey: .type)
         if let accountClass = accountClass {
             try container.encode(accountClass, forKey: .accountClass)
+        }
+        if let recipientRelationship = recipientRelationship {
+            try container.encode(recipientRelationship, forKey: .recipientRelationship)
         }
         if let accountNumber = accountNumber {
             try container.encode(accountNumber, forKey: .accountNumber)
@@ -789,6 +828,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
         if let swiftIntermediaryBankName = swiftIntermediaryBankName {
             try container.encode(swiftIntermediaryBankName, forKey: .swiftIntermediaryBankName)
         }
+        if let swiftPaymentCode = swiftPaymentCode {
+            try container.encode(swiftPaymentCode, forKey: .swiftPaymentCode)
+        }
         if let swiftIntermediaryBankSwiftCodeBic = swiftIntermediaryBankSwiftCodeBic {
             try container.encode(swiftIntermediaryBankSwiftCodeBic, forKey: .swiftIntermediaryBankSwiftCodeBic)
         }
@@ -797,6 +839,18 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
         if let transfersType = transfersType {
             try container.encode(transfersType, forKey: .transfersType)
+        }
+        if let businessIndustry = businessIndustry {
+            try container.encode(businessIndustry, forKey: .businessIndustry)
+        }
+        if let phoneNumber = phoneNumber {
+            try container.encode(phoneNumber, forKey: .phoneNumber)
+        }
+        if let taxId = taxId {
+            try container.encode(taxId, forKey: .taxId)
+        }
+        if let dateOfBirth = dateOfBirth {
+            try container.encode(dateOfBirth, forKey: .dateOfBirth)
         }
     }
 }
