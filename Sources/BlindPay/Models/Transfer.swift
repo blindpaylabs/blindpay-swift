@@ -2,6 +2,8 @@
 //  Transfer.swift
 //  blindpay-swift
 //
+//  Created by Eric Viana on 09/04/26.
+//
 
 import Foundation
 
