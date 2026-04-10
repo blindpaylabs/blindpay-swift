@@ -1028,6 +1028,50 @@ public struct AuthorizeStellarInput: Codable, Sendable {
   }
 }
 
+/// Input for submitting payout documents (required for SWIFT payouts)
+public struct SubmitPayoutDocumentsInput: Codable, Sendable {
+    /// Transaction document type
+    public let transactionDocumentType: TransactionDocumentType
+
+    /// Transaction document ID (max 512 characters)
+    public let transactionDocumentId: String
+
+    /// Transaction document file URL (from upload endpoint)
+    public let transactionDocumentFile: String
+
+    /// Description (max 128 characters)
+    public let description: String?
+
+    public init(
+        transactionDocumentType: TransactionDocumentType,
+        transactionDocumentId: String,
+        transactionDocumentFile: String,
+        description: String? = nil
+    ) {
+        self.transactionDocumentType = transactionDocumentType
+        self.transactionDocumentId = transactionDocumentId
+        self.transactionDocumentFile = transactionDocumentFile
+        self.description = description
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case transactionDocumentType = "transaction_document_type"
+        case transactionDocumentId = "transaction_document_id"
+        case transactionDocumentFile = "transaction_document_file"
+        case description
+    }
+}
+
+/// Response for submitting payout documents
+public struct SubmitPayoutDocumentsResponse: Codable, Sendable {
+    /// Success status
+    public let success: Bool
+
+    public init(success: Bool) {
+        self.success = success
+    }
+}
+
 /// Input for authorizing Solana token
 public struct AuthorizeSolanaInput: Codable, Sendable {
   /// Quote ID

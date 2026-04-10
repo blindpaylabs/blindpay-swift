@@ -34,6 +34,34 @@ public enum AccountClass: String, Codable, Sendable {
     case business = "business"
 }
 
+/// Recipient relationship type
+public enum RecipientRelationship: String, Codable, Sendable {
+    case firstParty = "first_party"
+    case employee = "employee"
+    case independentContractor = "independent_contractor"
+    case vendorOrSupplier = "vendor_or_supplier"
+    case subsidiaryOrAffiliate = "subsidiary_or_affiliate"
+    case merchantOrPartner = "merchant_or_partner"
+    case customer = "customer"
+    case landlord = "landlord"
+    case family = "family"
+    case other = "other"
+}
+
+/// Represents a NAICS business industry code
+public struct NaicsCode: Codable, Sendable, Equatable {
+    /// NAICS code value
+    public let code: String
+
+    /// Business industry title
+    public let title: String
+
+    public init(code: String, title: String) {
+        self.code = code
+        self.title = title
+    }
+}
+
 // MARK: - Rail Response
 
 /// Represents an available payment rail

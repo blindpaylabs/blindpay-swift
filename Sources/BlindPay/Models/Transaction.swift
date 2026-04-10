@@ -16,6 +16,7 @@ public enum TransactionStatus: String, Codable, Sendable {
     case completed = "completed"
     case failed = "failed"
     case onHold = "on_hold"
+    case pendingReview = "pending_review"
 }
 
 // MARK: - Tracking Types

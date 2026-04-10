@@ -1473,6 +1473,115 @@ public final class BlindPay: Sendable {
         )
     }
     
+    // MARK: - Transfers Service Methods
+
+    /// Creates a transfer quote
+    ///
+    /// - Parameter data: The input data containing transfer quote configuration
+    /// - Returns: An `APIResponse` containing the created transfer quote
+    /// - Throws: `BlindPayError` if the request fails
+    public func createTransferQuote(data: CreateTransferQuoteInput) async throws -> APIResponse<CreateTransferQuoteResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/transfer-quotes",
+            method: .post,
+            body: data
+        )
+    }
+
+    /// Creates a transfer from a previously created transfer quote
+    ///
+    /// - Parameter data: The input data containing the transfer quote ID
+    /// - Returns: An `APIResponse` containing the created transfer
+    /// - Throws: `BlindPayError` if the request fails
+    public func createTransfer(data: CreateTransferInput) async throws -> APIResponse<CreateTransferResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/transfers",
+            method: .post,
+            body: data
+        )
+    }
+
+    /// Lists all transfers for the instance
+    ///
+    /// - Parameter params: Optional parameters for pagination
+    /// - Returns: An `APIResponse` containing a list of transfers with pagination
+    /// - Throws: `BlindPayError` if the request fails
+    public func listTransfers(params: ListTransfersInput? = nil) async throws -> APIResponse<ListTransfersResponse> {
+        let queryParams = params?.toQueryParameters() ?? [:]
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/transfers",
+            method: .get,
+            queryParameters: queryParams.isEmpty ? nil : queryParams
+        )
+    }
+
+    /// Retrieves a specific transfer by ID
+    ///
+    /// - Parameter transferId: The unique identifier of the transfer
+    /// - Returns: An `APIResponse` containing the transfer details
+    /// - Throws: `BlindPayError` if the request fails
+    public func getTransfer(transferId: String) async throws -> APIResponse<TransferResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/transfers/\(transferId)",
+            method: .get
+        )
+    }
+
+    /// Retrieves transfer tracking information using the public endpoint
+    ///
+    /// - Parameter transferId: The unique identifier of the transfer
+    /// - Returns: An `APIResponse` containing the transfer with tracking info
+    /// - Throws: `BlindPayError` if the request fails
+    public func getTransferTrack(transferId: String) async throws -> APIResponse<TransferResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/e/transfers/\(transferId)",
+            method: .get
+        )
+    }
+
+    // MARK: - Fees Service Methods
+
+    /// Retrieves the instance billing fees
+    ///
+    /// - Returns: An `APIResponse` containing fees for all rails
+    /// - Throws: `BlindPayError` if the request fails
+    public func getFees() async throws -> APIResponse<FeesResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/billing/fees",
+            method: .get
+        )
+    }
+
+    // MARK: - Payout Documents
+
+    /// Submits documents for a payout (required for SWIFT payouts)
+    ///
+    /// - Parameters:
+    ///   - payoutId: The unique identifier of the payout
+    ///   - data: The document submission data
+    /// - Returns: An `APIResponse` containing the submission result
+    /// - Throws: `BlindPayError` if the request fails
+    public func submitPayoutDocuments(payoutId: String, data: SubmitPayoutDocumentsInput) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)/documents",
+            method: .post,
+            body: data
+        )
+    }
+
+    // MARK: - Available NAICS Codes
+
+    /// Retrieves available NAICS business industry codes
+    ///
+    /// - Returns: An `APIResponse` containing an array of NAICS codes
+    /// - Throws: `BlindPayError` if the request fails
+    public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
+        return try await apiClient.request(
+            endpoint: "/v1/available/naics",
+            method: .get
+        )
+    }
+
     // MARK: - Terms of Service Service Methods
     
     /// Initiates a new terms of service session

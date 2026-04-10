@@ -24,6 +24,9 @@ public enum PaymentMethod: String, Codable, Sendable {
   case wire = "wire"
   case pix = "pix"
   case spei = "spei"
+  case transfers = "transfers"
+  case pse = "pse"
+  case internationalSwift = "international_swift"
 }
 
 /// Payin type
