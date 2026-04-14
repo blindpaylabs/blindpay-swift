@@ -1628,5 +1628,97 @@ public final class BlindPay: Sendable {
             body: data
         )
     }
+
+    // MARK: - Sandbox Service Methods
+
+    /// Lists all sandbox items for the instance
+    ///
+    /// - Returns: An `APIResponse` containing an array of `Sandbox` objects
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.listSandboxItems()
+    /// if let items = response.data {
+    ///     for item in items {
+    ///         print("\(item.name) - \(item.status.rawValue)")
+    ///     }
+    /// }
+    /// ```
+    public func listSandboxItems() async throws -> APIResponse<SandboxesResponse> {
+        return try await instances.sandbox.list()
+    }
+
+    /// Creates a new sandbox item
+    ///
+    /// - Parameter data: The input data containing the item name and optional metadata
+    /// - Returns: An `APIResponse` containing the created sandbox item
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = CreateSandboxInput(name: "My Sandbox Item", metadata: ["key": "value"])
+    /// let response = try await blindPay.createSandboxItem(data: input)
+    /// if let created = response.data {
+    ///     print("Created sandbox item: \(created.id)")
+    /// }
+    /// ```
+    public func createSandboxItem(data: CreateSandboxInput) async throws -> APIResponse<CreateSandboxResponse> {
+        return try await instances.sandbox.create(data: data)
+    }
+
+    /// Retrieves a specific sandbox item by ID
+    ///
+    /// - Parameter id: The unique identifier of the sandbox item
+    /// - Returns: An `APIResponse` containing the `Sandbox` object
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.getSandboxItem(id: "sb_000000000000")
+    /// if let item = response.data {
+    ///     print("Sandbox item: \(item.name) - \(item.status.rawValue)")
+    /// }
+    /// ```
+    public func getSandboxItem(id: String) async throws -> APIResponse<Sandbox> {
+        return try await instances.sandbox.get(id: id)
+    }
+
+    /// Updates an existing sandbox item
+    ///
+    /// - Parameters:
+    ///   - id: The unique identifier of the sandbox item to update
+    ///   - data: The update data containing the fields to update
+    /// - Returns: An `APIResponse` containing the updated `Sandbox` object
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = UpdateSandboxInput(name: "Updated Name")
+    /// let response = try await blindPay.updateSandboxItem(id: "sb_000000000000", data: input)
+    /// if let updated = response.data {
+    ///     print("Updated sandbox item: \(updated.name)")
+    /// }
+    /// ```
+    public func updateSandboxItem(id: String, data: UpdateSandboxInput) async throws -> APIResponse<Sandbox> {
+        return try await instances.sandbox.update(id: id, data: data)
+    }
+
+    /// Deletes a sandbox item
+    ///
+    /// - Parameter id: The unique identifier of the sandbox item to delete
+    /// - Returns: An `APIResponse` containing the deletion success status
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.deleteSandboxItem(id: "sb_000000000000")
+    /// if let result = response.data {
+    ///     print("Deletion successful: \(result.success)")
+    /// }
+    /// ```
+    public func deleteSandboxItem(id: String) async throws -> APIResponse<DeleteSandboxResponse> {
+        return try await instances.sandbox.delete(id: id)
+    }
 }
 

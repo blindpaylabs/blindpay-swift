@@ -33,7 +33,10 @@ public final class InstancesService: Sendable {
     
     /// Terms of service management service
     public let termsOfService: TermsOfServiceService
-    
+
+    /// Sandbox management service
+    public let sandbox: SandboxService
+
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -44,6 +47,7 @@ public final class InstancesService: Sendable {
         self.payins = PayinsService(apiClient: apiClient, instanceId: instanceId)
         self.payouts = PayoutsService(apiClient: apiClient, instanceId: instanceId)
         self.termsOfService = TermsOfServiceService(apiClient: apiClient, instanceId: instanceId)
+        self.sandbox = SandboxService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Retrieves all members of the instance
