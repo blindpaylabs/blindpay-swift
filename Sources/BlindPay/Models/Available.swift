@@ -60,6 +60,11 @@ public struct NaicsCode: Codable, Sendable, Equatable {
         self.code = code
         self.title = title
     }
+
+    enum CodingKeys: String, CodingKey {
+        case code = "value"
+        case title = "label"
+    }
 }
 
 // MARK: - Rail Response

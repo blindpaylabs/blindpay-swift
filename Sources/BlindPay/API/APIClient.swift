@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// API client for making network requests
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
@@ -14,22 +17,22 @@ internal final class APIClient: Sendable {
     private let instanceId: String
     private let configuration: Configuration
     private let session: URLSession
-    
+
     init(apiKey: String, instanceId: String, configuration: Configuration) {
         self.apiKey = apiKey
         self.instanceId = instanceId
         self.configuration = configuration
-        
+
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.httpAdditionalHeaders = [
             "Content-Type": "application/json",
             "User-Agent": "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
             "Authorization": "Bearer \(apiKey)",
         ]
-        
+
         self.session = URLSession(configuration: sessionConfiguration)
     }
-    
+
     func request<T: Codable>(
         endpoint: String,
         method: HTTPMethod = .get,
@@ -37,7 +40,7 @@ internal final class APIClient: Sendable {
         queryParameters: [String: String]? = nil
     ) async throws -> APIResponse<T> {
         var urlString = "\(configuration.baseURL)\(endpoint)"
-        
+
         if let queryParameters = queryParameters, !queryParameters.isEmpty {
             var components = URLComponents(string: urlString)
             components?.queryItems = queryParameters.map { key, value in
@@ -45,26 +48,26 @@ internal final class APIClient: Sendable {
             }
             urlString = components?.url?.absoluteString ?? urlString
         }
-        
+
         guard let url = URL(string: urlString) else {
             throw BlindPayError.invalidURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
-        
+
         if let body = body {
             request.httpBody = try JSONEncoder().encode(body)
         }
-        
+
         let (data, response) = try await session.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw BlindPayError.invalidResponse
         }
-        
+
         let decoder = JSONDecoder()
-        
+
         if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
             // Check if response is null (either as NSNull or as the string "null")
             if data.count == 4, let dataString = String(data: data, encoding: .utf8), dataString == "null" {
@@ -73,11 +76,100 @@ internal final class APIClient: Sendable {
             if let jsonObject = try? JSONSerialization.jsonObject(with: data), jsonObject is NSNull {
                 return APIResponse<T>(data: nil, error: nil)
             }
-            
+
             do {
                 let apiResponse = try decoder.decode(APIResponse<T>.self, from: data)
                 // If APIResponse decoded but both data and error are nil,
                 // the response was likely direct data, so try direct decode
+                if apiResponse.data == nil && apiResponse.error == nil {
+                    let directData = try decoder.decode(T.self, from: data)
+                    return APIResponse<T>(data: directData, error: nil)
+                }
+                return apiResponse
+            } catch {
+                do {
+                    let directData = try decoder.decode(T.self, from: data)
+                    return APIResponse<T>(data: directData, error: nil)
+                } catch {
+                    throw BlindPayError.decodingError(error)
+                }
+            }
+        } else {
+            do {
+                let errorResponse = try decoder.decode(APIResponse<EmptyResponse>.self, from: data)
+                if let error = errorResponse.error {
+                    return APIResponse<T>(data: nil, error: error)
+                }
+            } catch {
+                throw BlindPayError.decodingError(error)
+            }
+            if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let message = errorDict["message"] as? String {
+                return APIResponse<T>(data: nil, error: APIError(message: message))
+            }
+            throw BlindPayError.httpError(statusCode: httpResponse.statusCode)
+        }
+    }
+
+    func uploadFile<T: Codable>(
+        endpoint: String,
+        fileData: Data,
+        fileName: String,
+        mimeType: String,
+        formFields: [String: String],
+        queryParameters: [String: String]? = nil
+    ) async throws -> APIResponse<T> {
+        let boundary = "Boundary-\(UUID().uuidString)"
+
+        var urlString = "\(configuration.baseURL)\(endpoint)"
+        if let queryParameters = queryParameters, !queryParameters.isEmpty {
+            var components = URLComponents(string: urlString)
+            components?.queryItems = queryParameters.map { key, value in
+                URLQueryItem(name: key, value: value)
+            }
+            urlString = components?.url?.absoluteString ?? urlString
+        }
+
+        guard let url = URL(string: urlString) else {
+            throw BlindPayError.invalidURL
+        }
+
+        var body = Data()
+        for (key, value) in formFields {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(value)\r\n".data(using: .utf8)!)
+        }
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+        body.append(fileData)
+        body.append("\r\n".data(using: .utf8)!)
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw BlindPayError.invalidResponse
+        }
+
+        let decoder = JSONDecoder()
+
+        if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
+            if data.count == 4, let dataString = String(data: data, encoding: .utf8), dataString == "null" {
+                return APIResponse<T>(data: nil, error: nil)
+            }
+            if let jsonObject = try? JSONSerialization.jsonObject(with: data), jsonObject is NSNull {
+                return APIResponse<T>(data: nil, error: nil)
+            }
+
+            do {
+                let apiResponse = try decoder.decode(APIResponse<T>.self, from: data)
                 if apiResponse.data == nil && apiResponse.error == nil {
                     let directData = try decoder.decode(T.self, from: data)
                     return APIResponse<T>(data: directData, error: nil)
@@ -120,4 +212,3 @@ internal enum HTTPMethod: String, Sendable {
 
 /// Empty codable type for error-only responses
 private struct EmptyResponse: Codable, Sendable {}
-

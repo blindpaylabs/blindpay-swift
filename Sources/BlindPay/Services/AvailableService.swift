@@ -99,4 +99,25 @@ public final class AvailableService: Sendable {
             method: .get
         )
     }
+
+    /// Retrieves available NAICS business industry codes
+    ///
+    /// - Returns: An `APIResponse` containing an array of `NaicsCode` objects
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.available.getNaicsCodes()
+    /// if let codes = response.data {
+    ///     for code in codes {
+    ///         print("\(code.code): \(code.title)")
+    ///     }
+    /// }
+    /// ```
+    public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
+        return try await apiClient.request(
+            endpoint: "/v1/available/naics",
+            method: .get
+        )
+    }
 }

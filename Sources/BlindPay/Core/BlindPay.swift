@@ -1582,6 +1582,57 @@ public final class BlindPay: Sendable {
         )
     }
 
+    // MARK: - Upload
+
+    /// Uploads a file to BlindPay storage
+    ///
+    /// This method uploads a file using multipart form data and returns the URL of the stored file.
+    /// The returned URL can be used in other API calls that require a document or image URL,
+    /// such as `submitPayoutDocuments` or receiver document fields.
+    ///
+    /// - Parameters:
+    ///   - fileData: The raw binary data of the file to upload
+    ///   - fileName: The filename including extension (e.g., "document.pdf", "photo.jpg")
+    ///   - mimeType: The MIME type of the file (e.g., "application/pdf", "image/jpeg")
+    ///   - bucket: The storage bucket to upload to (`.avatar`, `.onboarding`, or `.limitIncrease`)
+    ///   - instanceId: Optional instance ID to associate with the upload
+    /// - Returns: An `APIResponse` containing the `UploadResponse` with the uploaded file URL
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let pdfData = try Data(contentsOf: documentURL)
+    /// let response = try await blindPay.upload(
+    ///     fileData: pdfData,
+    ///     fileName: "bank_statement.pdf",
+    ///     mimeType: "application/pdf",
+    ///     bucket: .onboarding
+    /// )
+    /// if let result = response.data {
+    ///     print("Uploaded to: \(result.fileUrl)")
+    /// }
+    /// ```
+    public func upload(
+        fileData: Data,
+        fileName: String,
+        mimeType: String,
+        bucket: UploadBucket,
+        instanceId: String? = nil
+    ) async throws -> APIResponse<UploadResponse> {
+        var queryParameters: [String: String]? = nil
+        if let instanceId = instanceId {
+            queryParameters = ["instance_id": instanceId]
+        }
+        return try await apiClient.uploadFile(
+            endpoint: "/v1/upload",
+            fileData: fileData,
+            fileName: fileName,
+            mimeType: mimeType,
+            formFields: ["bucket": bucket.rawValue],
+            queryParameters: queryParameters
+        )
+    }
+
     // MARK: - Terms of Service Service Methods
     
     /// Initiates a new terms of service session
