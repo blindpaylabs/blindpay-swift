@@ -403,6 +403,11 @@ public final class BlindPay: Sendable {
     ///   - startingAfter: A cursor for pagination - object ID that defines your place in the list (optional)
     ///   - endingBefore: A cursor for pagination - object ID that defines your place in the list (optional)
     ///   - fullName: Filter by full name (optional)
+    ///   - receiverName: Filter by receiver name (optional)
+    ///   - status: Filter by KYC status (optional)
+    ///   - receiverId: Filter by receiver ID (optional)
+    ///   - bankAccountId: Filter by bank account ID (optional)
+    ///   - country: Filter by country code (optional)
     /// - Returns: An `APIResponse` containing a list of receivers with pagination information
     /// - Throws: `BlindPayError` if the request fails
     ///
@@ -419,7 +424,12 @@ public final class BlindPay: Sendable {
         offset: String? = nil,
         startingAfter: String? = nil,
         endingBefore: String? = nil,
-        fullName: String? = nil
+        fullName: String? = nil,
+        receiverName: String? = nil,
+        status: String? = nil,
+        receiverId: String? = nil,
+        bankAccountId: String? = nil,
+        country: String? = nil
     ) async throws -> APIResponse<ListReceiversResponse> {
         var queryParameters: [String: String] = [:]
         if let limit = limit {
@@ -437,7 +447,22 @@ public final class BlindPay: Sendable {
         if let fullName = fullName {
             queryParameters["full_name"] = fullName
         }
-        
+        if let receiverName = receiverName {
+            queryParameters["receiver_name"] = receiverName
+        }
+        if let status = status {
+            queryParameters["status"] = status
+        }
+        if let receiverId = receiverId {
+            queryParameters["receiver_id"] = receiverId
+        }
+        if let bankAccountId = bankAccountId {
+            queryParameters["bank_account_id"] = bankAccountId
+        }
+        if let country = country {
+            queryParameters["country"] = country
+        }
+
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers",
             method: .get,

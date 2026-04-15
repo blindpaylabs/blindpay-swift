@@ -31,9 +31,6 @@ public enum IDDocType: String, Codable, Sendable {
     case passport = "PASSPORT"
     case idCard = "ID_CARD"
     case drivers = "DRIVERS"
-    case driversLicense = "DRIVERS_LICENSE"
-    case nationalId = "NATIONAL_ID"
-    case other = "OTHER"
 }
 
 // MARK: - Proof of Address Document Type
@@ -45,8 +42,6 @@ public enum ProofOfAddressDocType: String, Codable, Sendable {
     case rentalAgreement = "RENTAL_AGREEMENT"
     case taxDocument = "TAX_DOCUMENT"
     case governmentCorrespondence = "GOVERNMENT_CORRESPONDENCE"
-    case governmentLetter = "GOVERNMENT_LETTER"
-    case other = "OTHER"
 }
 
 // MARK: - Source of Funds Document Type
@@ -58,10 +53,14 @@ public enum SourceOfFundsDocType: String, Codable, Sendable {
     case gifts = "gifts"
     case governmentBenefits = "government_benefits"
     case inheritance = "inheritance"
+    case investmentLoans = "investment_loans"
+    case pensionRetirement = "pension_retirement"
     case salary = "salary"
-    case investment = "investment"
-    case gift = "gift"
-    case other = "other"
+    case saleOfAssetsRealEstate = "sale_of_assets_real_estate"
+    case savings = "savings"
+    case esops = "esops"
+    case investmentProceeds = "investment_proceeds"
+    case someoneElseFunds = "someone_else_funds"
 }
 
 // MARK: - Purpose of Transactions
@@ -73,18 +72,87 @@ public enum PurposeOfTransactions: String, Codable, Sendable {
     case investmentPurposes = "investment_purposes"
     case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
     case personalOrLivingExpenses = "personal_or_living_expenses"
-    case personalTransactions = "personal_transactions"
-    case investment = "investment"
+    case protectWealth = "protect_wealth"
+    case purchaseGoodAndServices = "purchase_good_and_services"
+    case receivePaymentForFreelancing = "receive_payment_for_freelancing"
+    case receiveSalary = "receive_salary"
     case other = "other"
+}
+
+// MARK: - Account Purpose
+
+/// Purpose of account
+public enum AccountPurpose: String, Codable, Sendable {
+    case charitableDonations = "charitable_donations"
+    case ecommerceRetailPayments = "ecommerce_retail_payments"
+    case investmentPurposes = "investment_purposes"
+    case businessExpenses = "business_expenses"
+    case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
+    case personalOrLivingExpenses = "personal_or_living_expenses"
+    case protectWealth = "protect_wealth"
+    case purchaseGoodsAndServices = "purchase_goods_and_services"
+    case receivePaymentsForGoodsAndServices = "receive_payments_for_goods_and_services"
+    case taxOptimization = "tax_optimization"
+    case thirdPartyMoneyTransmission = "third_party_money_transmission"
+    case payroll = "payroll"
+    case treasuryManagement = "treasury_management"
+    case other = "other"
+}
+
+// MARK: - Business Type
+
+/// Type of business entity
+public enum BusinessType: String, Codable, Sendable {
+    case corporation = "corporation"
+    case llc = "llc"
+    case partnership = "partnership"
+    case soleProprietorship = "sole_proprietorship"
+    case trust = "trust"
+    case nonProfit = "non_profit"
+}
+
+// MARK: - Estimated Annual Revenue
+
+/// Estimated annual revenue range
+public enum EstimatedAnnualRevenue: String, Codable, Sendable {
+    case under100k = "0_99999"
+    case range100kTo1m = "100000_999999"
+    case range1mTo10m = "1000000_9999999"
+    case range10mTo50m = "10000000_49999999"
+    case range50mTo250m = "50000000_249999999"
+    case over2point5b = "2500000000_plus"
+}
+
+// MARK: - Source of Wealth
+
+/// Source of wealth
+public enum SourceOfWealth: String, Codable, Sendable {
+    case businessDividendsOrProfits = "business_dividends_or_profits"
+    case investments = "investments"
+    case assetSales = "asset_sales"
+    case clientInvestorContributions = "client_investor_contributions"
+    case gambling = "gambling"
+    case charitableContributions = "charitable_contributions"
+    case inheritance = "inheritance"
+    case affiliateOrRoyaltyIncome = "affiliate_or_royalty_income"
+}
+
+// MARK: - AML Status
+
+/// Anti-money laundering check status
+public enum AMLStatus: String, Codable, Sendable {
+    case clear = "clear"
+    case hit = "hit"
+    case error = "error"
 }
 
 // MARK: - Owner Role
 
 /// Role of an owner
 public enum OwnerRole: String, Codable, Sendable {
+    case beneficialControlling = "beneficial_controlling"
     case beneficialOwner = "beneficial_owner"
-    case authorizedSigner = "authorized_signer"
-    case other = "other"
+    case controllingPerson = "controlling_person"
 }
 
 // MARK: - Owner
@@ -93,54 +161,62 @@ public enum OwnerRole: String, Codable, Sendable {
 public struct ReceiverOwner: Codable, Sendable, Equatable {
     /// Owner ID (for response)
     public let id: String?
-    
+
+    /// Instance ID (for response)
+    public let instanceId: String?
+
+    /// Receiver ID (for response)
+    public let receiverId: String?
+
     /// First name
     public let firstName: String
-    
+
     /// Last name
     public let lastName: String
-    
-    /// Role of the owner (optional in response)
+
+    /// Role of the owner
     public let role: OwnerRole?
-    
-    /// Date of birth (ISO 8601 format, optional in response)
+
+    /// Date of birth (ISO 8601 format, optional)
     public let dateOfBirth: String?
-    
-    /// Tax ID (optional in response)
+
+    /// Tax ID (optional)
     public let taxId: String?
-    
+
     /// Address line 1
     public let addressLine1: String
-    
+
     /// Address line 2 (optional)
     public let addressLine2: String?
-    
+
     /// City
     public let city: String
-    
+
     /// State/province/region
     public let stateProvinceRegion: String
-    
+
     /// Country code
     public let country: Country
-    
+
     /// Postal code
     public let postalCode: String
-    
-    /// ID document country code
-    public let idDocCountry: Country
-    
-    /// ID document type
-    public let idDocType: IDDocType
-    
-    /// ID document front file URL
-    public let idDocFrontFile: String
-    
+
+    /// ID document country code (optional)
+    public let idDocCountry: Country?
+
+    /// ID document type (optional)
+    public let idDocType: IDDocType?
+
+    /// ID document front file URL (optional)
+    public let idDocFrontFile: String?
+
     /// ID document back file URL (optional)
     public let idDocBackFile: String?
-    
+
     public init(
         id: String? = nil,
+        instanceId: String? = nil,
+        receiverId: String? = nil,
         firstName: String,
         lastName: String,
         role: OwnerRole? = nil,
@@ -152,12 +228,14 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
         stateProvinceRegion: String,
         country: Country,
         postalCode: String,
-        idDocCountry: Country,
-        idDocType: IDDocType,
-        idDocFrontFile: String,
+        idDocCountry: Country? = nil,
+        idDocType: IDDocType? = nil,
+        idDocFrontFile: String? = nil,
         idDocBackFile: String? = nil
     ) {
         self.id = id
+        self.instanceId = instanceId
+        self.receiverId = receiverId
         self.firstName = firstName
         self.lastName = lastName
         self.role = role
@@ -174,9 +252,11 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
         self.idDocFrontFile = idDocFrontFile
         self.idDocBackFile = idDocBackFile
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id
+        case instanceId = "instance_id"
+        case receiverId = "receiver_id"
         case firstName = "first_name"
         case lastName = "last_name"
         case role
@@ -201,115 +281,142 @@ public struct ReceiverOwner: Codable, Sendable, Equatable {
 public struct CreateReceiverInput: Codable, Sendable {
     /// Country code
     public let country: Country
-    
+
     /// Email address
     public let email: String
-    
+
     /// KYC type
     public let kycType: KYCType
-    
+
     /// Receiver type
     public let type: ReceiverType
-    
+
     /// Address line 1 (optional)
     public let addressLine1: String?
-    
+
     /// Address line 2 (optional)
     public let addressLine2: String?
-    
+
     /// Alternate name (optional)
     public let alternateName: String?
-    
+
     /// City (optional)
     public let city: String?
-    
+
     /// Date of birth (optional, ISO 8601 format)
     public let dateOfBirth: String?
-    
+
     /// External ID (optional)
     public let externalId: String?
-    
+
     /// First name (optional)
     public let firstName: String?
-    
+
     /// Formation date (optional, ISO 8601 format)
     public let formationDate: String?
-    
+
     /// Last name (optional)
     public let lastName: String?
-    
+
     /// Legal name (optional)
     public let legalName: String?
-    
+
     /// State/province/region (optional)
     public let stateProvinceRegion: String?
-    
+
     /// Postal code (optional)
     public let postalCode: String?
-    
+
     /// Tax ID (optional)
     public let taxId: String?
-    
+
     /// IP address (optional)
     public let ipAddress: String?
-    
+
     /// Image URL (optional)
     public let imageUrl: String?
-    
+
     /// Phone number (optional)
     public let phoneNumber: String?
-    
+
     /// Proof of address document type (optional)
     public let proofOfAddressDocType: ProofOfAddressDocType?
-    
+
     /// Proof of address document file URL (optional)
     public let proofOfAddressDocFile: String?
-    
+
     /// ID document country (optional)
     public let idDocCountry: Country?
-    
+
     /// ID document type (optional)
     public let idDocType: IDDocType?
-    
+
     /// ID document front file URL (optional)
     public let idDocFrontFile: String?
-    
+
     /// ID document back file URL (optional)
     public let idDocBackFile: String?
-    
+
     /// Website (optional)
     public let website: String?
-    
+
     /// Owners (optional, for business receivers)
     public let owners: [ReceiverOwner]?
-    
+
     /// Incorporation document file URL (optional)
     public let incorporationDocFile: String?
-    
+
     /// Proof of ownership document file URL (optional)
     public let proofOfOwnershipDocFile: String?
-    
+
     /// Source of funds document type (optional)
     public let sourceOfFundsDocType: SourceOfFundsDocType?
-    
+
     /// Source of funds document file URL (optional)
     public let sourceOfFundsDocFile: String?
-    
+
     /// Selfie file URL (optional)
     public let selfieFile: String?
-    
+
     /// Purpose of transactions (optional)
     public let purposeOfTransactions: PurposeOfTransactions?
-    
+
     /// Purpose of transactions explanation (optional)
     public let purposeOfTransactionsExplanation: String?
-    
+
+    /// Account purpose (optional)
+    public let accountPurpose: AccountPurpose?
+
+    /// Account purpose other explanation (optional)
+    public let accountPurposeOther: String?
+
+    /// Business type (optional)
+    public let businessType: BusinessType?
+
+    /// Business description (optional)
+    public let businessDescription: String?
+
+    /// Business industry NAICS code (optional)
+    public let businessIndustry: String?
+
+    /// Estimated annual revenue (optional)
+    public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
+
+    /// Source of wealth (optional)
+    public let sourceOfWealth: SourceOfWealth?
+
+    /// Whether the business is publicly traded (optional)
+    public let publiclyTraded: Bool?
+
+    /// Occupation (optional)
+    public let occupation: String?
+
     /// Whether this is an FBO account (optional)
     public let isFbo: Bool?
-    
+
     /// Terms of service ID (optional)
     public let tosId: String?
-    
+
     public init(
         country: Country,
         email: String,
@@ -346,6 +453,15 @@ public struct CreateReceiverInput: Codable, Sendable {
         selfieFile: String? = nil,
         purposeOfTransactions: PurposeOfTransactions? = nil,
         purposeOfTransactionsExplanation: String? = nil,
+        accountPurpose: AccountPurpose? = nil,
+        accountPurposeOther: String? = nil,
+        businessType: BusinessType? = nil,
+        businessDescription: String? = nil,
+        businessIndustry: String? = nil,
+        estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
+        sourceOfWealth: SourceOfWealth? = nil,
+        publiclyTraded: Bool? = nil,
+        occupation: String? = nil,
         isFbo: Bool? = nil,
         tosId: String? = nil
     ) {
@@ -384,10 +500,19 @@ public struct CreateReceiverInput: Codable, Sendable {
         self.selfieFile = selfieFile
         self.purposeOfTransactions = purposeOfTransactions
         self.purposeOfTransactionsExplanation = purposeOfTransactionsExplanation
+        self.accountPurpose = accountPurpose
+        self.accountPurposeOther = accountPurposeOther
+        self.businessType = businessType
+        self.businessDescription = businessDescription
+        self.businessIndustry = businessIndustry
+        self.estimatedAnnualRevenue = estimatedAnnualRevenue
+        self.sourceOfWealth = sourceOfWealth
+        self.publiclyTraded = publiclyTraded
+        self.occupation = occupation
         self.isFbo = isFbo
         self.tosId = tosId
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case country
         case email
@@ -424,6 +549,15 @@ public struct CreateReceiverInput: Codable, Sendable {
         case selfieFile = "selfie_file"
         case purposeOfTransactions = "purpose_of_transactions"
         case purposeOfTransactionsExplanation = "purpose_of_transactions_explanation"
+        case accountPurpose = "account_purpose"
+        case accountPurposeOther = "account_purpose_other"
+        case businessType = "business_type"
+        case businessDescription = "business_description"
+        case businessIndustry = "business_industry"
+        case estimatedAnnualRevenue = "estimated_annual_revenue"
+        case sourceOfWealth = "source_of_wealth"
+        case publiclyTraded = "publicly_traded"
+        case occupation
         case isFbo = "is_fbo"
         case tosId = "tos_id"
     }
@@ -436,7 +570,8 @@ public enum KYCStatus: String, Codable, Sendable {
     case verifying = "verifying"
     case approved = "approved"
     case rejected = "rejected"
-    case pending = "pending"
+    case deprecated = "deprecated"
+    case pendingReview = "pending_review"
 }
 
 // MARK: - KYC Warning
@@ -444,24 +579,24 @@ public enum KYCStatus: String, Codable, Sendable {
 /// KYC warning information
 public struct KYCWarning: Codable, Sendable, Equatable {
     /// Warning code
-    public let code: String
-    
+    public let code: String?
+
     /// Warning message
-    public let message: String
-    
+    public let message: String?
+
     /// Resolution status
-    public let resolutionStatus: String
-    
+    public let resolutionStatus: String?
+
     /// Warning ID
-    public let warningId: String
-    
-    public init(code: String, message: String, resolutionStatus: String, warningId: String) {
+    public let warningId: String?
+
+    public init(code: String? = nil, message: String? = nil, resolutionStatus: String? = nil, warningId: String? = nil) {
         self.code = code
         self.message = message
         self.resolutionStatus = resolutionStatus
         self.warningId = warningId
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case code
         case message
@@ -475,18 +610,18 @@ public struct KYCWarning: Codable, Sendable, Equatable {
 /// Fraud warning information
 public struct FraudWarning: Codable, Sendable, Equatable {
     /// Warning ID
-    public let id: String
-    
+    public let id: String?
+
     /// Warning name
-    public let name: String
-    
+    public let name: String?
+
     /// Operation type
-    public let operation: String
-    
+    public let operation: String?
+
     /// Score
-    public let score: Int
-    
-    public init(id: String, name: String, operation: String, score: Int) {
+    public let score: Double?
+
+    public init(id: String? = nil, name: String? = nil, operation: String? = nil, score: Double? = nil) {
         self.id = id
         self.name = name
         self.operation = operation
@@ -499,20 +634,20 @@ public struct FraudWarning: Codable, Sendable, Equatable {
 /// Receiver transaction limits
 public struct ReceiverLimits: Codable, Sendable, Equatable {
     /// Per transaction limit
-    public let perTransaction: Int
-    
+    public let perTransaction: Double?
+
     /// Daily limit
-    public let daily: Int
-    
+    public let daily: Double?
+
     /// Monthly limit
-    public let monthly: Int
-    
-    public init(perTransaction: Int, daily: Int, monthly: Int) {
+    public let monthly: Double?
+
+    public init(perTransaction: Double? = nil, daily: Double? = nil, monthly: Double? = nil) {
         self.perTransaction = perTransaction
         self.daily = daily
         self.monthly = monthly
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case perTransaction = "per_transaction"
         case daily
@@ -526,145 +661,175 @@ public struct ReceiverLimits: Codable, Sendable, Equatable {
 public struct Receiver: Codable, Sendable, Equatable {
     /// Unique identifier
     public let id: String
-    
+
     /// Receiver type
     public let type: ReceiverType
-    
+
     /// KYC type
     public let kycType: KYCType
-    
+
     /// KYC status
     public let kycStatus: KYCStatus?
-    
+
     /// KYC warnings
     public let kycWarnings: [KYCWarning]?
-    
+
     /// Fraud warnings
     public let fraudWarnings: [FraudWarning]?
-    
+
     /// Email address
     public let email: String
-    
+
     /// Tax ID
     public let taxId: String?
-    
+
     /// Address line 1
     public let addressLine1: String?
-    
+
     /// Address line 2
     public let addressLine2: String?
-    
+
     /// City
     public let city: String?
-    
+
     /// State/province/region
     public let stateProvinceRegion: String?
-    
+
     /// Country code
     public let country: Country
-    
+
     /// Postal code
     public let postalCode: String?
-    
+
     /// IP address
     public let ipAddress: String?
-    
+
     /// Image URL
     public let imageUrl: String?
-    
+
     /// Phone number
     public let phoneNumber: String?
-    
+
     /// Proof of address document type
     public let proofOfAddressDocType: ProofOfAddressDocType?
-    
+
     /// Proof of address document file URL
     public let proofOfAddressDocFile: String?
-    
+
     /// First name
     public let firstName: String?
-    
+
     /// Last name
     public let lastName: String?
-    
+
     /// Date of birth
     public let dateOfBirth: String?
-    
+
     /// ID document country
     public let idDocCountry: Country?
-    
+
     /// ID document type
     public let idDocType: IDDocType?
-    
+
     /// ID document front file URL
     public let idDocFrontFile: String?
-    
+
     /// ID document back file URL
     public let idDocBackFile: String?
-    
+
     /// Legal name (for business)
     public let legalName: String?
-    
+
     /// Alternate name (for business)
     public let alternateName: String?
-    
+
     /// Formation date (for business)
     public let formationDate: String?
-    
+
     /// Website (for business)
     public let website: String?
-    
+
     /// Owners (for business)
     public let owners: [ReceiverOwner]?
-    
+
     /// Incorporation document file URL
     public let incorporationDocFile: String?
-    
+
     /// Proof of ownership document file URL
     public let proofOfOwnershipDocFile: String?
-    
+
     /// Source of funds document type
     public let sourceOfFundsDocType: SourceOfFundsDocType?
-    
+
     /// Source of funds document file URL
     public let sourceOfFundsDocFile: String?
-    
+
     /// Selfie file URL
     public let selfieFile: String?
-    
+
     /// Purpose of transactions
     public let purposeOfTransactions: PurposeOfTransactions?
-    
+
     /// Purpose of transactions explanation
     public let purposeOfTransactionsExplanation: String?
-    
+
+    /// Account purpose
+    public let accountPurpose: AccountPurpose?
+
+    /// Account purpose other explanation
+    public let accountPurposeOther: String?
+
+    /// Business type
+    public let businessType: BusinessType?
+
+    /// Business description
+    public let businessDescription: String?
+
+    /// Business industry NAICS code
+    public let businessIndustry: String?
+
+    /// Estimated annual revenue
+    public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
+
+    /// Source of wealth
+    public let sourceOfWealth: SourceOfWealth?
+
+    /// Whether the business is publicly traded
+    public let publiclyTraded: Bool?
+
+    /// Occupation
+    public let occupation: String?
+
     /// Whether this is an FBO account
     public let isFbo: Bool?
-    
+
     /// External ID
     public let externalId: String?
-    
+
     /// Instance ID
     public let instanceId: String
-    
+
     /// Terms of service ID
     public let tosId: String?
-    
+
     /// Aiprise validation key
     public let aipriseValidationKey: String?
-    
+
+    /// AML status
+    public let amlStatus: AMLStatus?
+
     /// Created at timestamp
     public let createdAt: String
-    
+
     /// Updated at timestamp
     public let updatedAt: String
-    
+
     /// Transaction limits
     public let limit: ReceiverLimits?
-    
+
     /// Whether TOS is accepted
     public let isTosAccepted: Bool?
-    
+
     public init(
         id: String,
         type: ReceiverType,
@@ -704,11 +869,21 @@ public struct Receiver: Codable, Sendable, Equatable {
         selfieFile: String? = nil,
         purposeOfTransactions: PurposeOfTransactions? = nil,
         purposeOfTransactionsExplanation: String? = nil,
+        accountPurpose: AccountPurpose? = nil,
+        accountPurposeOther: String? = nil,
+        businessType: BusinessType? = nil,
+        businessDescription: String? = nil,
+        businessIndustry: String? = nil,
+        estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
+        sourceOfWealth: SourceOfWealth? = nil,
+        publiclyTraded: Bool? = nil,
+        occupation: String? = nil,
         isFbo: Bool? = nil,
         externalId: String? = nil,
         instanceId: String,
         tosId: String? = nil,
         aipriseValidationKey: String? = nil,
+        amlStatus: AMLStatus? = nil,
         createdAt: String,
         updatedAt: String,
         limit: ReceiverLimits? = nil,
@@ -752,17 +927,27 @@ public struct Receiver: Codable, Sendable, Equatable {
         self.selfieFile = selfieFile
         self.purposeOfTransactions = purposeOfTransactions
         self.purposeOfTransactionsExplanation = purposeOfTransactionsExplanation
+        self.accountPurpose = accountPurpose
+        self.accountPurposeOther = accountPurposeOther
+        self.businessType = businessType
+        self.businessDescription = businessDescription
+        self.businessIndustry = businessIndustry
+        self.estimatedAnnualRevenue = estimatedAnnualRevenue
+        self.sourceOfWealth = sourceOfWealth
+        self.publiclyTraded = publiclyTraded
+        self.occupation = occupation
         self.isFbo = isFbo
         self.externalId = externalId
         self.instanceId = instanceId
         self.tosId = tosId
         self.aipriseValidationKey = aipriseValidationKey
+        self.amlStatus = amlStatus
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.limit = limit
         self.isTosAccepted = isTosAccepted
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case type
@@ -802,11 +987,21 @@ public struct Receiver: Codable, Sendable, Equatable {
         case selfieFile = "selfie_file"
         case purposeOfTransactions = "purpose_of_transactions"
         case purposeOfTransactionsExplanation = "purpose_of_transactions_explanation"
+        case accountPurpose = "account_purpose"
+        case accountPurposeOther = "account_purpose_other"
+        case businessType = "business_type"
+        case businessDescription = "business_description"
+        case businessIndustry = "business_industry"
+        case estimatedAnnualRevenue = "estimated_annual_revenue"
+        case sourceOfWealth = "source_of_wealth"
+        case publiclyTraded = "publicly_traded"
+        case occupation
         case isFbo = "is_fbo"
         case externalId = "external_id"
         case instanceId = "instance_id"
         case tosId = "tos_id"
         case aipriseValidationKey = "aiprise_validation_key"
+        case amlStatus = "aml_status"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case limit
@@ -820,109 +1015,136 @@ public struct Receiver: Codable, Sendable, Equatable {
 public struct UpdateReceiverInput: Codable, Sendable {
     /// Country code
     public let country: Country
-    
+
     /// Email address
     public let email: String
-    
+
     /// Address line 1 (optional)
     public let addressLine1: String?
-    
+
     /// Address line 2 (optional)
     public let addressLine2: String?
-    
+
     /// Alternate name (optional)
     public let alternateName: String?
-    
+
     /// City (optional)
     public let city: String?
-    
+
     /// Date of birth (optional, ISO 8601 format)
     public let dateOfBirth: String?
-    
+
     /// External ID (optional)
     public let externalId: String?
-    
+
     /// First name (optional)
     public let firstName: String?
-    
+
     /// Formation date (optional, ISO 8601 format)
     public let formationDate: String?
-    
+
     /// ID document back file URL (optional)
     public let idDocBackFile: String?
-    
+
     /// ID document country (optional)
     public let idDocCountry: Country?
-    
+
     /// ID document front file URL (optional)
     public let idDocFrontFile: String?
-    
+
     /// ID document type (optional)
     public let idDocType: IDDocType?
-    
+
     /// Image URL (optional)
     public let imageUrl: String?
-    
+
     /// Incorporation document file URL (optional)
     public let incorporationDocFile: String?
-    
+
     /// IP address (optional)
     public let ipAddress: String?
-    
+
     /// Whether this is an FBO account (optional)
     public let isFbo: Bool?
-    
+
     /// Last name (optional)
     public let lastName: String?
-    
+
     /// Legal name (optional)
     public let legalName: String?
-    
+
     /// Owners (optional, for business receivers)
     public let owners: [ReceiverOwner]?
-    
+
     /// Phone number (optional)
     public let phoneNumber: String?
-    
+
     /// Postal code (optional)
     public let postalCode: String?
-    
+
     /// Proof of address document file URL (optional)
     public let proofOfAddressDocFile: String?
-    
+
     /// Proof of address document type (optional)
     public let proofOfAddressDocType: ProofOfAddressDocType?
-    
+
     /// Proof of ownership document file URL (optional)
     public let proofOfOwnershipDocFile: String?
-    
+
     /// Purpose of transactions (optional)
     public let purposeOfTransactions: PurposeOfTransactions?
-    
+
     /// Purpose of transactions explanation (optional)
     public let purposeOfTransactionsExplanation: String?
-    
+
     /// Selfie file URL (optional)
     public let selfieFile: String?
-    
+
     /// Source of funds document file URL (optional)
     public let sourceOfFundsDocFile: String?
-    
+
     /// Source of funds document type (optional)
     public let sourceOfFundsDocType: SourceOfFundsDocType?
-    
+
     /// State/province/region (optional)
     public let stateProvinceRegion: String?
-    
+
     /// Tax ID (optional)
     public let taxId: String?
-    
+
     /// Terms of service ID (optional)
     public let tosId: String?
-    
+
     /// Website (optional)
     public let website: String?
-    
+
+    /// Account purpose (optional)
+    public let accountPurpose: AccountPurpose?
+
+    /// Account purpose other explanation (optional)
+    public let accountPurposeOther: String?
+
+    /// Business type (optional)
+    public let businessType: BusinessType?
+
+    /// Business description (optional)
+    public let businessDescription: String?
+
+    /// Business industry NAICS code (optional)
+    public let businessIndustry: String?
+
+    /// Estimated annual revenue (optional)
+    public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
+
+    /// Source of wealth (optional)
+    public let sourceOfWealth: SourceOfWealth?
+
+    /// Whether the business is publicly traded (optional)
+    public let publiclyTraded: Bool?
+
+    /// Occupation (optional)
+    public let occupation: String?
+
     public init(
         country: Country,
         email: String,
@@ -958,7 +1180,16 @@ public struct UpdateReceiverInput: Codable, Sendable {
         stateProvinceRegion: String? = nil,
         taxId: String? = nil,
         tosId: String? = nil,
-        website: String? = nil
+        website: String? = nil,
+        accountPurpose: AccountPurpose? = nil,
+        accountPurposeOther: String? = nil,
+        businessType: BusinessType? = nil,
+        businessDescription: String? = nil,
+        businessIndustry: String? = nil,
+        estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
+        sourceOfWealth: SourceOfWealth? = nil,
+        publiclyTraded: Bool? = nil,
+        occupation: String? = nil
     ) {
         self.country = country
         self.email = email
@@ -995,8 +1226,17 @@ public struct UpdateReceiverInput: Codable, Sendable {
         self.taxId = taxId
         self.tosId = tosId
         self.website = website
+        self.accountPurpose = accountPurpose
+        self.accountPurposeOther = accountPurposeOther
+        self.businessType = businessType
+        self.businessDescription = businessDescription
+        self.businessIndustry = businessIndustry
+        self.estimatedAnnualRevenue = estimatedAnnualRevenue
+        self.sourceOfWealth = sourceOfWealth
+        self.publiclyTraded = publiclyTraded
+        self.occupation = occupation
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case country
         case email
@@ -1033,6 +1273,15 @@ public struct UpdateReceiverInput: Codable, Sendable {
         case taxId = "tax_id"
         case tosId = "tos_id"
         case website
+        case accountPurpose = "account_purpose"
+        case accountPurposeOther = "account_purpose_other"
+        case businessType = "business_type"
+        case businessDescription = "business_description"
+        case businessIndustry = "business_industry"
+        case estimatedAnnualRevenue = "estimated_annual_revenue"
+        case sourceOfWealth = "source_of_wealth"
+        case publiclyTraded = "publicly_traded"
+        case occupation
     }
 }
 
@@ -1042,7 +1291,7 @@ public struct UpdateReceiverInput: Codable, Sendable {
 public struct CreateReceiverResponse: Codable, Sendable, Equatable {
     /// Unique identifier for the created receiver
     public let id: String
-    
+
     public init(id: String) {
         self.id = id
     }
@@ -1052,7 +1301,7 @@ public struct CreateReceiverResponse: Codable, Sendable, Equatable {
 public struct UpdateReceiverResponse: Codable, Sendable, Equatable {
     /// Whether the update was successful
     public let success: Bool
-    
+
     public init(success: Bool) {
         self.success = success
     }
@@ -1062,7 +1311,7 @@ public struct UpdateReceiverResponse: Codable, Sendable, Equatable {
 public struct DeleteReceiverResponse: Codable, Sendable, Equatable {
     /// Whether the deletion was successful
     public let success: Bool
-    
+
     public init(success: Bool) {
         self.success = success
     }
@@ -1072,19 +1321,19 @@ public struct DeleteReceiverResponse: Codable, Sendable, Equatable {
 public struct Pagination: Codable, Sendable, Equatable {
     /// Whether there are more items
     public let hasMore: Bool
-    
+
     /// Next page cursor
     public let nextPage: String?
-    
+
     /// Previous page cursor
     public let prevPage: String?
-    
+
     public init(hasMore: Bool, nextPage: String? = nil, prevPage: String? = nil) {
         self.hasMore = hasMore
         self.nextPage = nextPage
         self.prevPage = prevPage
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case hasMore = "has_more"
         case nextPage = "next_page"
@@ -1096,13 +1345,12 @@ public struct Pagination: Codable, Sendable, Equatable {
 public struct ListReceiversResponse: Codable, Sendable, Equatable {
     /// Array of receivers
     public let data: [Receiver]
-    
+
     /// Pagination information
     public let pagination: Pagination
-    
+
     public init(data: [Receiver], pagination: Pagination) {
         self.data = data
         self.pagination = pagination
     }
 }
-
