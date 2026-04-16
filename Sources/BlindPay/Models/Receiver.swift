@@ -49,6 +49,15 @@ public enum ProofOfAddressDocType: String, Codable, Sendable {
     case other = "OTHER"
 }
 
+// MARK: - Sole Proprietor Document Type
+
+/// Type of sole proprietor document
+public enum SoleProprietorDocType: String, Codable, Sendable {
+    case bankStatement = "bank_statement"
+    case masterServiceAgreement = "master_service_agreement"
+    case salarySlip = "salary_slip"
+}
+
 // MARK: - Source of Funds Document Type
 
 /// Type of source of funds document
