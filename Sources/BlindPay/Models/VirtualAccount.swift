@@ -13,6 +13,8 @@ import Foundation
 public enum BankingPartner: String, Codable, Sendable {
     case jpmorgan = "jpmorgan"
     case citi = "citi"
+    case hsbc = "hsbc"
+    case cfsb = "cfsb"
 }
 
 // MARK: - Blockchain Wallet Reference
