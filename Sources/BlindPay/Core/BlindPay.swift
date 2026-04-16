@@ -112,7 +112,7 @@ public final class BlindPay: Sendable {
             method: .get
         )
     }
-    
+
     // MARK: - Instance Service Methods
     
     /// Retrieves all members of the instance

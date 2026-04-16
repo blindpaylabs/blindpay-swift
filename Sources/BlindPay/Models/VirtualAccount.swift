@@ -296,23 +296,39 @@ public struct UpdateVirtualAccountResponse: Codable, Sendable, Equatable {
 public struct CreateVirtualAccountInput: Codable, Sendable {
     /// Banking partner
     public let bankingPartner: BankingPartner
-    
+
     /// Token (USDC, USDT, or USDB)
     public let token: StablecoinToken
-    
+
     /// Blockchain wallet ID
     public let blockchainWalletId: String
-    
-    public init(bankingPartner: BankingPartner, token: StablecoinToken, blockchainWalletId: String) {
+
+    /// Sole proprietor document type (optional)
+    public let soleProprietorDocType: String?
+
+    /// Sole proprietor document file (optional)
+    public let soleProprietorDocFile: String?
+
+    public init(
+        bankingPartner: BankingPartner,
+        token: StablecoinToken,
+        blockchainWalletId: String,
+        soleProprietorDocType: String? = nil,
+        soleProprietorDocFile: String? = nil
+    ) {
         self.bankingPartner = bankingPartner
         self.token = token
         self.blockchainWalletId = blockchainWalletId
+        self.soleProprietorDocType = soleProprietorDocType
+        self.soleProprietorDocFile = soleProprietorDocFile
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case bankingPartner = "banking_partner"
         case token
         case blockchainWalletId = "blockchain_wallet_id"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
+        case soleProprietorDocFile = "sole_proprietor_doc_file"
     }
 }
 
