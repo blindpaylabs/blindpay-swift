@@ -316,6 +316,15 @@ public enum AmlStatus: String, Codable, Sendable {
     case error = "error"
 }
 
+// MARK: - Sole Proprietor Document Type
+
+/// Supporting document type for sole proprietor businesses
+public enum SoleProprietorDocType: String, Codable, Sendable {
+    case bankStatement = "bank_statement"
+    case masterServiceAgreement = "master_service_agreement"
+    case salarySlip = "salary_slip"
+}
+
 // MARK: - Owner Tax Type
 
 /// Tax identifier type for owner
@@ -669,6 +678,15 @@ public struct CreateReceiverInput: Codable, Sendable {
     /// Occupation (optional)
     public let occupation: String?
 
+    /// Relationship between sender and recipient (optional)
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Supporting document type for sole proprietor businesses (optional)
+    public let soleProprietorDocType: SoleProprietorDocType?
+
+    /// AML screening status (optional)
+    public let amlStatus: AmlStatus?
+
     public init(
         country: Country,
         email: String,
@@ -715,7 +733,10 @@ public struct CreateReceiverInput: Codable, Sendable {
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
-        occupation: String? = nil
+        occupation: String? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        soleProprietorDocType: SoleProprietorDocType? = nil,
+        amlStatus: AmlStatus? = nil
     ) {
         self.country = country
         self.email = email
@@ -763,6 +784,9 @@ public struct CreateReceiverInput: Codable, Sendable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.recipientRelationship = recipientRelationship
+        self.soleProprietorDocType = soleProprietorDocType
+        self.amlStatus = amlStatus
     }
 
     enum CodingKeys: String, CodingKey {
@@ -812,6 +836,9 @@ public struct CreateReceiverInput: Codable, Sendable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case recipientRelationship = "recipient_relationship"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
+        case amlStatus = "aml_status"
     }
 }
 
@@ -1086,6 +1113,12 @@ public struct Receiver: Codable, Sendable, Equatable {
     /// AML screening match details
     public let amlHits: AmlHits?
 
+    /// Relationship between sender and recipient
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Supporting document type for sole proprietor businesses
+    public let soleProprietorDocType: SoleProprietorDocType?
+
     public init(
         id: String,
         type: ReceiverType,
@@ -1144,7 +1177,9 @@ public struct Receiver: Codable, Sendable, Equatable {
         publiclyTraded: Bool? = nil,
         occupation: String? = nil,
         amlStatus: AmlStatus? = nil,
-        amlHits: AmlHits? = nil
+        amlHits: AmlHits? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        soleProprietorDocType: SoleProprietorDocType? = nil
     ) {
         self.id = id
         self.type = type
@@ -1204,6 +1239,8 @@ public struct Receiver: Codable, Sendable, Equatable {
         self.occupation = occupation
         self.amlStatus = amlStatus
         self.amlHits = amlHits
+        self.recipientRelationship = recipientRelationship
+        self.soleProprietorDocType = soleProprietorDocType
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1265,6 +1302,8 @@ public struct Receiver: Codable, Sendable, Equatable {
         case occupation
         case amlStatus = "aml_status"
         case amlHits = "aml_hits"
+        case recipientRelationship = "recipient_relationship"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
     }
 }
 
@@ -1404,6 +1443,15 @@ public struct UpdateReceiverInput: Codable, Sendable {
     /// Occupation (optional)
     public let occupation: String?
 
+    /// Relationship between sender and recipient (optional)
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Supporting document type for sole proprietor businesses (optional)
+    public let soleProprietorDocType: SoleProprietorDocType?
+
+    /// AML screening status (optional)
+    public let amlStatus: AmlStatus?
+
     public init(
         country: Country,
         email: String,
@@ -1448,7 +1496,10 @@ public struct UpdateReceiverInput: Codable, Sendable {
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
-        occupation: String? = nil
+        occupation: String? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        soleProprietorDocType: SoleProprietorDocType? = nil,
+        amlStatus: AmlStatus? = nil
     ) {
         self.country = country
         self.email = email
@@ -1494,6 +1545,9 @@ public struct UpdateReceiverInput: Codable, Sendable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.recipientRelationship = recipientRelationship
+        self.soleProprietorDocType = soleProprietorDocType
+        self.amlStatus = amlStatus
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1541,6 +1595,9 @@ public struct UpdateReceiverInput: Codable, Sendable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case recipientRelationship = "recipient_relationship"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
+        case amlStatus = "aml_status"
     }
 }
 
