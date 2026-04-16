@@ -101,6 +101,9 @@ public struct Transfer: Codable, Sendable, Equatable {
     /// Timestamp when the transfer was last updated
     public let updatedAt: String?
 
+    /// External identifier
+    public let externalId: String?
+
     public init(
         id: String,
         status: TransactionStatus,
@@ -119,7 +122,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         receiverToken: String? = nil,
         receiverWalletAddress: String? = nil,
         createdAt: String? = nil,
-        updatedAt: String? = nil
+        updatedAt: String? = nil,
+        externalId: String? = nil
     ) {
         self.id = id
         self.status = status
@@ -139,6 +143,7 @@ public struct Transfer: Codable, Sendable, Equatable {
         self.receiverWalletAddress = receiverWalletAddress
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.externalId = externalId
     }
 
     enum CodingKeys: String, CodingKey {
@@ -160,6 +165,7 @@ public struct Transfer: Codable, Sendable, Equatable {
         case receiverWalletAddress = "receiver_wallet_address"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case externalId = "external_id"
     }
 }
 
@@ -210,6 +216,9 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Amount reference (sender or receiver)
     public let amountReference: String
 
+    /// Partner fee ID (optional)
+    public let partnerFeeId: String?
+
     public init(
         walletId: String,
         senderToken: StablecoinToken,
@@ -218,7 +227,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         receiverNetwork: Network,
         requestAmount: Double,
         coverFees: Bool,
-        amountReference: String
+        amountReference: String,
+        partnerFeeId: String? = nil
     ) {
         self.walletId = walletId
         self.senderToken = senderToken
@@ -228,6 +238,7 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         self.requestAmount = requestAmount
         self.coverFees = coverFees
         self.amountReference = amountReference
+        self.partnerFeeId = partnerFeeId
     }
 
     enum CodingKeys: String, CodingKey {
@@ -239,6 +250,7 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         case requestAmount = "request_amount"
         case coverFees = "cover_fees"
         case amountReference = "amount_reference"
+        case partnerFeeId = "partner_fee_id"
     }
 }
 

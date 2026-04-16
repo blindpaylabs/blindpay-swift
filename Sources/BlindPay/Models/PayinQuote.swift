@@ -199,34 +199,40 @@ public typealias PayinQuoteResponse = PayinQuote
 public struct CreatePayinQuoteInput: Codable, Sendable {
     /// Receiver ID
     public let receiverId: String
-    
+
     /// Blockchain wallet ID
     public let blockchainWalletId: String
-    
+
     /// Payment method
     public let paymentMethod: PaymentMethod
-    
+
     /// Currency type (sender or receiver)
     public let currencyType: CurrencyType
-    
+
     /// Network (optional)
     public let network: Network?
-    
+
     /// Request amount
     public let requestAmount: Double
-    
+
     /// Token (optional)
     public let token: StablecoinToken?
-    
+
     /// Whether to cover fees
     public let coverFees: Bool?
-    
+
     /// Description (optional)
     public let description: String?
-    
+
     /// Partner fee ID (optional)
     public let partnerFeeId: String?
-    
+
+    /// Whether this is an OTC transaction (optional)
+    public let isOtc: Bool?
+
+    /// Wallet ID (optional)
+    public let walletId: String?
+
     public init(
         receiverId: String,
         blockchainWalletId: String,
@@ -237,7 +243,9 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         token: StablecoinToken? = nil,
         coverFees: Bool? = nil,
         description: String? = nil,
-        partnerFeeId: String? = nil
+        partnerFeeId: String? = nil,
+        isOtc: Bool? = nil,
+        walletId: String? = nil
     ) {
         self.receiverId = receiverId
         self.blockchainWalletId = blockchainWalletId
@@ -249,8 +257,10 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         self.coverFees = coverFees
         self.description = description
         self.partnerFeeId = partnerFeeId
+        self.isOtc = isOtc
+        self.walletId = walletId
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case receiverId = "receiver_id"
         case blockchainWalletId = "blockchain_wallet_id"
@@ -262,8 +272,10 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         case coverFees = "cover_fees"
         case description
         case partnerFeeId = "partner_fee_id"
+        case isOtc = "is_otc"
+        case walletId = "wallet_id"
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(receiverId, forKey: .receiverId)
@@ -277,6 +289,8 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         try container.encodeIfPresent(coverFees, forKey: .coverFees)
         try container.encodeIfPresent(description, forKey: .description)
         try container.encodeIfPresent(partnerFeeId, forKey: .partnerFeeId)
+        try container.encodeIfPresent(isOtc, forKey: .isOtc)
+        try container.encodeIfPresent(walletId, forKey: .walletId)
     }
 }
 

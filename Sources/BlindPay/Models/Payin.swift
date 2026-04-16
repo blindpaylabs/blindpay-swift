@@ -459,6 +459,24 @@ public struct Payin: Codable, Sendable, Equatable {
   /// BlindPay bank details
   public let blindpayBankDetails: BlindPayBankDetails?
 
+  /// Whether this is an OTC transaction
+  public let isOtc: Bool?
+
+  /// Billing fee amount
+  public let billingFeeAmount: String?
+
+  /// PSE document type
+  public let pseDocumentType: String?
+
+  /// PSE full name
+  public let pseFullName: String?
+
+  /// PSE payment link
+  public let psePaymentLink: String?
+
+  /// PSE tax ID
+  public let pseTaxId: String?
+
   public init(
     id: String,
     receiverId: String,
@@ -492,7 +510,13 @@ public struct Payin: Codable, Sendable, Equatable {
     name: String? = nil,
     address: String? = nil,
     network: Network? = nil,
-    blindpayBankDetails: BlindPayBankDetails? = nil
+    blindpayBankDetails: BlindPayBankDetails? = nil,
+    isOtc: Bool? = nil,
+    billingFeeAmount: String? = nil,
+    pseDocumentType: String? = nil,
+    pseFullName: String? = nil,
+    psePaymentLink: String? = nil,
+    pseTaxId: String? = nil
   ) {
     self.id = id
     self.receiverId = receiverId
@@ -527,6 +551,12 @@ public struct Payin: Codable, Sendable, Equatable {
     self.address = address
     self.network = network
     self.blindpayBankDetails = blindpayBankDetails
+    self.isOtc = isOtc
+    self.billingFeeAmount = billingFeeAmount
+    self.pseDocumentType = pseDocumentType
+    self.pseFullName = pseFullName
+    self.psePaymentLink = psePaymentLink
+    self.pseTaxId = pseTaxId
   }
 
   enum CodingKeys: String, CodingKey {
@@ -563,6 +593,12 @@ public struct Payin: Codable, Sendable, Equatable {
     case address
     case network
     case blindpayBankDetails = "blindpay_bank_details"
+    case isOtc = "is_otc"
+    case billingFeeAmount = "billing_fee_amount"
+    case pseDocumentType = "pse_document_type"
+    case pseFullName = "pse_full_name"
+    case psePaymentLink = "pse_payment_link"
+    case pseTaxId = "pse_tax_id"
   }
 }
 

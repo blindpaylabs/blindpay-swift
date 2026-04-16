@@ -99,4 +99,28 @@ public final class AvailableService: Sendable {
             method: .get
         )
     }
+
+    /// Retrieves all available NAICS business industry codes
+    ///
+    /// This method fetches a list of NAICS (North American Industry Classification System)
+    /// codes that can be used to classify a receiver's business industry.
+    ///
+    /// - Returns: An `APIResponse` containing an array of `NaicsCode` objects
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.available.getNaicsCodes()
+    /// if let codes = response.data {
+    ///     for code in codes {
+    ///         print("\(code.code) - \(code.title)")
+    ///     }
+    /// }
+    /// ```
+    public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
+        return try await apiClient.request(
+            endpoint: "/v1/available/naics",
+            method: .get
+        )
+    }
 }
