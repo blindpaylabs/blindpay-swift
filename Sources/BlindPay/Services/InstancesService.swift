@@ -350,7 +350,12 @@ public final class InstancesService: Sendable {
         offset: String? = nil,
         startingAfter: String? = nil,
         endingBefore: String? = nil,
-        fullName: String? = nil
+        fullName: String? = nil,
+        receiverName: String? = nil,
+        status: String? = nil,
+        receiverId: String? = nil,
+        bankAccountId: String? = nil,
+        country: String? = nil
     ) async throws -> APIResponse<ListReceiversResponse> {
         var queryParameters: [String: String] = [:]
         if let limit = limit {
@@ -368,7 +373,22 @@ public final class InstancesService: Sendable {
         if let fullName = fullName {
             queryParameters["full_name"] = fullName
         }
-        
+        if let receiverName = receiverName {
+            queryParameters["receiver_name"] = receiverName
+        }
+        if let status = status {
+            queryParameters["status"] = status
+        }
+        if let receiverId = receiverId {
+            queryParameters["receiver_id"] = receiverId
+        }
+        if let bankAccountId = bankAccountId {
+            queryParameters["bank_account_id"] = bankAccountId
+        }
+        if let country = country {
+            queryParameters["country"] = country
+        }
+
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers",
             method: .get,
