@@ -7,6 +7,16 @@
 
 import Foundation
 
+// MARK: - Bank Account Status
+
+/// Status of a bank account
+public enum BankAccountStatus: String, Codable, Sendable {
+    case verifying = "verifying"
+    case approved = "approved"
+    case rejected = "rejected"
+    case deprecated = "deprecated"
+}
+
 // MARK: - Bank Account
 
 /// Represents a bank account
@@ -166,10 +176,31 @@ public struct BankAccount: Codable, Sendable, Equatable {
     
     /// Offramp wallets
     public let offrampWallets: [OfframpWallet]?
-    
+
+    /// Bank account status
+    public let status: BankAccountStatus?
+
+    /// Recipient relationship
+    public let recipientRelationship: RecipientRelationship?
+
+    /// SWIFT payment code
+    public let swiftPaymentCode: String?
+
+    /// Business industry (NAICS code)
+    public let businessIndustry: String?
+
+    /// Phone number
+    public let phoneNumber: String?
+
+    /// Tax ID
+    public let taxId: String?
+
+    /// Date of birth
+    public let dateOfBirth: String?
+
     /// Timestamp when the bank account was created
     public let createdAt: String
-    
+
     public init(
         id: String,
         name: String,
@@ -223,6 +254,13 @@ public struct BankAccount: Codable, Sendable, Equatable {
         swiftIntermediaryBankCountry: Country? = nil,
         tronWalletHash: String? = nil,
         offrampWallets: [OfframpWallet]? = nil,
+        status: BankAccountStatus? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        swiftPaymentCode: String? = nil,
+        businessIndustry: String? = nil,
+        phoneNumber: String? = nil,
+        taxId: String? = nil,
+        dateOfBirth: String? = nil,
         createdAt: String
     ) {
         self.id = id
@@ -277,6 +315,13 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.swiftIntermediaryBankCountry = swiftIntermediaryBankCountry
         self.tronWalletHash = tronWalletHash
         self.offrampWallets = offrampWallets
+        self.status = status
+        self.recipientRelationship = recipientRelationship
+        self.swiftPaymentCode = swiftPaymentCode
+        self.businessIndustry = businessIndustry
+        self.phoneNumber = phoneNumber
+        self.taxId = taxId
+        self.dateOfBirth = dateOfBirth
         self.createdAt = createdAt
     }
     
@@ -333,6 +378,13 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
         case tronWalletHash = "tron_wallet_hash"
         case offrampWallets = "offramp_wallets"
+        case status
+        case recipientRelationship = "recipient_relationship"
+        case swiftPaymentCode = "swift_payment_code"
+        case businessIndustry = "business_industry"
+        case phoneNumber = "phone_number"
+        case taxId = "tax_id"
+        case dateOfBirth = "date_of_birth"
         case createdAt = "created_at"
     }
 }

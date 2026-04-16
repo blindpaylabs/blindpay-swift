@@ -237,5 +237,37 @@ public final class PayoutsService: Sendable {
             body: data
         )
     }
+
+    /// Submits compliance documents for a payout
+    ///
+    /// This method submits documents for SWIFT payouts requiring review.
+    /// Includes optional payment description.
+    ///
+    /// - Parameters:
+    ///   - payoutId: The unique identifier of the payout
+    ///   - data: The document submission data
+    /// - Returns: An `APIResponse` containing the submission result
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = SubmitPayoutDocumentsInput(
+    ///     transactionDocumentType: .invoice,
+    ///     transactionDocumentId: "INV-001",
+    ///     transactionDocumentFile: "https://example.com/document.pdf",
+    ///     description: "Payment for services"
+    /// )
+    /// let response = try await blindPay.instances.payouts.submitDocuments(payoutId: "pa_123", data: input)
+    /// if let result = response.data {
+    ///     print("Success: \(result.success)")
+    /// }
+    /// ```
+    public func submitDocuments(payoutId: String, data: SubmitPayoutDocumentsInput) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)/documents",
+            method: .post,
+            body: data
+        )
+    }
 }
 

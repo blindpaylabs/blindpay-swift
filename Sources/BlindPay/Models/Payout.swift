@@ -22,6 +22,7 @@ public enum PayoutStatus: String, Codable, Sendable {
 public enum TrackingStep: String, Codable, Sendable {
   case processing = "processing"
   case onHold = "on_hold"
+  case pendingReview = "pending_review"
   case completed = "completed"
 }
 
@@ -121,16 +122,26 @@ public struct PayoutTrackingTransaction: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
+  /// Ledger transaction ID for the IN (crypto deposit) transaction
+  public let ledgerInTransactionId: String?
+
+  /// Ledger transaction ID for the OUT (fiat withdrawal) transaction
+  public let ledgerOutTransactionId: String?
+
   public init(
     step: TrackingStep,
     status: TrackingTransactionStatus? = nil,
     transactionHash: String? = nil,
-    completedAt: String? = nil
+    completedAt: String? = nil,
+    ledgerInTransactionId: String? = nil,
+    ledgerOutTransactionId: String? = nil
   ) {
     self.step = step
     self.status = status
     self.transactionHash = transactionHash
     self.completedAt = completedAt
+    self.ledgerInTransactionId = ledgerInTransactionId
+    self.ledgerOutTransactionId = ledgerOutTransactionId
   }
 
   enum CodingKeys: String, CodingKey {
@@ -138,6 +149,8 @@ public struct PayoutTrackingTransaction: Codable, Sendable, Equatable {
     case status
     case transactionHash = "transaction_hash"
     case completedAt = "completed_at"
+    case ledgerInTransactionId = "ledger_in_transaction_id"
+    case ledgerOutTransactionId = "ledger_out_transaction_id"
   }
 }
 
@@ -154,6 +167,12 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
 
   /// Provider status
   public let providerStatus: PaymentProviderStatus?
+
+  /// Provider error reason when payment fails
+  public let providerErrorReason: String?
+
+  /// Payment provider UETR
+  public let providerUetr: String?
 
   /// Recipient name
   public let recipientName: String?
@@ -173,6 +192,12 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
   /// Recipient account type
   public let recipientAccountType: String?
 
+  /// COELSA transaction reference ID for ARS transfers
+  public let coelsaId: String?
+
+  /// BACEN Pix end-to-end transaction ID
+  public let endToEndId: String?
+
   /// Estimated time of arrival
   public let estimatedTimeOfArrival: EstimatedTimeOfArrival?
 
@@ -184,12 +209,16 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     providerName: String? = nil,
     providerTransactionId: String? = nil,
     providerStatus: PaymentProviderStatus? = nil,
+    providerErrorReason: String? = nil,
+    providerUetr: String? = nil,
     recipientName: String? = nil,
     recipientTaxId: String? = nil,
     recipientBankCode: String? = nil,
     recipientBranchCode: String? = nil,
     recipientAccountNumber: String? = nil,
     recipientAccountType: String? = nil,
+    coelsaId: String? = nil,
+    endToEndId: String? = nil,
     estimatedTimeOfArrival: EstimatedTimeOfArrival? = nil,
     completedAt: String? = nil
   ) {
@@ -197,12 +226,16 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     self.providerName = providerName
     self.providerTransactionId = providerTransactionId
     self.providerStatus = providerStatus
+    self.providerErrorReason = providerErrorReason
+    self.providerUetr = providerUetr
     self.recipientName = recipientName
     self.recipientTaxId = recipientTaxId
     self.recipientBankCode = recipientBankCode
     self.recipientBranchCode = recipientBranchCode
     self.recipientAccountNumber = recipientAccountNumber
     self.recipientAccountType = recipientAccountType
+    self.coelsaId = coelsaId
+    self.endToEndId = endToEndId
     self.estimatedTimeOfArrival = estimatedTimeOfArrival
     self.completedAt = completedAt
   }
@@ -212,12 +245,16 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     case providerName = "provider_name"
     case providerTransactionId = "provider_transaction_id"
     case providerStatus = "provider_status"
+    case providerErrorReason = "provider_error_reason"
+    case providerUetr = "provider_uetr"
     case recipientName = "recipient_name"
     case recipientTaxId = "recipient_tax_id"
     case recipientBankCode = "recipient_bank_code"
     case recipientBranchCode = "recipient_branch_code"
     case recipientAccountNumber = "recipient_account_number"
     case recipientAccountType = "recipient_account_type"
+    case coelsaId = "coelsa_id"
+    case endToEndId = "end_to_end_id"
     case estimatedTimeOfArrival = "estimated_time_of_arrival"
     case completedAt = "completed_at"
   }
@@ -271,6 +308,9 @@ public struct PayoutTrackingComplete: Codable, Sendable, Equatable {
   /// Status
   public let status: TrackingCompleteStatus?
 
+  /// Reason for refund when tokens are returned to sender
+  public let refundReason: String?
+
   /// Transaction hash
   public let transactionHash: String?
 
@@ -280,11 +320,13 @@ public struct PayoutTrackingComplete: Codable, Sendable, Equatable {
   public init(
     step: TrackingStep,
     status: TrackingCompleteStatus? = nil,
+    refundReason: String? = nil,
     transactionHash: String? = nil,
     completedAt: String? = nil
   ) {
     self.step = step
     self.status = status
+    self.refundReason = refundReason
     self.transactionHash = transactionHash
     self.completedAt = completedAt
   }
@@ -292,6 +334,7 @@ public struct PayoutTrackingComplete: Codable, Sendable, Equatable {
   enum CodingKeys: String, CodingKey {
     case step
     case status
+    case refundReason = "refund_reason"
     case transactionHash = "transaction_hash"
     case completedAt = "completed_at"
   }
@@ -321,6 +364,46 @@ public struct PayoutTrackingPartnerFee: Codable, Sendable, Equatable {
   enum CodingKeys: String, CodingKey {
     case step
     case transactionHash = "transaction_hash"
+    case completedAt = "completed_at"
+  }
+}
+
+/// Documents tracking status
+public enum PayoutDocumentsStatus: String, Codable, Sendable {
+  case waitingDocuments = "waiting_documents"
+  case complianceReviewing = "compliance_reviewing"
+}
+
+/// Documents tracking information for payout
+public struct PayoutTrackingDocuments: Codable, Sendable, Equatable {
+  /// Step name
+  public let step: TrackingStep
+
+  /// Documents status
+  public let status: PayoutDocumentsStatus?
+
+  /// Reviewer email/name
+  public let reviewedBy: String?
+
+  /// Completion timestamp
+  public let completedAt: String?
+
+  public init(
+    step: TrackingStep,
+    status: PayoutDocumentsStatus? = nil,
+    reviewedBy: String? = nil,
+    completedAt: String? = nil
+  ) {
+    self.step = step
+    self.status = status
+    self.reviewedBy = reviewedBy
+    self.completedAt = completedAt
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case step
+    case status
+    case reviewedBy = "reviewed_by"
     case completedAt = "completed_at"
   }
 }
@@ -789,6 +872,15 @@ public struct CreatePayoutResponse: Codable, Sendable {
   /// Sender wallet address
   public let senderWalletAddress: String
 
+  /// Billing fee in cents (charged via invoice at the end of the month)
+  public let billingFeeAmount: Double?
+
+  /// Transaction fee in cents (percentage-based fee)
+  public let transactionFeeAmount: Double?
+
+  /// Partner fee amount in cents
+  public let partnerFee: Int?
+
   /// Complete tracking information
   public let trackingComplete: PayoutTrackingComplete
 
@@ -804,41 +896,68 @@ public struct CreatePayoutResponse: Codable, Sendable {
   /// Liquidity tracking information
   public let trackingLiquidity: PayoutTrackingLiquidity?
 
+  /// Documents tracking information
+  public let trackingDocuments: PayoutTrackingDocuments?
+
   /// Receiver ID
   public let receiverId: String?
+
+  /// Bank account ID
+  public let bankAccountId: String?
+
+  /// Offramp wallet ID
+  public let offrampWalletId: String?
 
   public init(
     id: String,
     status: PayoutStatus,
     senderWalletAddress: String,
+    billingFeeAmount: Double? = nil,
+    transactionFeeAmount: Double? = nil,
+    partnerFee: Int? = nil,
     trackingComplete: PayoutTrackingComplete,
     trackingPayment: PayoutTrackingPayment,
     trackingTransaction: PayoutTrackingTransaction,
     trackingPartnerFee: PayoutTrackingPartnerFee? = nil,
     trackingLiquidity: PayoutTrackingLiquidity? = nil,
-    receiverId: String? = nil
+    trackingDocuments: PayoutTrackingDocuments? = nil,
+    receiverId: String? = nil,
+    bankAccountId: String? = nil,
+    offrampWalletId: String? = nil
   ) {
     self.id = id
     self.status = status
     self.senderWalletAddress = senderWalletAddress
+    self.billingFeeAmount = billingFeeAmount
+    self.transactionFeeAmount = transactionFeeAmount
+    self.partnerFee = partnerFee
     self.trackingComplete = trackingComplete
     self.trackingPayment = trackingPayment
     self.trackingTransaction = trackingTransaction
     self.trackingPartnerFee = trackingPartnerFee
     self.trackingLiquidity = trackingLiquidity
+    self.trackingDocuments = trackingDocuments
     self.receiverId = receiverId
+    self.bankAccountId = bankAccountId
+    self.offrampWalletId = offrampWalletId
   }
 
   enum CodingKeys: String, CodingKey {
     case id
     case status
     case senderWalletAddress = "sender_wallet_address"
+    case billingFeeAmount = "billing_fee_amount"
+    case transactionFeeAmount = "transaction_fee_amount"
+    case partnerFee = "partner_fee"
     case trackingComplete = "tracking_complete"
     case trackingPayment = "tracking_payment"
     case trackingTransaction = "tracking_transaction"
     case trackingPartnerFee = "tracking_partner_fee"
     case trackingLiquidity = "tracking_liquidity"
+    case trackingDocuments = "tracking_documents"
     case receiverId = "receiver_id"
+    case bankAccountId = "bank_account_id"
+    case offrampWalletId = "offramp_wallet_id"
   }
 }
 
@@ -892,13 +1011,37 @@ public struct ListPayoutsInput: Codable, Sendable {
   /// Filter by status
   public let status: PayoutStatus?
 
+  /// Filter by receiver name
+  public let receiverName: String?
+
+  /// Filter by bank account ID
+  public let bankAccountId: String?
+
+  /// Filter by country
+  public let country: String?
+
+  /// Filter by payment method
+  public let paymentMethod: PaymentType?
+
+  /// Filter by network
+  public let network: String?
+
+  /// Filter by token
+  public let token: String?
+
   public init(
     limit: String? = nil,
     offset: String? = nil,
     startingAfter: String? = nil,
     endingBefore: String? = nil,
     receiverId: String? = nil,
-    status: PayoutStatus? = nil
+    status: PayoutStatus? = nil,
+    receiverName: String? = nil,
+    bankAccountId: String? = nil,
+    country: String? = nil,
+    paymentMethod: PaymentType? = nil,
+    network: String? = nil,
+    token: String? = nil
   ) {
     self.limit = limit
     self.offset = offset
@@ -906,6 +1049,12 @@ public struct ListPayoutsInput: Codable, Sendable {
     self.endingBefore = endingBefore
     self.receiverId = receiverId
     self.status = status
+    self.receiverName = receiverName
+    self.bankAccountId = bankAccountId
+    self.country = country
+    self.paymentMethod = paymentMethod
+    self.network = network
+    self.token = token
   }
 
   enum CodingKeys: String, CodingKey {
@@ -915,6 +1064,12 @@ public struct ListPayoutsInput: Codable, Sendable {
     case endingBefore = "ending_before"
     case receiverId = "receiver_id"
     case status
+    case receiverName = "receiver_name"
+    case bankAccountId = "bank_account_id"
+    case country
+    case paymentMethod = "payment_method"
+    case network
+    case token
   }
 
   /// Converts to query parameters dictionary
@@ -937,6 +1092,24 @@ public struct ListPayoutsInput: Codable, Sendable {
     }
     if let status = status {
       params["status"] = status.rawValue
+    }
+    if let receiverName = receiverName {
+      params["receiver_name"] = receiverName
+    }
+    if let bankAccountId = bankAccountId {
+      params["bank_account_id"] = bankAccountId
+    }
+    if let country = country {
+      params["country"] = country
+    }
+    if let paymentMethod = paymentMethod {
+      params["payment_method"] = paymentMethod.rawValue
+    }
+    if let network = network {
+      params["network"] = network
+    }
+    if let token = token {
+      params["token"] = token
     }
     return params
   }
