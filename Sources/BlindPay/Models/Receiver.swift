@@ -268,6 +268,17 @@ public enum BusinessIndustry: String, Codable, Sendable {
     case n541990 = "541990"
     case n541214 = "541214"
     case n561499 = "561499"
+    case dapp = "dapp"
+    case exchange = "exchange"
+    case gambling = "gambling"
+    case gaming = "gaming"
+    case infra = "infra"
+    case marketplace = "marketplace"
+    case neoBank = "neo_bank"
+    case other = "other"
+    case saas = "saas"
+    case social = "social"
+    case wallet = "wallet"
 }
 
 // MARK: - Estimated Annual Revenue
