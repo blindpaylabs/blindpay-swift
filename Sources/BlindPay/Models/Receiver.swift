@@ -129,38 +129,71 @@ public enum BusinessIndustry: String, Codable, Sendable {
     case n112120 = "112120"
     case n113310 = "113310"
     case n115114 = "115114"
-    case n541211 = "541211"
-    case n541810 = "541810"
-    case n541430 = "541430"
-    case n541715 = "541715"
-    case n541930 = "541930"
-    case n561422 = "561422"
-    case n561311 = "561311"
-    case n561612 = "561612"
-    case n561740 = "561740"
-    case n561730 = "561730"
+    case n211120 = "211120"
+    case n212114 = "212114"
+    case n213112 = "213112"
+    case n221310 = "221310"
     case n236115 = "236115"
     case n236220 = "236220"
     case n237310 = "237310"
     case n238210 = "238210"
-    case n811111 = "811111"
-    case n812111 = "812111"
-    case n812112 = "812112"
-    case n532111 = "532111"
-    case n624410 = "624410"
-    case n541922 = "541922"
-    case n811210 = "811210"
-    case n812199 = "812199"
-    case n611110 = "611110"
-    case n611310 = "611310"
-    case n611410 = "611410"
-    case n611710 = "611710"
-    case n211120 = "211120"
-    case n212114 = "212114"
-    case n221310 = "221310"
-    case n562111 = "562111"
-    case n562920 = "562920"
-    case n213112 = "213112"
+    case n311421 = "311421"
+    case n312130 = "312130"
+    case n313110 = "313110"
+    case n315990 = "315990"
+    case n322220 = "322220"
+    case n325412 = "325412"
+    case n334111 = "334111"
+    case n334118 = "334118"
+    case n334210 = "334210"
+    case n336110 = "336110"
+    case n336390 = "336390"
+    case n337121 = "337121"
+    case n339112 = "339112"
+    case n339910 = "339910"
+    case n339920 = "339920"
+    case n339930 = "339930"
+    case n423110 = "423110"
+    case n423430 = "423430"
+    case n423510 = "423510"
+    case n423690 = "423690"
+    case n423830 = "423830"
+    case n423840 = "423840"
+    case n423940 = "423940"
+    case n424210 = "424210"
+    case n424410 = "424410"
+    case n424480 = "424480"
+    case n424690 = "424690"
+    case n424990 = "424990"
+    case n444110 = "444110"
+    case n445110 = "445110"
+    case n445320 = "445320"
+    case n449210 = "449210"
+    case n454110 = "454110"
+    case n455110 = "455110"
+    case n455219 = "455219"
+    case n456110 = "456110"
+    case n457110 = "457110"
+    case n458110 = "458110"
+    case n458210 = "458210"
+    case n458310 = "458310"
+    case n459120 = "459120"
+    case n459210 = "459210"
+    case n481111 = "481111"
+    case n483111 = "483111"
+    case n484121 = "484121"
+    case n485210 = "485210"
+    case n488510 = "488510"
+    case n493110 = "493110"
+    case n511210 = "511210"
+    case n512250 = "512250"
+    case n513130 = "513130"
+    case n516120 = "516120"
+    case n517111 = "517111"
+    case n517112 = "517112"
+    case n517410 = "517410"
+    case n518210 = "518210"
+    case n519130 = "519130"
     case n522110 = "522110"
     case n522210 = "522210"
     case n522320 = "522320"
@@ -168,51 +201,6 @@ public enum BusinessIndustry: String, Codable, Sendable {
     case n523940 = "523940"
     case n523999 = "523999"
     case n524113 = "524113"
-    case n813110 = "813110"
-    case n813211 = "813211"
-    case n813219 = "813219"
-    case n551112 = "551112"
-    case n721110 = "721110"
-    case n722511 = "722511"
-    case n722513 = "722513"
-    case n561510 = "561510"
-    case n713110 = "713110"
-    case n713210 = "713210"
-    case n712110 = "712110"
-    case n711110 = "711110"
-    case n711211 = "711211"
-    case n621111 = "621111"
-    case n621210 = "621210"
-    case n622110 = "622110"
-    case n623110 = "623110"
-    case n621511 = "621511"
-    case n623220 = "623220"
-    case n541940 = "541940"
-    case n621399 = "621399"
-    case n621910 = "621910"
-    case n541110 = "541110"
-    case n311421 = "311421"
-    case n337121 = "337121"
-    case n322220 = "322220"
-    case n339920 = "339920"
-    case n334210 = "334210"
-    case n339930 = "339930"
-    case n312130 = "312130"
-    case n334111 = "334111"
-    case n334118 = "334118"
-    case n325412 = "325412"
-    case n339112 = "339112"
-    case n336110 = "336110"
-    case n336390 = "336390"
-    case n315990 = "315990"
-    case n313110 = "313110"
-    case n339910 = "339910"
-    case n516120 = "516120"
-    case n513130 = "513130"
-    case n512250 = "512250"
-    case n519130 = "519130"
-    case n711410 = "711410"
-    case n711510 = "711510"
     case n531110 = "531110"
     case n531120 = "531120"
     case n531130 = "531130"
@@ -222,52 +210,64 @@ public enum BusinessIndustry: String, Codable, Sendable {
     case n531312 = "531312"
     case n531320 = "531320"
     case n531390 = "531390"
-    case n454110 = "454110"
-    case n445110 = "445110"
-    case n455110 = "455110"
-    case n457110 = "457110"
-    case n449210 = "449210"
-    case n444110 = "444110"
-    case n459210 = "459210"
-    case n459120 = "459120"
-    case n445320 = "445320"
-    case n458110 = "458110"
-    case n458210 = "458210"
-    case n458310 = "458310"
-    case n455219 = "455219"
-    case n424210 = "424210"
-    case n456110 = "456110"
+    case n532111 = "532111"
+    case n541110 = "541110"
+    case n541211 = "541211"
+    case n541214 = "541214"
+    case n541330 = "541330"
+    case n541430 = "541430"
     case n541511 = "541511"
     case n541512 = "541512"
     case n541519 = "541519"
-    case n518210 = "518210"
-    case n511210 = "511210"
-    case n517111 = "517111"
-    case n517112 = "517112"
-    case n517410 = "517410"
-    case n481111 = "481111"
-    case n483111 = "483111"
-    case n485210 = "485210"
-    case n488510 = "488510"
-    case n484121 = "484121"
-    case n493110 = "493110"
-    case n423430 = "423430"
-    case n423690 = "423690"
-    case n423110 = "423110"
-    case n423830 = "423830"
-    case n423840 = "423840"
-    case n423510 = "423510"
-    case n424690 = "424690"
-    case n424990 = "424990"
-    case n424410 = "424410"
-    case n424480 = "424480"
-    case n423940 = "423940"
     case n541611 = "541611"
     case n541618 = "541618"
-    case n541330 = "541330"
+    case n541715 = "541715"
+    case n541810 = "541810"
+    case n541922 = "541922"
+    case n541930 = "541930"
+    case n541940 = "541940"
     case n541990 = "541990"
-    case n541214 = "541214"
+    case n551112 = "551112"
+    case n561311 = "561311"
+    case n561422 = "561422"
     case n561499 = "561499"
+    case n561510 = "561510"
+    case n561612 = "561612"
+    case n561730 = "561730"
+    case n561740 = "561740"
+    case n562111 = "562111"
+    case n562920 = "562920"
+    case n611110 = "611110"
+    case n611310 = "611310"
+    case n611410 = "611410"
+    case n611710 = "611710"
+    case n621111 = "621111"
+    case n621210 = "621210"
+    case n621399 = "621399"
+    case n621511 = "621511"
+    case n621910 = "621910"
+    case n622110 = "622110"
+    case n623110 = "623110"
+    case n623220 = "623220"
+    case n624410 = "624410"
+    case n711110 = "711110"
+    case n711211 = "711211"
+    case n711410 = "711410"
+    case n711510 = "711510"
+    case n712110 = "712110"
+    case n713110 = "713110"
+    case n713210 = "713210"
+    case n721110 = "721110"
+    case n722511 = "722511"
+    case n722513 = "722513"
+    case n811111 = "811111"
+    case n811210 = "811210"
+    case n812111 = "812111"
+    case n812112 = "812112"
+    case n812199 = "812199"
+    case n813110 = "813110"
+    case n813211 = "813211"
+    case n813219 = "813219"
     case dapp = "dapp"
     case exchange = "exchange"
     case gambling = "gambling"
@@ -314,6 +314,15 @@ public enum AmlStatus: String, Codable, Sendable {
     case clear = "clear"
     case hit = "hit"
     case error = "error"
+}
+
+// MARK: - Sole Proprietor Document Type
+
+/// Type of sole proprietor document
+public enum SoleProprietorDocType: String, Codable, Sendable {
+    case bankStatement = "bank_statement"
+    case masterServiceAgreement = "master_service_agreement"
+    case salarySlip = "salary_slip"
 }
 
 // MARK: - Owner Tax Type
@@ -669,6 +678,15 @@ public struct CreateReceiverInput: Codable, Sendable {
     /// Occupation (optional)
     public let occupation: String?
 
+    /// Recipient relationship (optional)
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Sole proprietor document type (optional)
+    public let soleProprietorDocType: SoleProprietorDocType?
+
+    /// AML status (optional)
+    public let amlStatus: AmlStatus?
+
     public init(
         country: Country,
         email: String,
@@ -715,7 +733,10 @@ public struct CreateReceiverInput: Codable, Sendable {
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
-        occupation: String? = nil
+        occupation: String? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        soleProprietorDocType: SoleProprietorDocType? = nil,
+        amlStatus: AmlStatus? = nil
     ) {
         self.country = country
         self.email = email
@@ -763,6 +784,9 @@ public struct CreateReceiverInput: Codable, Sendable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.recipientRelationship = recipientRelationship
+        self.soleProprietorDocType = soleProprietorDocType
+        self.amlStatus = amlStatus
     }
 
     enum CodingKeys: String, CodingKey {
@@ -812,6 +836,9 @@ public struct CreateReceiverInput: Codable, Sendable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case recipientRelationship = "recipient_relationship"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
+        case amlStatus = "aml_status"
     }
 }
 
@@ -1080,6 +1107,12 @@ public struct Receiver: Codable, Sendable, Equatable {
     /// Occupation
     public let occupation: String?
 
+    /// Recipient relationship
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Sole proprietor document type
+    public let soleProprietorDocType: SoleProprietorDocType?
+
     /// AML screening status
     public let amlStatus: AmlStatus?
 
@@ -1143,6 +1176,8 @@ public struct Receiver: Codable, Sendable, Equatable {
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
         occupation: String? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        soleProprietorDocType: SoleProprietorDocType? = nil,
         amlStatus: AmlStatus? = nil,
         amlHits: AmlHits? = nil
     ) {
@@ -1202,6 +1237,8 @@ public struct Receiver: Codable, Sendable, Equatable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.recipientRelationship = recipientRelationship
+        self.soleProprietorDocType = soleProprietorDocType
         self.amlStatus = amlStatus
         self.amlHits = amlHits
     }
@@ -1263,6 +1300,8 @@ public struct Receiver: Codable, Sendable, Equatable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case recipientRelationship = "recipient_relationship"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
         case amlStatus = "aml_status"
         case amlHits = "aml_hits"
     }
@@ -1404,6 +1443,15 @@ public struct UpdateReceiverInput: Codable, Sendable {
     /// Occupation (optional)
     public let occupation: String?
 
+    /// Recipient relationship (optional)
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Sole proprietor document type (optional)
+    public let soleProprietorDocType: SoleProprietorDocType?
+
+    /// AML status (optional)
+    public let amlStatus: AmlStatus?
+
     public init(
         country: Country,
         email: String,
@@ -1448,7 +1496,10 @@ public struct UpdateReceiverInput: Codable, Sendable {
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
-        occupation: String? = nil
+        occupation: String? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        soleProprietorDocType: SoleProprietorDocType? = nil,
+        amlStatus: AmlStatus? = nil
     ) {
         self.country = country
         self.email = email
@@ -1494,6 +1545,9 @@ public struct UpdateReceiverInput: Codable, Sendable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.recipientRelationship = recipientRelationship
+        self.soleProprietorDocType = soleProprietorDocType
+        self.amlStatus = amlStatus
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1541,6 +1595,9 @@ public struct UpdateReceiverInput: Codable, Sendable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case recipientRelationship = "recipient_relationship"
+        case soleProprietorDocType = "sole_proprietor_doc_type"
+        case amlStatus = "aml_status"
     }
 }
 
