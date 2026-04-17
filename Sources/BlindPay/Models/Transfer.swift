@@ -104,6 +104,30 @@ public struct Transfer: Codable, Sendable, Equatable {
     /// External identifier
     public let externalId: String?
 
+    /// Receiver ID
+    public let receiverId: String?
+
+    /// Address
+    public let address: String?
+
+    /// Network
+    public let network: String?
+
+    /// Partner fee amount
+    public let partnerFeeAmount: Double?
+
+    /// Image URL
+    public let imageUrl: String?
+
+    /// First name
+    public let firstName: String?
+
+    /// Last name
+    public let lastName: String?
+
+    /// Legal name
+    public let legalName: String?
+
     public init(
         id: String,
         status: TransactionStatus,
@@ -123,7 +147,15 @@ public struct Transfer: Codable, Sendable, Equatable {
         receiverWalletAddress: String? = nil,
         createdAt: String? = nil,
         updatedAt: String? = nil,
-        externalId: String? = nil
+        externalId: String? = nil,
+        receiverId: String? = nil,
+        address: String? = nil,
+        network: String? = nil,
+        partnerFeeAmount: Double? = nil,
+        imageUrl: String? = nil,
+        firstName: String? = nil,
+        lastName: String? = nil,
+        legalName: String? = nil
     ) {
         self.id = id
         self.status = status
@@ -144,6 +176,14 @@ public struct Transfer: Codable, Sendable, Equatable {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.externalId = externalId
+        self.receiverId = receiverId
+        self.address = address
+        self.network = network
+        self.partnerFeeAmount = partnerFeeAmount
+        self.imageUrl = imageUrl
+        self.firstName = firstName
+        self.lastName = lastName
+        self.legalName = legalName
     }
 
     enum CodingKeys: String, CodingKey {
@@ -166,6 +206,14 @@ public struct Transfer: Codable, Sendable, Equatable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case externalId = "external_id"
+        case receiverId = "receiver_id"
+        case address
+        case network
+        case partnerFeeAmount = "partner_fee_amount"
+        case imageUrl = "image_url"
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case legalName = "legal_name"
     }
 }
 
