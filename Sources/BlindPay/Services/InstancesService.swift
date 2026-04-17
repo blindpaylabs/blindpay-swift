@@ -31,9 +31,6 @@ public final class InstancesService: Sendable {
     /// Payouts management service
     public let payouts: PayoutsService
     
-    /// Terms of service management service
-    public let termsOfService: TermsOfServiceService
-    
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -43,7 +40,6 @@ public final class InstancesService: Sendable {
         self.webhookEndpoints = WebhookEndpointsService(apiClient: apiClient, instanceId: instanceId)
         self.payins = PayinsService(apiClient: apiClient, instanceId: instanceId)
         self.payouts = PayoutsService(apiClient: apiClient, instanceId: instanceId)
-        self.termsOfService = TermsOfServiceService(apiClient: apiClient, instanceId: instanceId)
     }
     
     /// Retrieves all members of the instance
@@ -171,6 +167,7 @@ public final class InstancesService: Sendable {
     /// ```
     public func updateMemberRole(memberId: String, role: InstanceMemberRole) async throws -> APIResponse<VoidResponse> {
         let updateInput = UpdateMemberRoleInput(role: role)
+
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
             method: .put,
