@@ -116,10 +116,14 @@ public struct UpdateInstanceInput: Codable, Sendable {
 /// Input for updating a member's role
 public struct UpdateMemberRoleInput: Codable, Sendable {
     /// The new role to assign to the member
-    public let role: InstanceMemberRole
-    
+    public let userRole: InstanceMemberRole
+
     public init(role: InstanceMemberRole) {
-        self.role = role
+        self.userRole = role
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case userRole = "user_role"
     }
 }
 
