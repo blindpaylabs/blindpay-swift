@@ -52,8 +52,6 @@ public enum TransactionDocumentType: String, Codable, Sendable {
 
 /// Currency type
 public enum Currency: String, Codable, Sendable {
-    case usdc = "USDC"
-    case usdt = "USDT"
     case usdb = "USDB"
     case brl = "BRL"
     case usd = "USD"
