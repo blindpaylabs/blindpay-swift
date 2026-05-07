@@ -20,6 +20,7 @@ public enum Rail: String, Codable, Sendable {
     case achCopBitso = "ach_cop_bitso"
     case internationalSwift = "international_swift"
     case rtp = "rtp"
+    case ted = "ted"
 }
 
 /// Bank account type

@@ -27,6 +27,8 @@ public enum PaymentMethod: String, Codable, Sendable {
   case transfers = "transfers"
   case pse = "pse"
   case internationalSwift = "international_swift"
+  case rtp = "rtp"
+  case ted = "ted"
 }
 
 /// Payin type
@@ -432,6 +434,9 @@ public struct Payin: Codable, Sendable, Equatable {
   /// Partner fee amount
   public let partnerFeeAmount: Int?
 
+  /// Partner fee ID
+  public let partnerFeeId: String?
+
   /// Total fee amount
   public let totalFeeAmount: Double?
 
@@ -502,6 +507,7 @@ public struct Payin: Codable, Sendable, Equatable {
     receiverAmount: Int? = nil,
     token: StablecoinToken? = nil,
     partnerFeeAmount: Int? = nil,
+    partnerFeeId: String? = nil,
     totalFeeAmount: Double? = nil,
     commercialQuotation: Double? = nil,
     blindpayQuotation: Double? = nil,
@@ -542,6 +548,7 @@ public struct Payin: Codable, Sendable, Equatable {
     self.receiverAmount = receiverAmount
     self.token = token
     self.partnerFeeAmount = partnerFeeAmount
+    self.partnerFeeId = partnerFeeId
     self.totalFeeAmount = totalFeeAmount
     self.commercialQuotation = commercialQuotation
     self.blindpayQuotation = blindpayQuotation
@@ -584,6 +591,7 @@ public struct Payin: Codable, Sendable, Equatable {
     case receiverAmount = "receiver_amount"
     case token
     case partnerFeeAmount = "partner_fee_amount"
+    case partnerFeeId = "partner_fee_id"
     case totalFeeAmount = "total_fee_amount"
     case commercialQuotation = "commercial_quotation"
     case blindpayQuotation = "blindpay_quotation"

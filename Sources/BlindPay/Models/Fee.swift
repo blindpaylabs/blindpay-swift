@@ -55,6 +55,9 @@ public struct FeesResponse: Codable, Sendable, Equatable {
     /// RTP fees
     public let rtp: FeeOptions?
 
+    /// TED fees
+    public let ted: FeeOptions?
+
     /// International SWIFT fees
     public let internationalSwift: FeeOptions?
 
@@ -106,6 +109,7 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         ach: FeeOptions? = nil,
         domesticWire: FeeOptions? = nil,
         rtp: FeeOptions? = nil,
+        ted: FeeOptions? = nil,
         internationalSwift: FeeOptions? = nil,
         pix: FeeOptions? = nil,
         pixSafe: FeeOptions? = nil,
@@ -127,6 +131,7 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         self.ach = ach
         self.domesticWire = domesticWire
         self.rtp = rtp
+        self.ted = ted
         self.internationalSwift = internationalSwift
         self.pix = pix
         self.pixSafe = pixSafe
@@ -150,6 +155,7 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         case ach
         case domesticWire = "domestic_wire"
         case rtp
+        case ted
         case internationalSwift = "international_swift"
         case pix
         case pixSafe = "pix_safe"

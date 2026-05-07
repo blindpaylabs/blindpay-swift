@@ -51,6 +51,7 @@ public enum PaymentType: String, Codable, Sendable {
   case achCopBitso = "ach_cop_bitso"
   case internationalSwift = "international_swift"
   case rtp = "rtp"
+  case ted = "ted"
 }
 
 /// Account type
@@ -401,6 +402,18 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Partner fee amount (in smallest currency unit)
   public let partnerFeeAmount: Int?
 
+  /// Partner fee ID
+  public let partnerFeeId: String?
+
+  /// TED bank code
+  public let tedBankCode: String?
+
+  /// TED branch code
+  public let tedBranchCode: String?
+
+  /// TED CPF/CNPJ
+  public let tedCpfCnpj: String?
+
   /// Commercial quotation
   public let commercialQuotation: Double?
 
@@ -552,6 +565,10 @@ public struct Payout: Codable, Sendable, Equatable {
     senderAmount: Int,
     receiverAmount: Int,
     partnerFeeAmount: Int? = nil,
+    partnerFeeId: String? = nil,
+    tedBankCode: String? = nil,
+    tedBranchCode: String? = nil,
+    tedCpfCnpj: String? = nil,
     commercialQuotation: Double? = nil,
     blindpayQuotation: Double? = nil,
     totalFeeAmount: Double? = nil,
@@ -619,6 +636,10 @@ public struct Payout: Codable, Sendable, Equatable {
     self.senderAmount = senderAmount
     self.receiverAmount = receiverAmount
     self.partnerFeeAmount = partnerFeeAmount
+    self.partnerFeeId = partnerFeeId
+    self.tedBankCode = tedBankCode
+    self.tedBranchCode = tedBranchCode
+    self.tedCpfCnpj = tedCpfCnpj
     self.commercialQuotation = commercialQuotation
     self.blindpayQuotation = blindpayQuotation
     self.totalFeeAmount = totalFeeAmount
@@ -688,6 +709,10 @@ public struct Payout: Codable, Sendable, Equatable {
     case senderAmount = "sender_amount"
     case receiverAmount = "receiver_amount"
     case partnerFeeAmount = "partner_fee_amount"
+    case partnerFeeId = "partner_fee_id"
+    case tedBankCode = "ted_bank_code"
+    case tedBranchCode = "ted_branch_code"
+    case tedCpfCnpj = "ted_cpf_cnpj"
     case commercialQuotation = "commercial_quotation"
     case blindpayQuotation = "blindpay_quotation"
     case totalFeeAmount = "total_fee_amount"

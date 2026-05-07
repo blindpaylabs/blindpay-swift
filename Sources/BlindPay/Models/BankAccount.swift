@@ -160,7 +160,16 @@ public struct BankAccount: Codable, Sendable, Equatable {
     
     /// SWIFT intermediary bank country
     public let swiftIntermediaryBankCountry: Country?
-    
+
+    /// TED bank code
+    public let tedBankCode: String?
+
+    /// TED branch code
+    public let tedBranchCode: String?
+
+    /// TED CPF/CNPJ
+    public let tedCpfCnpj: String?
+
     /// Tron wallet hash
     public let tronWalletHash: String?
     
@@ -221,6 +230,9 @@ public struct BankAccount: Codable, Sendable, Equatable {
         swiftIntermediaryBankAccountNumberIban: String? = nil,
         swiftIntermediaryBankName: String? = nil,
         swiftIntermediaryBankCountry: Country? = nil,
+        tedBankCode: String? = nil,
+        tedBranchCode: String? = nil,
+        tedCpfCnpj: String? = nil,
         tronWalletHash: String? = nil,
         offrampWallets: [OfframpWallet]? = nil,
         createdAt: String
@@ -275,6 +287,9 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban
         self.swiftIntermediaryBankName = swiftIntermediaryBankName
         self.swiftIntermediaryBankCountry = swiftIntermediaryBankCountry
+        self.tedBankCode = tedBankCode
+        self.tedBranchCode = tedBranchCode
+        self.tedCpfCnpj = tedCpfCnpj
         self.tronWalletHash = tronWalletHash
         self.offrampWallets = offrampWallets
         self.createdAt = createdAt
@@ -331,6 +346,9 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case swiftIntermediaryBankAccountNumberIban = "swift_intermediary_bank_account_number_iban"
         case swiftIntermediaryBankName = "swift_intermediary_bank_name"
         case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
+        case tedBankCode = "ted_bank_code"
+        case tedBranchCode = "ted_branch_code"
+        case tedCpfCnpj = "ted_cpf_cnpj"
         case tronWalletHash = "tron_wallet_hash"
         case offrampWallets = "offramp_wallets"
         case createdAt = "created_at"
@@ -517,6 +535,15 @@ public struct CreateBankAccountInput: Codable, Sendable {
     /// Date of birth
     public let dateOfBirth: String?
 
+    /// TED bank code
+    public let tedBankCode: String?
+
+    /// TED branch code
+    public let tedBranchCode: String?
+
+    /// TED CPF/CNPJ
+    public let tedCpfCnpj: String?
+
     public init(
         name: String,
         type: Rail,
@@ -572,7 +599,10 @@ public struct CreateBankAccountInput: Codable, Sendable {
         businessIndustry: String? = nil,
         phoneNumber: String? = nil,
         taxId: String? = nil,
-        dateOfBirth: String? = nil
+        dateOfBirth: String? = nil,
+        tedBankCode: String? = nil,
+        tedBranchCode: String? = nil,
+        tedCpfCnpj: String? = nil
     ) {
         self.name = name
         self.type = type
@@ -629,6 +659,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.phoneNumber = phoneNumber
         self.taxId = taxId
         self.dateOfBirth = dateOfBirth
+        self.tedBankCode = tedBankCode
+        self.tedBranchCode = tedBranchCode
+        self.tedCpfCnpj = tedCpfCnpj
     }
 
     enum CodingKeys: String, CodingKey {
@@ -687,6 +720,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case phoneNumber = "phone_number"
         case taxId = "tax_id"
         case dateOfBirth = "date_of_birth"
+        case tedBankCode = "ted_bank_code"
+        case tedBranchCode = "ted_branch_code"
+        case tedCpfCnpj = "ted_cpf_cnpj"
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -851,6 +887,15 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
         if let dateOfBirth = dateOfBirth {
             try container.encode(dateOfBirth, forKey: .dateOfBirth)
+        }
+        if let tedBankCode = tedBankCode {
+            try container.encode(tedBankCode, forKey: .tedBankCode)
+        }
+        if let tedBranchCode = tedBranchCode {
+            try container.encode(tedBranchCode, forKey: .tedBranchCode)
+        }
+        if let tedCpfCnpj = tedCpfCnpj {
+            try container.encode(tedCpfCnpj, forKey: .tedCpfCnpj)
         }
     }
 }

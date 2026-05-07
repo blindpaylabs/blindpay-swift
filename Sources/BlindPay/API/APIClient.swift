@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// API client for making network requests
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)

@@ -834,6 +834,8 @@ public enum KYCStatus: String, Codable, Sendable {
     case pending = "pending"
     case deprecated = "deprecated"
     case pendingReview = "pending_review"
+    case awaitingContract = "awaiting_contract"
+    case complianceRequest = "compliance_request"
 }
 
 // MARK: - KYC Warning
