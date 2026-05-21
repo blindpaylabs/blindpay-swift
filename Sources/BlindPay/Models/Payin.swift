@@ -37,6 +37,12 @@ public enum PayinType: String, Codable, Sendable {
   case business = "business"
 }
 
+/// Manual execution status
+public enum ManualExecutionStatus: String, Codable, Sendable {
+  case pending = "pending"
+  case concluded = "concluded"
+}
+
 // MARK: - Tracking Types
 
 /// Transaction tracking information for payin
@@ -482,6 +488,15 @@ public struct Payin: Codable, Sendable, Equatable {
   /// PSE tax ID
   public let pseTaxId: String?
 
+  /// Manual execution concluded timestamp
+  public let manualConcludedAt: String?
+
+  /// Manual execution concluded by user
+  public let manualConcludedBy: String?
+
+  /// Manual execution status
+  public let manualExecutionStatus: ManualExecutionStatus?
+
   public init(
     id: String,
     receiverId: String,
@@ -522,7 +537,10 @@ public struct Payin: Codable, Sendable, Equatable {
     pseDocumentType: String? = nil,
     pseFullName: String? = nil,
     psePaymentLink: String? = nil,
-    pseTaxId: String? = nil
+    pseTaxId: String? = nil,
+    manualConcludedAt: String? = nil,
+    manualConcludedBy: String? = nil,
+    manualExecutionStatus: ManualExecutionStatus? = nil
   ) {
     self.id = id
     self.receiverId = receiverId
@@ -564,6 +582,9 @@ public struct Payin: Codable, Sendable, Equatable {
     self.pseFullName = pseFullName
     self.psePaymentLink = psePaymentLink
     self.pseTaxId = pseTaxId
+    self.manualConcludedAt = manualConcludedAt
+    self.manualConcludedBy = manualConcludedBy
+    self.manualExecutionStatus = manualExecutionStatus
   }
 
   enum CodingKeys: String, CodingKey {
@@ -607,6 +628,9 @@ public struct Payin: Codable, Sendable, Equatable {
     case pseFullName = "pse_full_name"
     case psePaymentLink = "pse_payment_link"
     case pseTaxId = "pse_tax_id"
+    case manualConcludedAt = "manual_concluded_at"
+    case manualConcludedBy = "manual_concluded_by"
+    case manualExecutionStatus = "manual_execution_status"
   }
 }
 

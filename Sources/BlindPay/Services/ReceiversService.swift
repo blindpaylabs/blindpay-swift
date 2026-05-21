@@ -26,6 +26,9 @@ public final class ReceiversService: Sendable {
     /// Custodial wallets management service
     public let custodialWallets: CustodialWalletsService
 
+    /// RFI (Request for Information) management service
+    public let rfi: RfiService
+
     init(apiClient: APIClient, instanceId: String, receiverId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -34,6 +37,7 @@ public final class ReceiversService: Sendable {
         self.virtualAccounts = VirtualAccountsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
         self.bankAccounts = BankAccountsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
         self.custodialWallets = CustodialWalletsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
+        self.rfi = RfiService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
     }
 }
 

@@ -21,6 +21,7 @@ public enum Rail: String, Codable, Sendable {
     case internationalSwift = "international_swift"
     case rtp = "rtp"
     case ted = "ted"
+    case sepa = "sepa"
 }
 
 /// Bank account type
@@ -47,6 +48,20 @@ public enum RecipientRelationship: String, Codable, Sendable {
     case landlord = "landlord"
     case family = "family"
     case other = "other"
+}
+
+/// Decision type
+public enum Decision: String, Codable, Sendable {
+    case approved = "approved"
+    case rejected = "rejected"
+}
+
+/// SWIFT payment code
+public enum SwiftPaymentCode: String, Codable, Sendable {
+    case hkSwiftCharitableDonation = "hk_swift_charitabledonation"
+    case hkSwiftGoods = "hk_swift_goods"
+    case hkSwiftPersonal = "hk_swift_personal"
+    case hkSwiftServices = "hk_swift_services"
 }
 
 /// Represents a NAICS business industry code

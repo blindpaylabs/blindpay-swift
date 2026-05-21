@@ -60,6 +60,7 @@ public enum Currency: String, Codable, Sendable {
     case mxn = "MXN"
     case cop = "COP"
     case ars = "ARS"
+    case eur = "EUR"
 }
 
 // MARK: - Create Quote

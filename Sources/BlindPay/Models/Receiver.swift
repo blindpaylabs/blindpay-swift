@@ -277,6 +277,7 @@ public enum BusinessIndustry: String, Codable, Sendable {
     case n541990 = "541990"
     case n541214 = "541214"
     case n561499 = "561499"
+    case n446120 = "446120"
     case dapp = "dapp"
     case exchange = "exchange"
     case gambling = "gambling"
