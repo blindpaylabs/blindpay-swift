@@ -1683,5 +1683,61 @@ public final class BlindPay: Sendable {
             body: data
         )
     }
+
+    // MARK: - RFI Service Methods
+
+    /// Get open RFI for receiver
+    ///
+    /// Retrieves the current open Request for Information (RFI) for the specified receiver.
+    /// An RFI is typically requested when additional information or documentation is needed
+    /// for compliance or verification purposes.
+    ///
+    /// - Parameter receiverId: The unique identifier of the receiver
+    /// - Returns: An `APIResponse` containing the open RFI if one exists
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.getRfi(receiverId: "re_000000000000")
+    /// if let rfi = response.data {
+    ///     print("RFI status: \(rfi.status)")
+    ///     print("RFI expires at: \(rfi.expiresAt)")
+    ///     // Process the RFI request sections
+    ///     for section in rfi.request {
+    ///         // Handle each section of the RFI
+    ///     }
+    /// }
+    /// ```
+    public func getRfi(receiverId: String) async throws -> APIResponse<RfiResponse> {
+        return try await instances.receivers(receiverId: receiverId).rfi.get()
+    }
+
+    /// Submit RFI response
+    ///
+    /// Submits a response to an open Request for Information (RFI) for the specified receiver.
+    /// This method allows you to provide the requested information or documentation to fulfill
+    /// the compliance or verification requirements.
+    ///
+    /// - Parameters:
+    ///   - receiverId: The unique identifier of the receiver
+    ///   - data: The RFI response data containing the requested information
+    /// - Returns: An `APIResponse` containing confirmation of submission
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let responseData: [String: AnyCodable] = [
+    ///     "section1": AnyCodable(["field1": "value1"]),
+    ///     "section2": AnyCodable(["field2": "value2"])
+    /// ]
+    /// let input = SubmitRfiInput(response: responseData)
+    /// let response = try await blindPay.submitRfi(receiverId: "re_000000000000", data: input)
+    /// if let result = response.data {
+    ///     print("RFI submission successful: \(result.success)")
+    /// }
+    /// ```
+    public func submitRfi(receiverId: String, data: SubmitRfiInput) async throws -> APIResponse<SubmitRfiResponse> {
+        return try await instances.receivers(receiverId: receiverId).rfi.submit(data: data)
+    }
 }
 
