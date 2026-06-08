@@ -103,7 +103,10 @@ public struct BankAccount: Codable, Sendable, Equatable {
     
     /// SWIFT code BIC
     public let swiftCodeBic: String?
-    
+
+    /// SEPA beneficiary BIC
+    public let sepaBeneficiaryBic: String?
+
     /// SWIFT account holder name
     public let swiftAccountHolderName: String?
     
@@ -211,6 +214,7 @@ public struct BankAccount: Codable, Sendable, Equatable {
         achCopDocumentType: AchCopDocumentType? = nil,
         achCopEmail: String? = nil,
         swiftCodeBic: String? = nil,
+        sepaBeneficiaryBic: String? = nil,
         swiftAccountHolderName: String? = nil,
         swiftAccountNumberIban: String? = nil,
         swiftBeneficiaryAddressLine1: String? = nil,
@@ -268,6 +272,7 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.achCopDocumentType = achCopDocumentType
         self.achCopEmail = achCopEmail
         self.swiftCodeBic = swiftCodeBic
+        self.sepaBeneficiaryBic = sepaBeneficiaryBic
         self.swiftAccountHolderName = swiftAccountHolderName
         self.swiftAccountNumberIban = swiftAccountNumberIban
         self.swiftBeneficiaryAddressLine1 = swiftBeneficiaryAddressLine1
@@ -327,6 +332,7 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case achCopDocumentType = "ach_cop_document_type"
         case achCopEmail = "ach_cop_email"
         case swiftCodeBic = "swift_code_bic"
+        case sepaBeneficiaryBic = "sepa_beneficiary_bic"
         case swiftAccountHolderName = "swift_account_holder_name"
         case swiftAccountNumberIban = "swift_account_number_iban"
         case swiftBeneficiaryAddressLine1 = "swift_beneficiary_address_line_1"
@@ -502,6 +508,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
     /// SWIFT code BIC
     public let swiftCodeBic: String?
 
+    /// SEPA beneficiary BIC
+    public let sepaBeneficiaryBic: String?
+
     /// SWIFT payment code (required for PK, PH, KE, JP, IN, ID, CN, CH, BH)
     public let swiftPaymentCode: String?
 
@@ -589,6 +598,7 @@ public struct CreateBankAccountInput: Codable, Sendable {
         swiftBeneficiaryPostalCode: String? = nil,
         swiftBeneficiaryStateProvinceRegion: String? = nil,
         swiftCodeBic: String? = nil,
+        sepaBeneficiaryBic: String? = nil,
         swiftPaymentCode: String? = nil,
         swiftIntermediaryBankAccountNumberIban: String? = nil,
         swiftIntermediaryBankCountry: Country? = nil,
@@ -648,6 +658,7 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.swiftBeneficiaryPostalCode = swiftBeneficiaryPostalCode
         self.swiftBeneficiaryStateProvinceRegion = swiftBeneficiaryStateProvinceRegion
         self.swiftCodeBic = swiftCodeBic
+        self.sepaBeneficiaryBic = sepaBeneficiaryBic
         self.swiftPaymentCode = swiftPaymentCode
         self.swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban
         self.swiftIntermediaryBankCountry = swiftIntermediaryBankCountry
@@ -709,6 +720,7 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case swiftBeneficiaryPostalCode = "swift_beneficiary_postal_code"
         case swiftBeneficiaryStateProvinceRegion = "swift_beneficiary_state_province_region"
         case swiftCodeBic = "swift_code_bic"
+        case sepaBeneficiaryBic = "sepa_beneficiary_bic"
         case swiftPaymentCode = "swift_payment_code"
         case swiftIntermediaryBankAccountNumberIban = "swift_intermediary_bank_account_number_iban"
         case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
@@ -854,6 +866,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
         if let swiftCodeBic = swiftCodeBic {
             try container.encode(swiftCodeBic, forKey: .swiftCodeBic)
+        }
+        if let sepaBeneficiaryBic = sepaBeneficiaryBic {
+            try container.encode(sepaBeneficiaryBic, forKey: .sepaBeneficiaryBic)
         }
         if let swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban {
             try container.encode(swiftIntermediaryBankAccountNumberIban, forKey: .swiftIntermediaryBankAccountNumberIban)

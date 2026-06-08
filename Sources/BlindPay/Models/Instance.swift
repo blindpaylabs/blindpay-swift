@@ -127,6 +127,30 @@ public struct UpdateMemberRoleInput: Codable, Sendable {
     }
 }
 
+/// Input for migrating instance ownership
+public struct MigrateInstanceOwnershipInput: Codable, Sendable {
+    /// User ID of the new owner
+    public let userId: String
+
+    public init(userId: String) {
+        self.userId = userId
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+    }
+}
+
+/// Response for migrating instance ownership
+public struct MigrateInstanceOwnershipResponse: Codable, Sendable, Equatable {
+    /// Success status
+    public let success: Bool
+
+    public init(success: Bool) {
+        self.success = success
+    }
+}
+
 /// Empty response type for void operations
 public struct VoidResponse: Codable, Sendable {
     public init() {}

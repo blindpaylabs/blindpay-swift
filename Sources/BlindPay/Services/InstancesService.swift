@@ -178,7 +178,32 @@ public final class InstancesService: Sendable {
             body: updateInput
         )
     }
-    
+
+    /// Migrates instance ownership to a new user
+    ///
+    /// This method transfers ownership of the instance to another user.
+    /// The user specified must have appropriate permissions and access to the instance.
+    ///
+    /// - Parameter data: The input data containing the new owner's user ID
+    /// - Returns: An `APIResponse` containing the success status
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = MigrateInstanceOwnershipInput(userId: "user_456")
+    /// let response = try await blindPay.instances.migrateOwnership(data: input)
+    /// if let result = response.data {
+    ///     print("Ownership migration successful: \(result.success)")
+    /// }
+    /// ```
+    public func migrateOwnership(data: MigrateInstanceOwnershipInput) async throws -> APIResponse<MigrateInstanceOwnershipResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/ownership",
+            method: .post,
+            body: data
+        )
+    }
+
     /// Creates an asset trustline for a Stellar wallet
     ///
     /// This method creates an asset trustline transaction that needs to be signed and submitted.
