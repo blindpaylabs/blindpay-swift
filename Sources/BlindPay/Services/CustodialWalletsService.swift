@@ -12,21 +12,21 @@ import Foundation
 public final class CustodialWalletsService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
-    private let receiverId: String
+    private let customerId: String
 
-    init(apiClient: APIClient, instanceId: String, receiverId: String) {
+    init(apiClient: APIClient, instanceId: String, customerId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
-        self.receiverId = receiverId
+        self.customerId = customerId
     }
 
-    /// Lists all custodial wallets for the receiver
+    /// Lists all custodial wallets for the customer
     ///
     /// - Returns: An `APIResponse` containing an array of `CustodialWallet` objects
     /// - Throws: `BlindPayError` if the request fails
     public func list() async throws -> APIResponse<CustodialWalletsResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/wallets",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets",
             method: .get
         )
     }
@@ -38,7 +38,7 @@ public final class CustodialWalletsService: Sendable {
     /// - Throws: `BlindPayError` if the request fails
     public func get(id: String) async throws -> APIResponse<CustodialWalletResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/wallets/\(id)",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)",
             method: .get
         )
     }
@@ -50,7 +50,7 @@ public final class CustodialWalletsService: Sendable {
     /// - Throws: `BlindPayError` if the request fails
     public func create(data: CreateCustodialWalletInput) async throws -> APIResponse<CreateCustodialWalletResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/wallets",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets",
             method: .post,
             body: data
         )
@@ -63,7 +63,7 @@ public final class CustodialWalletsService: Sendable {
     /// - Throws: `BlindPayError` if the request fails
     public func getBalance(id: String) async throws -> APIResponse<CustodialWalletBalanceResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/wallets/\(id)/balance",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)/balance",
             method: .get
         )
     }
@@ -75,7 +75,7 @@ public final class CustodialWalletsService: Sendable {
     /// - Throws: `BlindPayError` if the request fails
     public func delete(id: String) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/wallets/\(id)",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)",
             method: .delete
         )
     }

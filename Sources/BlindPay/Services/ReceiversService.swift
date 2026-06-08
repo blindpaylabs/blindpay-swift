@@ -8,12 +8,16 @@
 import Foundation
 
 /// Service for managing receiver resources
+///
+/// - Note: Deprecated since 2.10.0. Use `CustomersService` via
+///   `blindPay.customers(customerId:)` instead. See
+///   https://www.blindpay.com/changelog/2026-06-04-customers-rename
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 public final class ReceiversService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
     private let receiverId: String
-    
+
     /// Blockchain wallets management service
     public let blockchainWallets: BlockchainWalletsService
 
@@ -30,10 +34,10 @@ public final class ReceiversService: Sendable {
         self.apiClient = apiClient
         self.instanceId = instanceId
         self.receiverId = receiverId
-        self.blockchainWallets = BlockchainWalletsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
-        self.virtualAccounts = VirtualAccountsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
-        self.bankAccounts = BankAccountsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
-        self.custodialWallets = CustodialWalletsService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
+        self.blockchainWallets = BlockchainWalletsService(apiClient: apiClient, instanceId: instanceId, customerId: receiverId)
+        self.virtualAccounts = VirtualAccountsService(apiClient: apiClient, instanceId: instanceId, customerId: receiverId)
+        self.bankAccounts = BankAccountsService(apiClient: apiClient, instanceId: instanceId, customerId: receiverId)
+        self.custodialWallets = CustodialWalletsService(apiClient: apiClient, instanceId: instanceId, customerId: receiverId)
     }
 }
 

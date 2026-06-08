@@ -12,12 +12,12 @@ import Foundation
 public final class BlockchainWalletsService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
-    private let receiverId: String
+    private let customerId: String
     
-    init(apiClient: APIClient, instanceId: String, receiverId: String) {
+    init(apiClient: APIClient, instanceId: String, customerId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
-        self.receiverId = receiverId
+        self.customerId = customerId
     }
     
     /// Retrieves the sign message for a blockchain wallet
@@ -29,28 +29,28 @@ public final class BlockchainWalletsService: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").blockchainWallets.getSignMessage()
+    /// let response = try await blindPay.customers(customerId: "re_123").blockchainWallets.getSignMessage()
     /// if let signMessage = response.data {
     ///     print("Message to sign: \(signMessage.message)")
     /// }
     /// ```
     public func getSignMessage() async throws -> APIResponse<BlockchainWalletSignMessageResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/blockchain-wallets/sign-message",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/sign-message",
             method: .get
         )
     }
     
-    /// Lists all blockchain wallets for the receiver
+    /// Lists all blockchain wallets for the customer
     ///
-    /// This method fetches a list of all blockchain wallets associated with the receiver.
+    /// This method fetches a list of all blockchain wallets associated with the customer.
     ///
     /// - Returns: An `APIResponse` containing an array of `BlockchainWallet` objects
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").blockchainWallets.list()
+    /// let response = try await blindPay.customers(customerId: "re_123").blockchainWallets.list()
     /// if let wallets = response.data {
     ///     for wallet in wallets {
     ///         print("\(wallet.name) - \(wallet.network.rawValue)")
@@ -62,12 +62,12 @@ public final class BlockchainWalletsService: Sendable {
     /// ```
     public func list() async throws -> APIResponse<BlockchainWalletsResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/blockchain-wallets",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets",
             method: .get
         )
     }
     
-    /// Creates a new blockchain wallet for the receiver
+    /// Creates a new blockchain wallet for the customer
     ///
     /// This method creates a new blockchain wallet with the specified name, network, and optional address.
     ///
@@ -84,7 +84,7 @@ public final class BlockchainWalletsService: Sendable {
     ///     signatureTxHash: "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
     ///     isAccountAbstraction: false
     /// )
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").blockchainWallets.create(data: input)
+    /// let response = try await blindPay.customers(customerId: "re_123").blockchainWallets.create(data: input)
     /// if let wallet = response.data {
     ///     print("Created wallet: \(wallet.id)")
     ///     print("Network: \(wallet.network.rawValue)")
@@ -92,7 +92,7 @@ public final class BlockchainWalletsService: Sendable {
     /// ```
     public func create(data: CreateBlockchainWalletInput) async throws -> APIResponse<CreateBlockchainWalletResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/blockchain-wallets",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets",
             method: .post,
             body: data
         )
@@ -108,7 +108,7 @@ public final class BlockchainWalletsService: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").blockchainWallets.get(id: "bw_123")
+    /// let response = try await blindPay.customers(customerId: "re_123").blockchainWallets.get(id: "bw_123")
     /// if let wallet = response.data {
     ///     print("Wallet name: \(wallet.name)")
     ///     print("Network: \(wallet.network.rawValue)")
@@ -119,7 +119,7 @@ public final class BlockchainWalletsService: Sendable {
     /// ```
     public func get(id: String) async throws -> APIResponse<BlockchainWalletResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/blockchain-wallets/\(id)",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/\(id)",
             method: .get
         )
     }
@@ -134,7 +134,7 @@ public final class BlockchainWalletsService: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").blockchainWallets.delete(id: "bw_123")
+    /// let response = try await blindPay.customers(customerId: "re_123").blockchainWallets.delete(id: "bw_123")
     /// if let error = response.error {
     ///     print("Error: \(error.message)")
     /// } else {
@@ -143,7 +143,7 @@ public final class BlockchainWalletsService: Sendable {
     /// ```
     public func delete(id: String) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/blockchain-wallets/\(id)",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/\(id)",
             method: .delete
         )
     }
