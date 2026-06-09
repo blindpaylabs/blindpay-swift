@@ -107,6 +107,30 @@ public struct BankAccount: Codable, Sendable, Equatable {
     /// SEPA beneficiary BIC
     public let sepaBeneficiaryBic: String?
 
+    /// SEPA IBAN
+    public let sepaIban: String?
+
+    /// SEPA beneficiary legal name
+    public let sepaBeneficiaryLegalName: String?
+
+    /// SEPA beneficiary address line 1
+    public let sepaBeneficiaryAddressLine1: String?
+
+    /// SEPA beneficiary address line 2
+    public let sepaBeneficiaryAddressLine2: String?
+
+    /// SEPA beneficiary city
+    public let sepaBeneficiaryCity: String?
+
+    /// SEPA beneficiary state/province/region
+    public let sepaBeneficiaryStateProvinceRegion: String?
+
+    /// SEPA beneficiary postal code
+    public let sepaBeneficiaryPostalCode: String?
+
+    /// SEPA beneficiary country
+    public let sepaBeneficiaryCountry: Country?
+
     /// SWIFT account holder name
     public let swiftAccountHolderName: String?
     
@@ -215,6 +239,14 @@ public struct BankAccount: Codable, Sendable, Equatable {
         achCopEmail: String? = nil,
         swiftCodeBic: String? = nil,
         sepaBeneficiaryBic: String? = nil,
+        sepaIban: String? = nil,
+        sepaBeneficiaryLegalName: String? = nil,
+        sepaBeneficiaryAddressLine1: String? = nil,
+        sepaBeneficiaryAddressLine2: String? = nil,
+        sepaBeneficiaryCity: String? = nil,
+        sepaBeneficiaryStateProvinceRegion: String? = nil,
+        sepaBeneficiaryPostalCode: String? = nil,
+        sepaBeneficiaryCountry: Country? = nil,
         swiftAccountHolderName: String? = nil,
         swiftAccountNumberIban: String? = nil,
         swiftBeneficiaryAddressLine1: String? = nil,
@@ -273,6 +305,14 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.achCopEmail = achCopEmail
         self.swiftCodeBic = swiftCodeBic
         self.sepaBeneficiaryBic = sepaBeneficiaryBic
+        self.sepaIban = sepaIban
+        self.sepaBeneficiaryLegalName = sepaBeneficiaryLegalName
+        self.sepaBeneficiaryAddressLine1 = sepaBeneficiaryAddressLine1
+        self.sepaBeneficiaryAddressLine2 = sepaBeneficiaryAddressLine2
+        self.sepaBeneficiaryCity = sepaBeneficiaryCity
+        self.sepaBeneficiaryStateProvinceRegion = sepaBeneficiaryStateProvinceRegion
+        self.sepaBeneficiaryPostalCode = sepaBeneficiaryPostalCode
+        self.sepaBeneficiaryCountry = sepaBeneficiaryCountry
         self.swiftAccountHolderName = swiftAccountHolderName
         self.swiftAccountNumberIban = swiftAccountNumberIban
         self.swiftBeneficiaryAddressLine1 = swiftBeneficiaryAddressLine1
@@ -333,6 +373,14 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case achCopEmail = "ach_cop_email"
         case swiftCodeBic = "swift_code_bic"
         case sepaBeneficiaryBic = "sepa_beneficiary_bic"
+        case sepaIban = "sepa_iban"
+        case sepaBeneficiaryLegalName = "sepa_beneficiary_legal_name"
+        case sepaBeneficiaryAddressLine1 = "sepa_beneficiary_address_line_1"
+        case sepaBeneficiaryAddressLine2 = "sepa_beneficiary_address_line_2"
+        case sepaBeneficiaryCity = "sepa_beneficiary_city"
+        case sepaBeneficiaryStateProvinceRegion = "sepa_beneficiary_state_province_region"
+        case sepaBeneficiaryPostalCode = "sepa_beneficiary_postal_code"
+        case sepaBeneficiaryCountry = "sepa_beneficiary_country"
         case swiftAccountHolderName = "swift_account_holder_name"
         case swiftAccountNumberIban = "swift_account_number_iban"
         case swiftBeneficiaryAddressLine1 = "swift_beneficiary_address_line_1"
@@ -511,6 +559,30 @@ public struct CreateBankAccountInput: Codable, Sendable {
     /// SEPA beneficiary BIC
     public let sepaBeneficiaryBic: String?
 
+    /// SEPA IBAN
+    public let sepaIban: String?
+
+    /// SEPA beneficiary legal name
+    public let sepaBeneficiaryLegalName: String?
+
+    /// SEPA beneficiary address line 1
+    public let sepaBeneficiaryAddressLine1: String?
+
+    /// SEPA beneficiary address line 2
+    public let sepaBeneficiaryAddressLine2: String?
+
+    /// SEPA beneficiary city
+    public let sepaBeneficiaryCity: String?
+
+    /// SEPA beneficiary state/province/region
+    public let sepaBeneficiaryStateProvinceRegion: String?
+
+    /// SEPA beneficiary postal code
+    public let sepaBeneficiaryPostalCode: String?
+
+    /// SEPA beneficiary country
+    public let sepaBeneficiaryCountry: Country?
+
     /// SWIFT payment code (required for PK, PH, KE, JP, IN, ID, CN, CH, BH)
     public let swiftPaymentCode: String?
 
@@ -599,6 +671,14 @@ public struct CreateBankAccountInput: Codable, Sendable {
         swiftBeneficiaryStateProvinceRegion: String? = nil,
         swiftCodeBic: String? = nil,
         sepaBeneficiaryBic: String? = nil,
+        sepaIban: String? = nil,
+        sepaBeneficiaryLegalName: String? = nil,
+        sepaBeneficiaryAddressLine1: String? = nil,
+        sepaBeneficiaryAddressLine2: String? = nil,
+        sepaBeneficiaryCity: String? = nil,
+        sepaBeneficiaryStateProvinceRegion: String? = nil,
+        sepaBeneficiaryPostalCode: String? = nil,
+        sepaBeneficiaryCountry: Country? = nil,
         swiftPaymentCode: String? = nil,
         swiftIntermediaryBankAccountNumberIban: String? = nil,
         swiftIntermediaryBankCountry: Country? = nil,
@@ -659,6 +739,14 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.swiftBeneficiaryStateProvinceRegion = swiftBeneficiaryStateProvinceRegion
         self.swiftCodeBic = swiftCodeBic
         self.sepaBeneficiaryBic = sepaBeneficiaryBic
+        self.sepaIban = sepaIban
+        self.sepaBeneficiaryLegalName = sepaBeneficiaryLegalName
+        self.sepaBeneficiaryAddressLine1 = sepaBeneficiaryAddressLine1
+        self.sepaBeneficiaryAddressLine2 = sepaBeneficiaryAddressLine2
+        self.sepaBeneficiaryCity = sepaBeneficiaryCity
+        self.sepaBeneficiaryStateProvinceRegion = sepaBeneficiaryStateProvinceRegion
+        self.sepaBeneficiaryPostalCode = sepaBeneficiaryPostalCode
+        self.sepaBeneficiaryCountry = sepaBeneficiaryCountry
         self.swiftPaymentCode = swiftPaymentCode
         self.swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban
         self.swiftIntermediaryBankCountry = swiftIntermediaryBankCountry
@@ -721,6 +809,14 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case swiftBeneficiaryStateProvinceRegion = "swift_beneficiary_state_province_region"
         case swiftCodeBic = "swift_code_bic"
         case sepaBeneficiaryBic = "sepa_beneficiary_bic"
+        case sepaIban = "sepa_iban"
+        case sepaBeneficiaryLegalName = "sepa_beneficiary_legal_name"
+        case sepaBeneficiaryAddressLine1 = "sepa_beneficiary_address_line_1"
+        case sepaBeneficiaryAddressLine2 = "sepa_beneficiary_address_line_2"
+        case sepaBeneficiaryCity = "sepa_beneficiary_city"
+        case sepaBeneficiaryStateProvinceRegion = "sepa_beneficiary_state_province_region"
+        case sepaBeneficiaryPostalCode = "sepa_beneficiary_postal_code"
+        case sepaBeneficiaryCountry = "sepa_beneficiary_country"
         case swiftPaymentCode = "swift_payment_code"
         case swiftIntermediaryBankAccountNumberIban = "swift_intermediary_bank_account_number_iban"
         case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
@@ -869,6 +965,30 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
         if let sepaBeneficiaryBic = sepaBeneficiaryBic {
             try container.encode(sepaBeneficiaryBic, forKey: .sepaBeneficiaryBic)
+        }
+        if let sepaIban = sepaIban {
+            try container.encode(sepaIban, forKey: .sepaIban)
+        }
+        if let sepaBeneficiaryLegalName = sepaBeneficiaryLegalName {
+            try container.encode(sepaBeneficiaryLegalName, forKey: .sepaBeneficiaryLegalName)
+        }
+        if let sepaBeneficiaryAddressLine1 = sepaBeneficiaryAddressLine1 {
+            try container.encode(sepaBeneficiaryAddressLine1, forKey: .sepaBeneficiaryAddressLine1)
+        }
+        if let sepaBeneficiaryAddressLine2 = sepaBeneficiaryAddressLine2 {
+            try container.encode(sepaBeneficiaryAddressLine2, forKey: .sepaBeneficiaryAddressLine2)
+        }
+        if let sepaBeneficiaryCity = sepaBeneficiaryCity {
+            try container.encode(sepaBeneficiaryCity, forKey: .sepaBeneficiaryCity)
+        }
+        if let sepaBeneficiaryStateProvinceRegion = sepaBeneficiaryStateProvinceRegion {
+            try container.encode(sepaBeneficiaryStateProvinceRegion, forKey: .sepaBeneficiaryStateProvinceRegion)
+        }
+        if let sepaBeneficiaryPostalCode = sepaBeneficiaryPostalCode {
+            try container.encode(sepaBeneficiaryPostalCode, forKey: .sepaBeneficiaryPostalCode)
+        }
+        if let sepaBeneficiaryCountry = sepaBeneficiaryCountry {
+            try container.encode(sepaBeneficiaryCountry, forKey: .sepaBeneficiaryCountry)
         }
         if let swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban {
             try container.encode(swiftIntermediaryBankAccountNumberIban, forKey: .swiftIntermediaryBankAccountNumberIban)
