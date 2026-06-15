@@ -11,6 +11,7 @@ import Foundation
 public enum WebhookEvent: String, Codable, Sendable {
     case receiverNew = "receiver.new"
     case receiverUpdate = "receiver.update"
+    case receiverDelete = "receiver.delete"
     case bankAccountNew = "bankAccount.new"
     case payoutNew = "payout.new"
     case payoutUpdate = "payout.update"
@@ -136,9 +137,61 @@ public struct WebhookPortalAccess: Codable, Sendable {
 public struct DeleteWebhookEndpointResponse: Codable, Sendable {
     /// Indicates if the deletion was successful
     public let success: Bool
-    
+
     public init(success: Bool) {
         self.success = success
+    }
+}
+
+/// Webhook payload for receiver delete events
+public struct ReceiverDeleteWebhookOut: Codable, Sendable, Equatable {
+    /// Unique identifier for the deleted receiver
+    public let id: String
+
+    /// Email of the deleted receiver
+    public let email: String
+
+    /// First name of the deleted receiver
+    public let firstName: String?
+
+    /// Last name of the deleted receiver
+    public let lastName: String?
+
+    /// Legal name of the deleted receiver
+    public let legalName: String?
+
+    /// Instance ID the receiver belonged to
+    public let instanceId: String
+
+    /// Timestamp when the receiver was deleted
+    public let deletedAt: String
+
+    public init(
+        id: String,
+        email: String,
+        firstName: String? = nil,
+        lastName: String? = nil,
+        legalName: String? = nil,
+        instanceId: String,
+        deletedAt: String
+    ) {
+        self.id = id
+        self.email = email
+        self.firstName = firstName
+        self.lastName = lastName
+        self.legalName = legalName
+        self.instanceId = instanceId
+        self.deletedAt = deletedAt
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case legalName = "legal_name"
+        case instanceId = "instance_id"
+        case deletedAt = "deleted_at"
     }
 }
 

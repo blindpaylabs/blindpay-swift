@@ -106,6 +106,11 @@ public enum TransfersType: String, Codable, Sendable {
   case alias = "ALIAS"
 }
 
+/// Manual execution status
+public enum ManualExecutionStatus: String, Codable, Sendable {
+  case failed = "failed"
+}
+
 // MARK: - Tracking Types
 
 /// Transaction tracking information for payout
@@ -540,6 +545,18 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Has virtual account
   public let hasVirtualAccount: Bool?
 
+  /// Billing fee amount
+  public let billingFeeAmount: Double?
+
+  /// CPN payment ID
+  public let cpnPaymentId: String?
+
+  /// Sender legal name
+  public let senderLegalName: String?
+
+  /// Manual execution status
+  public let manualExecutionStatus: ManualExecutionStatus?
+
   public init(
     id: String,
     receiverId: String,
@@ -610,7 +627,11 @@ public struct Payout: Codable, Sendable, Equatable {
     swiftAccountNumberIban: String? = nil,
     transfersAccount: String? = nil,
     transfersType: TransfersType? = nil,
-    hasVirtualAccount: Bool? = nil
+    hasVirtualAccount: Bool? = nil,
+    billingFeeAmount: Double? = nil,
+    cpnPaymentId: String? = nil,
+    senderLegalName: String? = nil,
+    manualExecutionStatus: ManualExecutionStatus? = nil
   ) {
     self.id = id
     self.receiverId = receiverId
@@ -682,6 +703,10 @@ public struct Payout: Codable, Sendable, Equatable {
     self.transfersAccount = transfersAccount
     self.transfersType = transfersType
     self.hasVirtualAccount = hasVirtualAccount
+    self.billingFeeAmount = billingFeeAmount
+    self.cpnPaymentId = cpnPaymentId
+    self.senderLegalName = senderLegalName
+    self.manualExecutionStatus = manualExecutionStatus
   }
 
   enum CodingKeys: String, CodingKey {
@@ -755,6 +780,10 @@ public struct Payout: Codable, Sendable, Equatable {
     case transfersAccount = "transfers_account"
     case transfersType = "transfers_type"
     case hasVirtualAccount = "has_virtual_account"
+    case billingFeeAmount = "billing_fee_amount"
+    case cpnPaymentId = "cpn_payment_id"
+    case senderLegalName = "sender_legal_name"
+    case manualExecutionStatus = "manual_execution_status"
   }
 }
 

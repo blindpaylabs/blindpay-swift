@@ -132,3 +132,59 @@ public struct VoidResponse: Codable, Sendable {
     public init() {}
 }
 
+/// Input for migrating instance ownership
+public struct MigrateInstanceOwnershipInput: Codable, Sendable {
+    /// User ID to transfer ownership to
+    public let userId: String
+
+    public init(userId: String) {
+        self.userId = userId
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+    }
+}
+
+/// Response type for successful operations
+public struct Success: Codable, Sendable, Equatable {
+    /// Indicates if the operation was successful
+    public let success: Bool
+
+    public init(success: Bool) {
+        self.success = success
+    }
+}
+
+/// Input for copying instance members
+public struct CopyInstanceMembersInput: Codable, Sendable {
+    /// The source instance ID to copy members from
+    public let sourceInstanceId: String
+
+    public init(sourceInstanceId: String) {
+        self.sourceInstanceId = sourceInstanceId
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case sourceInstanceId = "source_instance_id"
+    }
+}
+
+/// Response type for copying instance members
+public struct CopyInstanceMembersResponse: Codable, Sendable, Equatable {
+    /// Number of members copied
+    public let copied: Int
+
+    /// Number of members skipped
+    public let skipped: Int
+
+    /// Number of members that failed to copy
+    public let failed: Int
+
+    public init(copied: Int, skipped: Int, failed: Int) {
+        self.copied = copied
+        self.skipped = skipped
+        self.failed = failed
+    }
+}
+
