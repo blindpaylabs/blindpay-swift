@@ -410,6 +410,7 @@ public final class BlindPay: Sendable {
     ///     print("Created receiver: \(receiver.id)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func createReceiver(data: CreateReceiverInput) async throws -> APIResponse<CreateReceiverResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers",
@@ -444,6 +445,7 @@ public final class BlindPay: Sendable {
     ///     print("Has more: \(result.pagination.hasMore)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func listReceivers(
         limit: String? = nil,
         offset: String? = nil,
@@ -511,6 +513,7 @@ public final class BlindPay: Sendable {
     ///     print("KYC Status: \(receiver.kycStatus?.rawValue ?? "unknown")")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func getReceiver(id: String) async throws -> APIResponse<Receiver> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
@@ -541,6 +544,7 @@ public final class BlindPay: Sendable {
     ///     print("Update successful: \(result.success)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func updateReceiver(id: String, data: UpdateReceiverInput) async throws -> APIResponse<UpdateReceiverResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
@@ -564,6 +568,7 @@ public final class BlindPay: Sendable {
     ///     print("Deletion successful: \(result.success)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func deleteReceiver(id: String) async throws -> APIResponse<DeleteReceiverResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
@@ -587,6 +592,7 @@ public final class BlindPay: Sendable {
     ///     print("Payout monthly: \(limits.limits.payout.monthly)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func getReceiverLimits(id: String) async throws -> APIResponse<ReceiverLimitsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/limits/receivers/\(id)",
@@ -619,6 +625,7 @@ public final class BlindPay: Sendable {
     ///     print("Request ID: \(result.id)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func requestLimitIncrease(receiverId: String, data: RequestLimitIncreaseInput) async throws -> APIResponse<RequestLimitIncreaseResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
@@ -644,6 +651,7 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func listLimitIncreaseRequests(receiverId: String) async throws -> APIResponse<[LimitIncreaseRequest]> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",

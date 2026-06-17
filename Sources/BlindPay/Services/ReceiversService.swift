@@ -13,6 +13,7 @@ import Foundation
 ///   `blindPay.customers(customerId:)` instead. See
 ///   https://www.blindpay.com/changelog/2026-06-04-customers-rename
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+@available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use CustomersService via blindPay.customers(customerId:) instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
 public final class ReceiversService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
