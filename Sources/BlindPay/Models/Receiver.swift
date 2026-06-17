@@ -1611,17 +1611,6 @@ public struct Pagination: Codable, Sendable, Equatable {
     }
 }
 
-/// Response type for listing receivers
-public struct ListReceiversResponse: Codable, Sendable, Equatable {
-    /// Array of receivers
-    public let data: [Receiver]
-    
-    /// Pagination information
-    public let pagination: Pagination
-    
-    public init(data: [Receiver], pagination: Pagination) {
-        self.data = data
-        self.pagination = pagination
-    }
-}
+/// Response type for listing receivers — API returns a plain array
+public typealias ListReceiversResponse = [Receiver]
 

@@ -21,31 +21,31 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
     /// Wallet address
     public let address: String
     
-    /// Bank account ID
-    public let bankAccountId: String
-    
-    /// Instance ID
-    public let instanceId: String
-    
-    /// Receiver ID
-    public let receiverId: String
-    
-    /// Timestamp when the wallet was created
-    public let createdAt: String
-    
-    /// Timestamp when the wallet was last updated
-    public let updatedAt: String
-    
+    /// Bank account ID (omitted when nested inside a bank account)
+    public let bankAccountId: String?
+
+    /// Instance ID (omitted when nested inside a bank account)
+    public let instanceId: String?
+
+    /// Receiver ID (omitted when nested inside a bank account)
+    public let receiverId: String?
+
+    /// Timestamp when the wallet was created (omitted when nested inside a bank account)
+    public let createdAt: String?
+
+    /// Timestamp when the wallet was last updated (omitted when nested inside a bank account)
+    public let updatedAt: String?
+
     public init(
         id: String,
         externalId: String? = nil,
         network: Network,
         address: String,
-        bankAccountId: String,
-        instanceId: String,
-        receiverId: String,
-        createdAt: String,
-        updatedAt: String
+        bankAccountId: String? = nil,
+        instanceId: String? = nil,
+        receiverId: String? = nil,
+        createdAt: String? = nil,
+        updatedAt: String? = nil
     ) {
         self.id = id
         self.externalId = externalId

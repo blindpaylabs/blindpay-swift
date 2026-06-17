@@ -250,7 +250,28 @@ public final class BlindPay: Sendable {
             body: updateInput
         )
     }
-    
+
+    /// Migrates instance ownership to a new user
+    ///
+    /// This method transfers ownership of the instance to another user.
+    /// The user specified must have appropriate permissions and access to the instance.
+    ///
+    /// - Parameter data: The input data containing the new owner's user ID
+    /// - Returns: An `APIResponse` containing the success status
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = MigrateInstanceOwnershipInput(userId: "user_456")
+    /// let response = try await blindPay.migrateInstanceOwnership(data: input)
+    /// if let result = response.data {
+    ///     print("Ownership migration successful: \(result.success)")
+    /// }
+    /// ```
+    public func migrateInstanceOwnership(data: MigrateInstanceOwnershipInput) async throws -> APIResponse<MigrateInstanceOwnershipResponse> {
+        return try await instances.migrateOwnership(data: data)
+    }
+
     /// Creates an asset trustline for a Stellar wallet
     ///
     /// This method creates an asset trustline transaction that needs to be signed and submitted.
@@ -389,6 +410,7 @@ public final class BlindPay: Sendable {
     ///     print("Created receiver: \(receiver.id)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func createReceiver(data: CreateReceiverInput) async throws -> APIResponse<CreateReceiverResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers",
@@ -423,6 +445,7 @@ public final class BlindPay: Sendable {
     ///     print("Has more: \(result.pagination.hasMore)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func listReceivers(
         limit: String? = nil,
         offset: String? = nil,
@@ -490,6 +513,7 @@ public final class BlindPay: Sendable {
     ///     print("KYC Status: \(receiver.kycStatus?.rawValue ?? "unknown")")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func getReceiver(id: String) async throws -> APIResponse<Receiver> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
@@ -520,6 +544,7 @@ public final class BlindPay: Sendable {
     ///     print("Update successful: \(result.success)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func updateReceiver(id: String, data: UpdateReceiverInput) async throws -> APIResponse<UpdateReceiverResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
@@ -543,6 +568,7 @@ public final class BlindPay: Sendable {
     ///     print("Deletion successful: \(result.success)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func deleteReceiver(id: String) async throws -> APIResponse<DeleteReceiverResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
@@ -566,6 +592,7 @@ public final class BlindPay: Sendable {
     ///     print("Payout monthly: \(limits.limits.payout.monthly)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func getReceiverLimits(id: String) async throws -> APIResponse<ReceiverLimitsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/limits/receivers/\(id)",
@@ -598,6 +625,7 @@ public final class BlindPay: Sendable {
     ///     print("Request ID: \(result.id)")
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func requestLimitIncrease(receiverId: String, data: RequestLimitIncreaseInput) async throws -> APIResponse<RequestLimitIncreaseResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
@@ -623,6 +651,7 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
+    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func listLimitIncreaseRequests(receiverId: String) async throws -> APIResponse<[LimitIncreaseRequest]> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
@@ -630,19 +659,28 @@ public final class BlindPay: Sendable {
         )
     }
     
-    /// Gets a receiver service for a specific receiver ID
+    /// Gets a customer service for a specific customer ID
     ///
-    /// This method returns a service instance for managing resources associated with a specific receiver,
-    /// such as blockchain wallets.
+    /// This method returns a service instance for managing resources associated with a specific customer,
+    /// such as bank accounts, virtual accounts, and blockchain wallets.
     ///
-    /// - Parameter receiverId: The unique identifier of the receiver
-    /// - Returns: A `ReceiversService` instance for the specified receiver
+    /// - Parameter customerId: The unique identifier of the customer
+    /// - Returns: A `CustomersService` instance for the specified customer
     ///
     /// Example:
     /// ```swift
-    /// let receiversService = blindPay.receivers(receiverId: "re_123")
-    /// let wallets = try await receiversService.blockchainWallets.list()
+    /// let customersService = blindPay.customers(customerId: "re_123")
+    /// let wallets = try await customersService.blockchainWallets.list()
     /// ```
+    public func customers(customerId: String) -> CustomersService {
+        return CustomersService(apiClient: apiClient, instanceId: instanceId, customerId: customerId)
+    }
+
+    /// Gets a receiver service for a specific receiver ID
+    ///
+    /// - Parameter receiverId: The unique identifier of the receiver
+    /// - Returns: A `ReceiversService` instance for the specified receiver
+    @available(*, deprecated, renamed: "customers(customerId:)", message: "Use customers(customerId:) instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
     public func receivers(receiverId: String) -> ReceiversService {
         return ReceiversService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
     }
@@ -1681,6 +1719,276 @@ public final class BlindPay: Sendable {
             endpoint: "/v1/e/instances/\(instanceId)/tos",
             method: .post,
             body: data
+        )
+    }
+
+    // MARK: - Customers Service Methods
+    //
+    // Customer-resource methods that mirror the deprecated receiver methods.
+    // See https://www.blindpay.com/changelog/2026-06-04-customers-rename
+    /// Creates a new customer
+    ///
+    /// This method creates a new customer with the specified information. Customers can be individuals or businesses,
+    /// and require various KYC information depending on the KYC type selected.
+    ///
+    /// - Parameter data: The input data containing customer information, KYC details, and optional documents
+    /// - Returns: An `APIResponse` containing the created customer ID
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = CreateCustomerInput(
+    ///     country: .us,
+    ///     email: "email@example.com",
+    ///     kycType: .standard,
+    ///     type: .individual,
+    ///     firstName: "John",
+    ///     lastName: "Doe",
+    ///     taxId: "536804398"
+    /// )
+    /// let response = try await blindPay.createCustomer(data: input)
+    /// if let customer = response.data {
+    ///     print("Created customer: \(customer.id)")
+    /// }
+    /// ```
+    public func createCustomer(data: CreateCustomerInput) async throws -> APIResponse<CreateCustomerResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Lists all customers for the instance
+    ///
+    /// This method retrieves a paginated list of customers with optional filtering and pagination parameters.
+    ///
+    /// - Parameters:
+    ///   - limit: Number of items to return (optional, enum: 10, 50, 100, 200, 500, 1000)
+    ///   - offset: Number of items to skip (optional, enum: 0, 10, 50, 100, 200, 500, 1000)
+    ///   - startingAfter: A cursor for pagination - object ID that defines your place in the list (optional)
+    ///   - endingBefore: A cursor for pagination - object ID that defines your place in the list (optional)
+    ///   - fullName: Filter by full name (optional)
+    ///   - customerName: Filter by customer name (optional)
+    ///   - status: Filter by status (optional, enum: verifying, approved, rejected, deprecated, pending_review)
+    ///   - customerId: Filter by customer ID (optional)
+    ///   - bankAccountId: Filter by bank account ID (optional)
+    ///   - country: Filter by country (optional)
+    /// - Returns: An `APIResponse` containing a list of customers with pagination information
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.listCustomers(limit: "50", offset: "0")
+    /// if let result = response.data {
+    ///     print("Found \(result.data.count) customers")
+    ///     print("Has more: \(result.pagination.hasMore)")
+    /// }
+    /// ```
+    public func listCustomers(
+        limit: String? = nil,
+        offset: String? = nil,
+        startingAfter: String? = nil,
+        endingBefore: String? = nil,
+        fullName: String? = nil,
+        customerName: String? = nil,
+        status: String? = nil,
+        customerId: String? = nil,
+        bankAccountId: String? = nil,
+        country: String? = nil
+    ) async throws -> APIResponse<ListCustomersResponse> {
+        var queryParameters: [String: String] = [:]
+        if let limit = limit {
+            queryParameters["limit"] = limit
+        }
+        if let offset = offset {
+            queryParameters["offset"] = offset
+        }
+        if let startingAfter = startingAfter {
+            queryParameters["starting_after"] = startingAfter
+        }
+        if let endingBefore = endingBefore {
+            queryParameters["ending_before"] = endingBefore
+        }
+        if let fullName = fullName {
+            queryParameters["full_name"] = fullName
+        }
+        if let customerName = customerName {
+            queryParameters["customer_name"] = customerName
+        }
+        if let status = status {
+            queryParameters["status"] = status
+        }
+        if let customerId = customerId {
+            queryParameters["customer_id"] = customerId
+        }
+        if let bankAccountId = bankAccountId {
+            queryParameters["bank_account_id"] = bankAccountId
+        }
+        if let country = country {
+            queryParameters["country"] = country
+        }
+
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers",
+            method: .get,
+            queryParameters: queryParameters.isEmpty ? nil : queryParameters
+        )
+    }
+    
+    /// Retrieves a specific customer by ID
+    ///
+    /// This method fetches detailed information about a customer, including KYC status, warnings, and limits.
+    ///
+    /// - Parameter id: The unique identifier of the customer
+    /// - Returns: An `APIResponse` containing the customer details
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.getCustomer(id: "re_123456789012345")
+    /// if let customer = response.data {
+    ///     print("Customer: \(customer.email)")
+    ///     print("KYC Status: \(customer.kycStatus?.rawValue ?? "unknown")")
+    /// }
+    /// ```
+    public func getCustomer(id: String) async throws -> APIResponse<Customer> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
+            method: .get
+        )
+    }
+    
+    /// Updates an existing customer
+    ///
+    /// This method updates customer information. Only provided fields will be updated.
+    ///
+    /// - Parameters:
+    ///   - id: The unique identifier of the customer to update
+    ///   - data: The update data containing the fields to update
+    /// - Returns: An `APIResponse` containing the update success status
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = UpdateCustomerInput(
+    ///     country: .us,
+    ///     email: "updated@example.com",
+    ///     firstName: "Jane",
+    ///     lastName: "Smith"
+    /// )
+    /// let response = try await blindPay.updateCustomer(id: "re_123", data: input)
+    /// if let result = response.data {
+    ///     print("Update successful: \(result.success)")
+    /// }
+    /// ```
+    public func updateCustomer(id: String, data: UpdateCustomerInput) async throws -> APIResponse<UpdateCustomerResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
+            method: .put,
+            body: data
+        )
+    }
+    
+    /// Deletes a customer
+    ///
+    /// This method permanently deletes a customer. This action cannot be undone.
+    ///
+    /// - Parameter id: The unique identifier of the customer to delete
+    /// - Returns: An `APIResponse` containing the deletion success status
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.deleteCustomer(id: "re_123456789012345")
+    /// if let result = response.data {
+    ///     print("Deletion successful: \(result.success)")
+    /// }
+    /// ```
+    public func deleteCustomer(id: String) async throws -> APIResponse<DeleteCustomerResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
+            method: .delete
+        )
+    }
+    
+    /// Gets customer limits
+    ///
+    /// This method retrieves the current payin and payout limits for a customer.
+    ///
+    /// - Parameter id: The unique identifier of the customer
+    /// - Returns: An `APIResponse` containing the customer limits
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.getCustomerLimits(id: "re_123456789012345")
+    /// if let limits = response.data {
+    ///     print("Payin daily: \(limits.limits.payin.daily)")
+    ///     print("Payout monthly: \(limits.limits.payout.monthly)")
+    /// }
+    /// ```
+    public func getCustomerLimits(id: String) async throws -> APIResponse<CustomerLimitsResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/limits/customers/\(id)",
+            method: .get
+        )
+    }
+    
+    /// Requests a limit increase for a customer
+    ///
+    /// This method submits a request to increase the transaction limits for a customer.
+    /// A supporting document is required.
+    ///
+    /// - Parameters:
+    ///   - customerId: The unique identifier of the customer
+    ///   - data: The input data containing the requested limits and supporting document
+    /// - Returns: An `APIResponse` containing the limit increase request ID
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let input = RequestLimitIncreaseInput(
+    ///     perTransaction: 100000,
+    ///     daily: 200000,
+    ///     monthly: 1000000,
+    ///     supportingDocumentType: .individualBankStatement,
+    ///     supportingDocumentFile: "https://example.com/document.pdf"
+    /// )
+    /// let response = try await blindPay.requestCustomerLimitIncrease(customerId: "re_123", data: input)
+    /// if let result = response.data {
+    ///     print("Request ID: \(result.id)")
+    /// }
+    /// ```
+    public func requestCustomerLimitIncrease(customerId: String, data: RequestLimitIncreaseInput) async throws -> APIResponse<RequestLimitIncreaseResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/limit-increase",
+            method: .post,
+            body: data
+        )
+    }
+    
+    /// Lists limit increase requests for a customer
+    ///
+    /// This method retrieves all limit increase requests for a specific customer.
+    ///
+    /// - Parameter customerId: The unique identifier of the customer
+    /// - Returns: An `APIResponse` containing an array of limit increase requests
+    /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Example:
+    /// ```swift
+    /// let response = try await blindPay.listCustomerLimitIncreaseRequests(customerId: "re_123456789012345")
+    /// if let requests = response.data {
+    ///     for request in requests {
+    ///         print("Request \(request.id): \(request.status.rawValue)")
+    ///     }
+    /// }
+    /// ```
+    public func listCustomerLimitIncreaseRequests(customerId: String) async throws -> APIResponse<[LimitIncreaseRequest]> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/limit-increase",
+            method: .get
         )
     }
 }

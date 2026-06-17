@@ -21,6 +21,7 @@ public enum Rail: String, Codable, Sendable {
     case internationalSwift = "international_swift"
     case rtp = "rtp"
     case ted = "ted"
+    case sepa = "sepa"
 }
 
 /// Bank account type

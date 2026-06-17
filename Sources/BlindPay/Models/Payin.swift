@@ -18,6 +18,11 @@ public enum PayinStatus: String, Codable, Sendable {
   case completed = "completed"
 }
 
+/// Manual execution status for payin
+public enum ManualExecutionStatus: String, Codable, Sendable {
+  case failed = "failed"
+}
+
 /// Payment method for payin
 public enum PaymentMethod: String, Codable, Sendable {
   case ach = "ach"
@@ -380,6 +385,9 @@ public struct Payin: Codable, Sendable, Equatable {
   /// Status of the payin
   public let status: PayinStatus
 
+  /// Manual execution status
+  public let manualExecutionStatus: ManualExecutionStatus?
+
   /// Payin quote ID
   public let payinQuoteId: String?
 
@@ -489,6 +497,7 @@ public struct Payin: Codable, Sendable, Equatable {
     memoCode: String? = nil,
     clabe: String? = nil,
     status: PayinStatus,
+    manualExecutionStatus: ManualExecutionStatus? = nil,
     payinQuoteId: String? = nil,
     instanceId: String,
     trackingTransaction: PayinTrackingTransaction? = nil,
@@ -530,6 +539,7 @@ public struct Payin: Codable, Sendable, Equatable {
     self.memoCode = memoCode
     self.clabe = clabe
     self.status = status
+    self.manualExecutionStatus = manualExecutionStatus
     self.payinQuoteId = payinQuoteId
     self.instanceId = instanceId
     self.trackingTransaction = trackingTransaction
@@ -573,6 +583,7 @@ public struct Payin: Codable, Sendable, Equatable {
     case memoCode = "memo_code"
     case clabe
     case status
+    case manualExecutionStatus = "manual_execution_status"
     case payinQuoteId = "payin_quote_id"
     case instanceId = "instance_id"
     case trackingTransaction = "tracking_transaction"

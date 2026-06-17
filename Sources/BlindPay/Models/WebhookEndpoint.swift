@@ -11,6 +11,7 @@ import Foundation
 public enum WebhookEvent: String, Codable, Sendable {
     case receiverNew = "receiver.new"
     case receiverUpdate = "receiver.update"
+    case receiverDelete = "receiver.delete"
     case bankAccountNew = "bankAccount.new"
     case payoutNew = "payout.new"
     case payoutUpdate = "payout.update"
@@ -136,9 +137,61 @@ public struct WebhookPortalAccess: Codable, Sendable {
 public struct DeleteWebhookEndpointResponse: Codable, Sendable {
     /// Indicates if the deletion was successful
     public let success: Bool
-    
+
     public init(success: Bool) {
         self.success = success
+    }
+}
+
+/// Webhook payload for receiver deletion events
+public struct ReceiverDeleteWebhookOut: Codable, Sendable, Equatable {
+    /// Event type
+    public let event: String
+
+    /// Instance ID
+    public let instanceId: String
+
+    /// Receiver ID that was deleted
+    public let receiverId: String
+
+    /// Receiver name
+    public let receiverName: String
+
+    /// Receiver email
+    public let receiverEmail: String
+
+    /// Deletion timestamp
+    public let deletedAt: String
+
+    /// User ID who performed the deletion
+    public let deletedBy: String
+
+    public init(
+        event: String,
+        instanceId: String,
+        receiverId: String,
+        receiverName: String,
+        receiverEmail: String,
+        deletedAt: String,
+        deletedBy: String
+    ) {
+        self.event = event
+        self.instanceId = instanceId
+        self.receiverId = receiverId
+        self.receiverName = receiverName
+        self.receiverEmail = receiverEmail
+        self.deletedAt = deletedAt
+        self.deletedBy = deletedBy
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case event
+        case instanceId = "instance_id"
+        case receiverId = "receiver_id"
+        case receiverName = "receiver_name"
+        case receiverEmail = "receiver_email"
+        case deletedAt = "deleted_at"
+        case deletedBy = "deleted_by"
     }
 }
 

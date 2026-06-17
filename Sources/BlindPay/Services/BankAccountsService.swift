@@ -12,28 +12,28 @@ import Foundation
 public final class BankAccountsService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
-    private let receiverId: String
+    private let customerId: String
     
     /// Offramp wallets management service
     public let offrampWallets: OfframpWalletsService
     
-    init(apiClient: APIClient, instanceId: String, receiverId: String) {
+    init(apiClient: APIClient, instanceId: String, customerId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.offrampWallets = OfframpWalletsService(apiClient: apiClient, instanceId: instanceId)
     }
     
-    /// Lists all bank accounts for the receiver
+    /// Lists all bank accounts for the customer
     ///
-    /// This method fetches a list of all bank accounts associated with the receiver.
+    /// This method fetches a list of all bank accounts associated with the customer.
     ///
     /// - Returns: An `APIResponse` containing an array of `BankAccount` objects
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").bankAccounts.list()
+    /// let response = try await blindPay.customers(customerId: "re_123").bankAccounts.list()
     /// if let bankAccounts = response.data {
     ///     for bankAccount in bankAccounts {
     ///         print("\(bankAccount.name) - \(bankAccount.type.rawValue)")
@@ -45,14 +45,14 @@ public final class BankAccountsService: Sendable {
     /// ```
     public func list() async throws -> APIResponse<BankAccountsResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/bank-accounts",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts",
             method: .get
         )
     }
     
     /// Creates a new bank account
     ///
-    /// This method creates a new bank account for the receiver with the specified configuration.
+    /// This method creates a new bank account for the customer with the specified configuration.
     ///
     /// - Parameter data: The input data containing bank account configuration
     /// - Returns: An `APIResponse` containing the created bank account details
@@ -74,7 +74,7 @@ public final class BankAccountsService: Sendable {
     ///     country: .us,
     ///     postalCode: "10001"
     /// )
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").bankAccounts.create(data: input)
+    /// let response = try await blindPay.customers(customerId: "re_123").bankAccounts.create(data: input)
     /// if let bankAccount = response.data {
     ///     print("Created bank account: \(bankAccount.id)")
     ///     print("Type: \(bankAccount.type.rawValue)")
@@ -82,7 +82,7 @@ public final class BankAccountsService: Sendable {
     /// ```
     public func create(data: CreateBankAccountInput) async throws -> APIResponse<CreateBankAccountResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/bank-accounts",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts",
             method: .post,
             body: data
         )
@@ -98,7 +98,7 @@ public final class BankAccountsService: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").bankAccounts.get(id: "ba_123")
+    /// let response = try await blindPay.customers(customerId: "re_123").bankAccounts.get(id: "ba_123")
     /// if let bankAccount = response.data {
     ///     print("Bank account name: \(bankAccount.name)")
     ///     print("Type: \(bankAccount.type.rawValue)")
@@ -109,7 +109,7 @@ public final class BankAccountsService: Sendable {
     /// ```
     public func get(id: String) async throws -> APIResponse<BankAccountResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/bank-accounts/\(id)",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(id)",
             method: .get
         )
     }
@@ -124,7 +124,7 @@ public final class BankAccountsService: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.instances.receivers(receiverId: "re_123").bankAccounts.delete(id: "ba_123")
+    /// let response = try await blindPay.customers(customerId: "re_123").bankAccounts.delete(id: "ba_123")
     /// if let error = response.error {
     ///     print("Error: \(error.message)")
     /// } else {
@@ -133,7 +133,7 @@ public final class BankAccountsService: Sendable {
     /// ```
     public func delete(id: String) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/bank-accounts/\(id)",
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(id)",
             method: .delete
         )
     }

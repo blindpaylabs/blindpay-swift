@@ -405,6 +405,12 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Partner fee ID
   public let partnerFeeId: String?
 
+  /// Billing fee amount
+  public let billingFeeAmount: Double?
+
+  /// CPN payment ID
+  public let cpnPaymentId: String?
+
   /// TED bank code
   public let tedBankCode: String?
 
@@ -566,6 +572,8 @@ public struct Payout: Codable, Sendable, Equatable {
     receiverAmount: Int,
     partnerFeeAmount: Int? = nil,
     partnerFeeId: String? = nil,
+    billingFeeAmount: Double? = nil,
+    cpnPaymentId: String? = nil,
     tedBankCode: String? = nil,
     tedBranchCode: String? = nil,
     tedCpfCnpj: String? = nil,
@@ -637,6 +645,8 @@ public struct Payout: Codable, Sendable, Equatable {
     self.receiverAmount = receiverAmount
     self.partnerFeeAmount = partnerFeeAmount
     self.partnerFeeId = partnerFeeId
+    self.billingFeeAmount = billingFeeAmount
+    self.cpnPaymentId = cpnPaymentId
     self.tedBankCode = tedBankCode
     self.tedBranchCode = tedBranchCode
     self.tedCpfCnpj = tedCpfCnpj
@@ -710,6 +720,8 @@ public struct Payout: Codable, Sendable, Equatable {
     case receiverAmount = "receiver_amount"
     case partnerFeeAmount = "partner_fee_amount"
     case partnerFeeId = "partner_fee_id"
+    case billingFeeAmount = "billing_fee_amount"
+    case cpnPaymentId = "cpn_payment_id"
     case tedBankCode = "ted_bank_code"
     case tedBranchCode = "ted_branch_code"
     case tedCpfCnpj = "ted_cpf_cnpj"
