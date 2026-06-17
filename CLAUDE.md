@@ -20,7 +20,7 @@ blindpay-swift/
       Common.swift                      # Country enum (ISO 3166-1 alpha-2), PaginationParams, PaginationMetadata.
       Available.swift                   # Rail, BankAccountType, AccountClass, RecipientRelationship, NaicsCode, RailResponse, BankDetailKey, BankDetailItem, BankDetailField, SwiftCodeResponse.
       Instance.swift                    # InstanceMemberRole, InstanceMember, UpdateInstanceInput, UpdateMemberRoleInput, VoidResponse.
-      Receiver.swift                    # KYCType, ReceiverType, IDDocType, ProofOfAddressDocType, SourceOfFundsDocType, PurposeOfTransactions, OwnerRole, ReceiverOwner, CreateReceiverInput, Receiver (full model), UpdateReceiverInput, response types, ListReceiversResponse.
+      Customer.swift                    # KYCType, CustomerType, IDDocType, ProofOfAddressDocType, SourceOfFundsDocType, PurposeOfTransactions, OwnerRole, CustomerOwner, CreateCustomerInput, Customer (full model), UpdateCustomerInput, response types, ListCustomersResponse.
       ApiKey.swift                      # ApiKeyPermission, ApiKey, CreateApiKeyInput, CreateApiKeyResponse.
       BankAccount.swift                 # BankAccount, CreateBankAccountInput, CreateBankAccountResponse, SpeiProtocol, TransfersType + related enums.
       BlockchainWallet.swift            # BlockchainWallet, CreateBlockchainWalletInput, BlockchainWalletSignMessageResponse, asset trustline types, mint USDB types, Solana delegate types.
@@ -32,7 +32,7 @@ blindpay-swift/
       PayinQuote.swift                  # PayinQuotePayerRules, PayinQuote, CreatePayinQuoteInput, ListPayinQuotesInput, response types.
       Payout.swift                      # PayoutStatus, TrackingStep, ProviderStatus, PaymentType, Payout, CreatePayoutEvmInput, CreatePayoutStellarInput, CreatePayoutSolanaInput, AuthorizeStellarInput/Response, AuthorizeSolanaInput/Response, ListPayoutsInput, response types.
       Quote.swift                       # CurrencyType, Network, StablecoinToken, TransactionDocumentType, Currency, CreateQuoteInput, QuoteNetwork, QuoteContract, CreateQuoteResponse, GetFxRateInput, GetFxRateResponse, AnyCodable helper.
-      ReceiverLimits.swift              # SupportingDocumentType, LimitIncreaseRequestStatus, PayinLimits, PayoutLimits, ReceiverLimitsResponse, RequestLimitIncreaseInput/Response, LimitIncreaseRequest.
+      CustomerLimits.swift              # SupportingDocumentType, LimitIncreaseRequestStatus, PayinLimits, PayoutLimits, CustomerLimitsResponse, RequestLimitIncreaseInput/Response, LimitIncreaseRequest.
       TermsOfService.swift              # InitiateTosInput, InitiateTosResponse.
       Transaction.swift                 # TransactionStatus, TrackingTransaction, TrackingPayment, TrackingLiquidity, TrackingComplete, TrackingPartnerFee.
       Transfer.swift                    # TransferTrackingStep, TransferTrackingTransactionMonitoring, Transfer.
@@ -40,20 +40,20 @@ blindpay-swift/
       WebhookEndpoint.swift             # WebhookEvent, WebhookEndpoint, CreateWebhookEndpointInput, CreateWebhookEndpointResponse, WebhookEndpointSecret, WebhookPortalAccess, DeleteWebhookEndpointResponse.
     Services/
       AvailableService.swift            # Top-level service. No instanceId. Methods: getRails, getBankDetails, getSwiftCode.
-      InstancesService.swift            # Instance-scoped service. Holds sub-services (apiKeys, partnerFees, quotes, webhookEndpoints, payins, payouts, termsOfService). Direct methods for members, receivers, asset trustline, mint, delegate. Factory method: receivers(receiverId:) -> ReceiversService.
-      ReceiversService.swift            # Receiver-scoped service. Holds sub-services (blockchainWallets, virtualAccounts, bankAccounts, custodialWallets). No direct methods -- purely a sub-service container.
+      InstancesService.swift            # Instance-scoped service. Holds sub-services (apiKeys, partnerFees, quotes, webhookEndpoints, payins, payouts, termsOfService). Direct methods for members, asset trustline, mint, delegate.
+      CustomersService.swift            # Customer-scoped service. Holds sub-services (blockchainWallets, virtualAccounts, bankAccounts, custodialWallets). No direct methods -- purely a sub-service container. Created via the customers(customerId:) factory on the BlindPay client.
       ApiKeysService.swift              # CRUD for API keys. Instance-scoped.
-      BankAccountsService.swift         # CRUD for bank accounts. Receiver-scoped. Holds sub-service: offrampWallets.
-      BlockchainWalletsService.swift    # CRUD for blockchain wallets + getSignMessage. Receiver-scoped.
-      CustodialWalletsService.swift     # CRUD + getBalance for custodial wallets. Receiver-scoped.
-      OfframpWalletsService.swift       # List/create/get for offramp wallets. Instance-scoped (takes receiverId + bankAccountId as params).
+      BankAccountsService.swift         # CRUD for bank accounts. Customer-scoped. Holds sub-service: offrampWallets.
+      BlockchainWalletsService.swift    # CRUD for blockchain wallets + getSignMessage. Customer-scoped.
+      CustodialWalletsService.swift     # CRUD + getBalance for custodial wallets. Customer-scoped.
+      OfframpWalletsService.swift       # List/create/get for offramp wallets. Instance-scoped (takes customerId + bankAccountId as params).
       PartnerFeesService.swift          # CRUD for partner fees. Instance-scoped.
       PayinQuotesService.swift          # Create/get/list + getFxRate. Instance-scoped. Nested under PayinsService.
       PayinsService.swift               # List/get/getTrack/createEvm. Instance-scoped. Holds sub-service: quotes (PayinQuotesService).
       PayoutsService.swift              # List/get/getTrack/createEvm/createStellar/createSolana/authorizeStellar/authorizeSolana. Instance-scoped.
       QuotesService.swift               # Create + getFxRate. Instance-scoped.
       TermsOfServiceService.swift       # Initiate TOS. Instance-scoped.
-      VirtualAccountsService.swift      # CRUD for virtual accounts. Receiver-scoped.
+      VirtualAccountsService.swift      # CRUD for virtual accounts. Customer-scoped.
       WebhookEndpointsService.swift     # CRUD + getSecret + getPortalAccessUrl. Instance-scoped.
   Examples/
     GetRails.swift                      # Executable example target.
@@ -77,12 +77,12 @@ BlindPay
       .quotes                            -> PayinQuotesService
     .payouts                           -> PayoutsService
     .termsOfService                    -> TermsOfServiceService
-    .receivers(receiverId:)            -> ReceiversService
-      .blockchainWallets                 -> BlockchainWalletsService
-      .virtualAccounts                   -> VirtualAccountsService
-      .bankAccounts                      -> BankAccountsService
-        .offrampWallets                    -> OfframpWalletsService
-      .custodialWallets                  -> CustodialWalletsService
+  .customers(customerId:)            -> CustomersService
+    .blockchainWallets                 -> BlockchainWalletsService
+    .virtualAccounts                   -> VirtualAccountsService
+    .bankAccounts                      -> BankAccountsService
+      .offrampWallets                    -> OfframpWalletsService
+    .custodialWallets                  -> CustodialWalletsService
 ```
 
 IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a flat convenience method on the root `BlindPay` class. When you add or modify a service method, you MUST also add or update the corresponding convenience method in `BlindPay.swift`.
@@ -107,7 +107,7 @@ IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a fl
 - All public types conform to `Codable` and `Sendable`.
 - Response model structs also conform to `Equatable`.
 - All service classes: `@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) public final class ... : Sendable`.
-- Service classes hold `private let apiClient: APIClient` (and `instanceId`, `receiverId`, etc. as needed).
+- Service classes hold `private let apiClient: APIClient` (and `instanceId`, `customerId`, etc. as needed).
 - Initializers are `internal` on service classes, `public` on model structs.
 - All API methods are `public func ... async throws -> APIResponse<T>`.
 - Optional fields on model structs use `T?` and have default `nil` in init.
@@ -361,14 +361,14 @@ Update the property type, the init parameter type, and any custom encoding/decod
 2. **Delete the service file**: `Sources/BlindPay/Services/{Resource}Service.swift`.
 3. **Remove the service property** from its parent service (e.g., remove `public let invoices: InvoicesService` and its initialization from `InstancesService`).
 4. **Remove all convenience methods** from `BlindPay.swift` that reference the deleted types.
-5. **Search the codebase** for any remaining references to the deleted types and remove them. Check `ReceiversService.swift` and other service containers.
+5. **Search the codebase** for any remaining references to the deleted types and remove them. Check `CustomersService.swift` and other service containers.
 6. No `Package.swift` changes needed.
 
 ---
 
 ## 7. How to Add a Sub-Resource (Nested Service Pattern)
 
-Sub-resources are services accessed through a parent service. Example: `BlockchainWalletsService` is a sub-resource of `ReceiversService`.
+Sub-resources are services accessed through a parent service. Example: `BlockchainWalletsService` is a sub-resource of `CustomersService`.
 
 ### Pattern: Static sub-service (initialized in parent init)
 
@@ -377,17 +377,17 @@ Use when the sub-resource shares the same parent IDs for all operations.
 In the parent service class:
 
 ```swift
-public final class ReceiversService: Sendable {
+public final class CustomersService: Sendable {
     // ...existing properties...
 
     public let blockchainWallets: BlockchainWalletsService
 
-    init(apiClient: APIClient, instanceId: String, receiverId: String) {
+    init(apiClient: APIClient, instanceId: String, customerId: String) {
         // ...existing init...
         self.blockchainWallets = BlockchainWalletsService(
             apiClient: apiClient,
             instanceId: instanceId,
-            receiverId: receiverId
+            customerId: customerId
         )
     }
 }
@@ -397,14 +397,14 @@ The sub-service stores the IDs it needs and uses them in its endpoint paths.
 
 ### Pattern: Factory method (creates service per call)
 
-Use when a dynamic ID is needed at access time. Example: `InstancesService.receivers(receiverId:)`.
+Use when a dynamic ID is needed at access time. Example: `BlindPay.customers(customerId:)`.
 
 ```swift
-public func receivers(receiverId: String) -> ReceiversService {
-    return ReceiversService(
+public func customers(customerId: String) -> CustomersService {
+    return CustomersService(
         apiClient: apiClient,
         instanceId: instanceId,
-        receiverId: receiverId
+        customerId: customerId
     )
 }
 ```
@@ -414,9 +414,9 @@ public func receivers(receiverId: String) -> ReceiversService {
 Sub-resources build endpoints by nesting path segments. Follow the REST pattern:
 
 ```
-/v1/instances/{instanceId}/receivers/{receiverId}/blockchain-wallets
-/v1/instances/{instanceId}/receivers/{receiverId}/blockchain-wallets/{id}
-/v1/instances/{instanceId}/receivers/{receiverId}/bank-accounts/{bankAccountId}/offramp-wallets
+/v1/instances/{instanceId}/customers/{customerId}/blockchain-wallets
+/v1/instances/{instanceId}/customers/{customerId}/blockchain-wallets/{id}
+/v1/instances/{instanceId}/customers/{customerId}/bank-accounts/{bankAccountId}/offramp-wallets
 ```
 
 ---

@@ -18,8 +18,8 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
     /// Blockchain network
     public let network: Network
     
-    /// Receiver ID this wallet belongs to
-    public let receiverId: String
+    /// Customer ID this wallet belongs to
+    public let customerId: String
     
     /// Wallet address (optional)
     public let address: String?
@@ -34,7 +34,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         id: String,
         name: String,
         network: Network,
-        receiverId: String,
+        customerId: String,
         address: String? = nil,
         isAccountAbstraction: Bool? = nil,
         signatureTxHash: String? = nil
@@ -42,7 +42,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         self.id = id
         self.name = name
         self.network = network
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.address = address
         self.isAccountAbstraction = isAccountAbstraction
         self.signatureTxHash = signatureTxHash
@@ -52,7 +52,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         case id
         case name
         case network
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case address
         case isAccountAbstraction = "is_account_abstraction"
         case signatureTxHash = "signature_tx_hash"
