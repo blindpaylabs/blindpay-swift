@@ -624,44 +624,10 @@ public struct Payin: Codable, Sendable, Equatable {
 // MARK: - Pagination Response
 
 /// Pagination metadata for payin list responses
-public struct PayinPaginationMetadata: Codable, Sendable, Equatable {
-  /// Whether there are more pages available
-  public let hasMore: Bool
-
-  /// Next page cursor (ID)
-  public let nextPage: String?
-
-  /// Previous page cursor (ID)
-  public let prevPage: String?
-
-  public init(hasMore: Bool, nextPage: String? = nil, prevPage: String? = nil) {
-    self.hasMore = hasMore
-    self.nextPage = nextPage
-    self.prevPage = prevPage
-  }
-
-  enum CodingKeys: String, CodingKey {
-    case hasMore = "has_more"
-    case nextPage = "next_page"
-    case prevPage = "prev_page"
-  }
-}
-
 // MARK: - Response Types
 
-/// Response type for listing payins with pagination
-public struct ListPayinsResponse: Codable, Sendable {
-  /// Array of payins
-  public let data: [Payin]
-
-  /// Pagination metadata
-  public let pagination: PayinPaginationMetadata
-
-  public init(data: [Payin], pagination: PayinPaginationMetadata) {
-    self.data = data
-    self.pagination = pagination
-  }
-}
+/// Response type for listing payins (plain array)
+public typealias ListPayinsResponse = [Payin]
 
 /// Response type for single payin
 public typealias PayinResponse = Payin

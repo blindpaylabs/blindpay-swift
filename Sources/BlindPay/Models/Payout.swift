@@ -773,44 +773,10 @@ public struct Payout: Codable, Sendable, Equatable {
 // MARK: - Pagination Response
 
 /// Pagination metadata for payout list responses
-public struct PayoutPaginationMetadata: Codable, Sendable, Equatable {
-  /// Whether there are more pages available
-  public let hasMore: Bool
-
-  /// Next page cursor (ID)
-  public let nextPage: String?
-
-  /// Previous page cursor (ID)
-  public let prevPage: String?
-
-  public init(hasMore: Bool, nextPage: String? = nil, prevPage: String? = nil) {
-    self.hasMore = hasMore
-    self.nextPage = nextPage
-    self.prevPage = prevPage
-  }
-
-  enum CodingKeys: String, CodingKey {
-    case hasMore = "has_more"
-    case nextPage = "next_page"
-    case prevPage = "prev_page"
-  }
-}
-
 // MARK: - Response Types
 
-/// Response type for listing payouts with pagination
-public struct ListPayoutsResponse: Codable, Sendable {
-  /// Array of payouts
-  public let data: [Payout]
-
-  /// Pagination metadata
-  public let pagination: PayoutPaginationMetadata
-
-  public init(data: [Payout], pagination: PayoutPaginationMetadata) {
-    self.data = data
-    self.pagination = pagination
-  }
-}
+/// Response type for listing payouts (plain array)
+public typealias ListPayoutsResponse = [Payout]
 
 /// Response type for single payout
 public typealias PayoutResponse = Payout

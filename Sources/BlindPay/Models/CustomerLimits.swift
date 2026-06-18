@@ -1,5 +1,5 @@
 //
-//  ReceiverLimits.swift
+//  CustomerLimits.swift
 //  blindpay-swift
 //
 //  Created by Eric Viana on 05/11/25.
@@ -30,7 +30,7 @@ public enum LimitIncreaseRequestStatus: String, Codable, Sendable {
 
 // MARK: - Payin Limits
 
-/// Payin limits for a receiver
+/// Payin limits for a customer
 public struct PayinLimits: Codable, Sendable, Equatable {
     /// Daily limit
     public let daily: Int
@@ -46,7 +46,7 @@ public struct PayinLimits: Codable, Sendable, Equatable {
 
 // MARK: - Payout Limits
 
-/// Payout limits for a receiver
+/// Payout limits for a customer
 public struct PayoutLimits: Codable, Sendable, Equatable {
     /// Daily limit
     public let daily: Int
@@ -60,20 +60,20 @@ public struct PayoutLimits: Codable, Sendable, Equatable {
     }
 }
 
-// MARK: - Receiver Limits Response
+// MARK: - Customer Limits Response
 
-/// Response containing receiver limits
-public struct ReceiverLimitsResponse: Codable, Sendable, Equatable {
+/// Response containing customer limits
+public struct CustomerLimitsResponse: Codable, Sendable, Equatable {
     /// Limits object containing payin and payout limits
-    public let limits: ReceiverLimitsDetail
+    public let limits: CustomerLimitsDetail
     
-    public init(limits: ReceiverLimitsDetail) {
+    public init(limits: CustomerLimitsDetail) {
         self.limits = limits
     }
 }
 
 /// Detailed limits information
-public struct ReceiverLimitsDetail: Codable, Sendable, Equatable {
+public struct CustomerLimitsDetail: Codable, Sendable, Equatable {
     /// Payin limits
     public let payin: PayinLimits
     
@@ -147,8 +147,8 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     /// Unique identifier
     public let id: String
     
-    /// Receiver ID
-    public let receiverId: String
+    /// Customer ID
+    public let customerId: String
     
     /// Status of the request
     public let status: LimitIncreaseRequestStatus
@@ -176,7 +176,7 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     
     public init(
         id: String,
-        receiverId: String,
+        customerId: String,
         status: LimitIncreaseRequestStatus,
         createdAt: String,
         updatedAt: String,
@@ -187,7 +187,7 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         supportingDocumentType: SupportingDocumentType? = nil
     ) {
         self.id = id
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.status = status
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -200,7 +200,7 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case status
         case createdAt = "created_at"
         case updatedAt = "updated_at"

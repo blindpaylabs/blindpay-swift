@@ -385,308 +385,6 @@ public final class BlindPay: Sendable {
         )
     }
     
-    /// Creates a new receiver
-    ///
-    /// This method creates a new receiver with the specified information. Receivers can be individuals or businesses,
-    /// and require various KYC information depending on the KYC type selected.
-    ///
-    /// - Parameter data: The input data containing receiver information, KYC details, and optional documents
-    /// - Returns: An `APIResponse` containing the created receiver ID
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let input = CreateReceiverInput(
-    ///     country: .us,
-    ///     email: "email@example.com",
-    ///     kycType: .standard,
-    ///     type: .individual,
-    ///     firstName: "John",
-    ///     lastName: "Doe",
-    ///     taxId: "536804398"
-    /// )
-    /// let response = try await blindPay.createReceiver(data: input)
-    /// if let receiver = response.data {
-    ///     print("Created receiver: \(receiver.id)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func createReceiver(data: CreateReceiverInput) async throws -> APIResponse<CreateReceiverResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers",
-            method: .post,
-            body: data
-        )
-    }
-    
-    /// Lists all receivers for the instance
-    ///
-    /// This method retrieves a paginated list of receivers with optional filtering and pagination parameters.
-    ///
-    /// - Parameters:
-    ///   - limit: Number of items to return (optional, enum: 10, 50, 100, 200, 500, 1000)
-    ///   - offset: Number of items to skip (optional, enum: 0, 10, 50, 100, 200, 500, 1000)
-    ///   - startingAfter: A cursor for pagination - object ID that defines your place in the list (optional)
-    ///   - endingBefore: A cursor for pagination - object ID that defines your place in the list (optional)
-    ///   - fullName: Filter by full name (optional)
-    ///   - receiverName: Filter by receiver name (optional)
-    ///   - status: Filter by status (optional, enum: verifying, approved, rejected, deprecated, pending_review)
-    ///   - receiverId: Filter by receiver ID (optional)
-    ///   - bankAccountId: Filter by bank account ID (optional)
-    ///   - country: Filter by country (optional)
-    /// - Returns: An `APIResponse` containing a list of receivers with pagination information
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.listReceivers(limit: "50", offset: "0")
-    /// if let result = response.data {
-    ///     print("Found \(result.data.count) receivers")
-    ///     print("Has more: \(result.pagination.hasMore)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func listReceivers(
-        limit: String? = nil,
-        offset: String? = nil,
-        startingAfter: String? = nil,
-        endingBefore: String? = nil,
-        fullName: String? = nil,
-        receiverName: String? = nil,
-        status: String? = nil,
-        receiverId: String? = nil,
-        bankAccountId: String? = nil,
-        country: String? = nil
-    ) async throws -> APIResponse<ListReceiversResponse> {
-        var queryParameters: [String: String] = [:]
-        if let limit = limit {
-            queryParameters["limit"] = limit
-        }
-        if let offset = offset {
-            queryParameters["offset"] = offset
-        }
-        if let startingAfter = startingAfter {
-            queryParameters["starting_after"] = startingAfter
-        }
-        if let endingBefore = endingBefore {
-            queryParameters["ending_before"] = endingBefore
-        }
-        if let fullName = fullName {
-            queryParameters["full_name"] = fullName
-        }
-        if let receiverName = receiverName {
-            queryParameters["receiver_name"] = receiverName
-        }
-        if let status = status {
-            queryParameters["status"] = status
-        }
-        if let receiverId = receiverId {
-            queryParameters["receiver_id"] = receiverId
-        }
-        if let bankAccountId = bankAccountId {
-            queryParameters["bank_account_id"] = bankAccountId
-        }
-        if let country = country {
-            queryParameters["country"] = country
-        }
-
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers",
-            method: .get,
-            queryParameters: queryParameters.isEmpty ? nil : queryParameters
-        )
-    }
-    
-    /// Retrieves a specific receiver by ID
-    ///
-    /// This method fetches detailed information about a receiver, including KYC status, warnings, and limits.
-    ///
-    /// - Parameter id: The unique identifier of the receiver
-    /// - Returns: An `APIResponse` containing the receiver details
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.getReceiver(id: "re_123456789012345")
-    /// if let receiver = response.data {
-    ///     print("Receiver: \(receiver.email)")
-    ///     print("KYC Status: \(receiver.kycStatus?.rawValue ?? "unknown")")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func getReceiver(id: String) async throws -> APIResponse<Receiver> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
-            method: .get
-        )
-    }
-    
-    /// Updates an existing receiver
-    ///
-    /// This method updates receiver information. Only provided fields will be updated.
-    ///
-    /// - Parameters:
-    ///   - id: The unique identifier of the receiver to update
-    ///   - data: The update data containing the fields to update
-    /// - Returns: An `APIResponse` containing the update success status
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let input = UpdateReceiverInput(
-    ///     country: .us,
-    ///     email: "updated@example.com",
-    ///     firstName: "Jane",
-    ///     lastName: "Smith"
-    /// )
-    /// let response = try await blindPay.updateReceiver(id: "re_123", data: input)
-    /// if let result = response.data {
-    ///     print("Update successful: \(result.success)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func updateReceiver(id: String, data: UpdateReceiverInput) async throws -> APIResponse<UpdateReceiverResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
-            method: .put,
-            body: data
-        )
-    }
-    
-    /// Deletes a receiver
-    ///
-    /// This method permanently deletes a receiver. This action cannot be undone.
-    ///
-    /// - Parameter id: The unique identifier of the receiver to delete
-    /// - Returns: An `APIResponse` containing the deletion success status
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.deleteReceiver(id: "re_123456789012345")
-    /// if let result = response.data {
-    ///     print("Deletion successful: \(result.success)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func deleteReceiver(id: String) async throws -> APIResponse<DeleteReceiverResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(id)",
-            method: .delete
-        )
-    }
-    
-    /// Gets receiver limits
-    ///
-    /// This method retrieves the current payin and payout limits for a receiver.
-    ///
-    /// - Parameter id: The unique identifier of the receiver
-    /// - Returns: An `APIResponse` containing the receiver limits
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.getReceiverLimits(id: "re_123456789012345")
-    /// if let limits = response.data {
-    ///     print("Payin daily: \(limits.limits.payin.daily)")
-    ///     print("Payout monthly: \(limits.limits.payout.monthly)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func getReceiverLimits(id: String) async throws -> APIResponse<ReceiverLimitsResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/limits/receivers/\(id)",
-            method: .get
-        )
-    }
-    
-    /// Requests a limit increase for a receiver
-    ///
-    /// This method submits a request to increase the transaction limits for a receiver.
-    /// A supporting document is required.
-    ///
-    /// - Parameters:
-    ///   - receiverId: The unique identifier of the receiver
-    ///   - data: The input data containing the requested limits and supporting document
-    /// - Returns: An `APIResponse` containing the limit increase request ID
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let input = RequestLimitIncreaseInput(
-    ///     perTransaction: 100000,
-    ///     daily: 200000,
-    ///     monthly: 1000000,
-    ///     supportingDocumentType: .individualBankStatement,
-    ///     supportingDocumentFile: "https://example.com/document.pdf"
-    /// )
-    /// let response = try await blindPay.requestLimitIncrease(receiverId: "re_123", data: input)
-    /// if let result = response.data {
-    ///     print("Request ID: \(result.id)")
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func requestLimitIncrease(receiverId: String, data: RequestLimitIncreaseInput) async throws -> APIResponse<RequestLimitIncreaseResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
-            method: .post,
-            body: data
-        )
-    }
-    
-    /// Lists limit increase requests for a receiver
-    ///
-    /// This method retrieves all limit increase requests for a specific receiver.
-    ///
-    /// - Parameter receiverId: The unique identifier of the receiver
-    /// - Returns: An `APIResponse` containing an array of limit increase requests
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.listLimitIncreaseRequests(receiverId: "re_123456789012345")
-    /// if let requests = response.data {
-    ///     for request in requests {
-    ///         print("Request \(request.id): \(request.status.rawValue)")
-    ///     }
-    /// }
-    /// ```
-    @available(*, deprecated, message: "The receivers resource is deprecated and will be removed in v3.0.0; use the customers resource instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func listLimitIncreaseRequests(receiverId: String) async throws -> APIResponse<[LimitIncreaseRequest]> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/receivers/\(receiverId)/limit-increase",
-            method: .get
-        )
-    }
-    
-    /// Gets a customer service for a specific customer ID
-    ///
-    /// This method returns a service instance for managing resources associated with a specific customer,
-    /// such as bank accounts, virtual accounts, and blockchain wallets.
-    ///
-    /// - Parameter customerId: The unique identifier of the customer
-    /// - Returns: A `CustomersService` instance for the specified customer
-    ///
-    /// Example:
-    /// ```swift
-    /// let customersService = blindPay.customers(customerId: "re_123")
-    /// let wallets = try await customersService.blockchainWallets.list()
-    /// ```
-    public func customers(customerId: String) -> CustomersService {
-        return CustomersService(apiClient: apiClient, instanceId: instanceId, customerId: customerId)
-    }
-
-    /// Gets a receiver service for a specific receiver ID
-    ///
-    /// - Parameter receiverId: The unique identifier of the receiver
-    /// - Returns: A `ReceiversService` instance for the specified receiver
-    @available(*, deprecated, renamed: "customers(customerId:)", message: "Use customers(customerId:) instead. See https://www.blindpay.com/changelog/2026-06-04-customers-rename")
-    public func receivers(receiverId: String) -> ReceiversService {
-        return ReceiversService(apiClient: apiClient, instanceId: instanceId, receiverId: receiverId)
-    }
-    
-    // MARK: - API Keys Service Methods
-    
     /// Lists all API keys for the instance
     ///
     /// This method fetches a list of all API keys associated with the instance.
@@ -1089,20 +787,15 @@ public final class BlindPay: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayinsResponse` with payins and pagination metadata
+    /// - Returns: An `APIResponse` containing a `ListPayinsResponse` (plain array of payins)
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayinsInput(
-    ///     limit: "50",
-    ///     status: .processing,
-    ///     receiverId: "re_123"
-    /// )
+    /// let params = ListPayinsInput(limit: "50", status: .processing)
     /// let response = try await blindPay.listPayins(params: params)
-    /// if let result = response.data {
-    ///     print("Found \(result.data.count) payins")
-    ///     print("Has more: \(result.pagination.hasMore)")
+    /// if let payins = response.data {
+    ///     print("Found \(payins.count) payins")
     /// }
     /// ```
     public func listPayins(params: ListPayinsInput? = nil) async throws -> APIResponse<ListPayinsResponse> {
@@ -1326,20 +1019,15 @@ public final class BlindPay: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse` with payouts and pagination metadata
+    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse` (plain array of payouts)
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayoutsInput(
-    ///     limit: "50",
-    ///     status: .processing,
-    ///     receiverId: "re_123"
-    /// )
+    /// let params = ListPayoutsInput(limit: "50", status: .processing)
     /// let response = try await blindPay.listPayouts(params: params)
-    /// if let result = response.data {
-    ///     print("Found \(result.data.count) payouts")
-    ///     print("Has more: \(result.pagination.hasMore)")
+    /// if let payouts = response.data {
+    ///     print("Found \(payouts.count) payouts")
     /// }
     /// ```
     public func listPayouts(params: ListPayoutsInput? = nil) async throws -> APIResponse<ListPayoutsResponse> {
@@ -1780,9 +1468,8 @@ public final class BlindPay: Sendable {
     /// Example:
     /// ```swift
     /// let response = try await blindPay.listCustomers(limit: "50", offset: "0")
-    /// if let result = response.data {
-    ///     print("Found \(result.data.count) customers")
-    ///     print("Has more: \(result.pagination.hasMore)")
+    /// if let customers = response.data {
+    ///     print("Found \(customers.count) customers")
     /// }
     /// ```
     public func listCustomers(
@@ -1814,13 +1501,15 @@ public final class BlindPay: Sendable {
             queryParameters["full_name"] = fullName
         }
         if let customerName = customerName {
-            queryParameters["customer_name"] = customerName
+            // The API's filter schema still uses receiver_name/receiver_id. Map the
+            // clean customer-* surface to the wire names; drop once the API accepts customer_*.
+            queryParameters["receiver_name"] = customerName
         }
         if let status = status {
             queryParameters["status"] = status
         }
         if let customerId = customerId {
-            queryParameters["customer_id"] = customerId
+            queryParameters["receiver_id"] = customerId
         }
         if let bankAccountId = bankAccountId {
             queryParameters["bank_account_id"] = bankAccountId
@@ -1991,5 +1680,10 @@ public final class BlindPay: Sendable {
             method: .get
         )
     }
-}
 
+
+    /// Gets a customer service for a specific customer ID
+    public func customers(customerId: String) -> CustomersService {
+        return CustomersService(apiClient: apiClient, instanceId: instanceId, customerId: customerId)
+    }
+}

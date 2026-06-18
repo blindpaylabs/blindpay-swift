@@ -27,8 +27,8 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
     /// Instance ID (omitted when nested inside a bank account)
     public let instanceId: String?
 
-    /// Receiver ID (omitted when nested inside a bank account)
-    public let receiverId: String?
+    /// Customer ID (omitted when nested inside a bank account)
+    public let customerId: String?
 
     /// Timestamp when the wallet was created (omitted when nested inside a bank account)
     public let createdAt: String?
@@ -43,7 +43,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         address: String,
         bankAccountId: String? = nil,
         instanceId: String? = nil,
-        receiverId: String? = nil,
+        customerId: String? = nil,
         createdAt: String? = nil,
         updatedAt: String? = nil
     ) {
@@ -53,7 +53,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         self.address = address
         self.bankAccountId = bankAccountId
         self.instanceId = instanceId
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -65,7 +65,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         case address
         case bankAccountId = "bank_account_id"
         case instanceId = "instance_id"
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
