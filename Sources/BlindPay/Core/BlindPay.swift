@@ -1501,15 +1501,13 @@ public final class BlindPay: Sendable {
             queryParameters["full_name"] = fullName
         }
         if let customerName = customerName {
-            // The API's filter schema still uses receiver_name/receiver_id. Map the
-            // clean customer-* surface to the wire names; drop once the API accepts customer_*.
-            queryParameters["receiver_name"] = customerName
+            queryParameters["customer_name"] = customerName
         }
         if let status = status {
             queryParameters["status"] = status
         }
         if let customerId = customerId {
-            queryParameters["receiver_id"] = customerId
+            queryParameters["customer_id"] = customerId
         }
         if let bankAccountId = bankAccountId {
             queryParameters["bank_account_id"] = bankAccountId

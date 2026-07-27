@@ -651,6 +651,9 @@ public struct ListPayinsInput: Codable, Sendable {
   /// Filter by receiver ID
   public let receiverId: String?
 
+  /// Filter by customer ID
+  public let customerId: String?
+
   /// Filter by status
   public let status: PayinStatus?
 
@@ -660,6 +663,7 @@ public struct ListPayinsInput: Codable, Sendable {
     startingAfter: String? = nil,
     endingBefore: String? = nil,
     receiverId: String? = nil,
+    customerId: String? = nil,
     status: PayinStatus? = nil
   ) {
     self.limit = limit
@@ -667,6 +671,7 @@ public struct ListPayinsInput: Codable, Sendable {
     self.startingAfter = startingAfter
     self.endingBefore = endingBefore
     self.receiverId = receiverId
+    self.customerId = customerId
     self.status = status
   }
 
@@ -676,6 +681,7 @@ public struct ListPayinsInput: Codable, Sendable {
     case startingAfter = "starting_after"
     case endingBefore = "ending_before"
     case receiverId = "receiver_id"
+    case customerId = "customer_id"
     case status
   }
 
@@ -696,6 +702,9 @@ public struct ListPayinsInput: Codable, Sendable {
     }
     if let receiverId = receiverId {
       params["receiver_id"] = receiverId
+    }
+    if let customerId = customerId {
+      params["customer_id"] = customerId
     }
     if let status = status {
       params["status"] = status.rawValue

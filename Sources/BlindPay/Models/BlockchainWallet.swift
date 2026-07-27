@@ -52,7 +52,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         case id
         case name
         case network
-        case customerId = "customer_id"
+        case customerId = "receiver_id"
         case address
         case isAccountAbstraction = "is_account_abstraction"
         case signatureTxHash = "signature_tx_hash"

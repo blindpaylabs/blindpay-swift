@@ -200,7 +200,7 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id
-        case customerId = "customer_id"
+        case customerId = "receiver_id"
         case status
         case createdAt = "created_at"
         case updatedAt = "updated_at"

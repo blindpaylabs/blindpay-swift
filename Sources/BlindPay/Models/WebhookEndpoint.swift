@@ -9,9 +9,15 @@ import Foundation
 
 /// Represents a webhook event type
 public enum WebhookEvent: String, Codable, Sendable {
+    @available(*, deprecated, message: "use .customerNew")
     case receiverNew = "receiver.new"
+    @available(*, deprecated, message: "use .customerUpdate")
     case receiverUpdate = "receiver.update"
+    @available(*, deprecated, message: "use .customerDelete")
     case receiverDelete = "receiver.delete"
+    case customerNew = "customer.new"
+    case customerUpdate = "customer.update"
+    case customerDelete = "customer.delete"
     case bankAccountNew = "bankAccount.new"
     case payoutNew = "payout.new"
     case payoutUpdate = "payout.update"
