@@ -29,10 +29,10 @@ public struct PayinQuotePayerRules: Codable, Sendable, Equatable {
 public struct PayinQuote: Codable, Sendable, Equatable {
     /// Unique identifier for the payin quote
     public let id: String
-    
-    /// Receiver ID
-    public let receiverId: String
-    
+
+    /// Customer ID
+    public let customerId: String
+
     /// Payment method
     public let paymentMethod: PaymentMethod
     
@@ -62,22 +62,22 @@ public struct PayinQuote: Codable, Sendable, Equatable {
     
     /// Receiver amount
     public let receiverAmount: Double
-    
+
     /// Sender amount
     public let senderAmount: Double
-    
+
     /// Partner fee amount
     public let partnerFeeAmount: Double
-    
+
     /// Flat fee
     public let flatFee: Double
-    
+
     /// Total fee amount
     public let totalFeeAmount: Double?
-    
-    /// Receiver local amount
-    public let receiverLocalAmount: Double?
-    
+
+    /// Customer local amount
+    public let customerLocalAmount: Double?
+
     /// Payer rules
     public let payerRules: PayinQuotePayerRules?
     
@@ -104,7 +104,7 @@ public struct PayinQuote: Codable, Sendable, Equatable {
     
     public init(
         id: String,
-        receiverId: String,
+        customerId: String,
         paymentMethod: PaymentMethod,
         token: StablecoinToken? = nil,
         requestAmount: Int,
@@ -119,7 +119,7 @@ public struct PayinQuote: Codable, Sendable, Equatable {
         partnerFeeAmount: Double,
         flatFee: Double,
         totalFeeAmount: Double? = nil,
-        receiverLocalAmount: Double? = nil,
+        customerLocalAmount: Double? = nil,
         payerRules: PayinQuotePayerRules? = nil,
         blockchainWalletId: String? = nil,
         instanceId: String,
@@ -130,7 +130,7 @@ public struct PayinQuote: Codable, Sendable, Equatable {
         updatedAt: String
     ) {
         self.id = id
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.paymentMethod = paymentMethod
         self.token = token
         self.requestAmount = requestAmount
@@ -145,7 +145,7 @@ public struct PayinQuote: Codable, Sendable, Equatable {
         self.partnerFeeAmount = partnerFeeAmount
         self.flatFee = flatFee
         self.totalFeeAmount = totalFeeAmount
-        self.receiverLocalAmount = receiverLocalAmount
+        self.customerLocalAmount = customerLocalAmount
         self.payerRules = payerRules
         self.blockchainWalletId = blockchainWalletId
         self.instanceId = instanceId
@@ -158,7 +158,7 @@ public struct PayinQuote: Codable, Sendable, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case paymentMethod = "payment_method"
         case token
         case requestAmount = "request_amount"
@@ -173,7 +173,7 @@ public struct PayinQuote: Codable, Sendable, Equatable {
         case partnerFeeAmount = "partner_fee_amount"
         case flatFee = "flat_fee"
         case totalFeeAmount = "total_fee_amount"
-        case receiverLocalAmount = "receiver_local_amount"
+        case customerLocalAmount = "customer_local_amount"
         case payerRules = "payer_rules"
         case blockchainWalletId = "blockchain_wallet_id"
         case instanceId = "instance_id"
@@ -197,8 +197,8 @@ public typealias PayinQuoteResponse = PayinQuote
 
 /// Input for creating a payin quote
 public struct CreatePayinQuoteInput: Codable, Sendable {
-    /// Receiver ID
-    public let receiverId: String
+    /// Customer ID
+    public let customerId: String
 
     /// Blockchain wallet ID
     public let blockchainWalletId: String
@@ -234,7 +234,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
     public let walletId: String?
 
     public init(
-        receiverId: String,
+        customerId: String,
         blockchainWalletId: String,
         paymentMethod: PaymentMethod,
         currencyType: CurrencyType,
@@ -247,7 +247,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         isOtc: Bool? = nil,
         walletId: String? = nil
     ) {
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.blockchainWalletId = blockchainWalletId
         self.paymentMethod = paymentMethod
         self.currencyType = currencyType
@@ -262,7 +262,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case blockchainWalletId = "blockchain_wallet_id"
         case paymentMethod = "payment_method"
         case currencyType = "currency_type"
@@ -278,7 +278,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(receiverId, forKey: .receiverId)
+        try container.encode(customerId, forKey: .customerId)
         try container.encode(blockchainWalletId, forKey: .blockchainWalletId)
         try container.encode(paymentMethod, forKey: .paymentMethod)
         try container.encode(currencyType, forKey: .currencyType)
@@ -311,31 +311,31 @@ public struct ListPayinQuotesInput: Codable, Sendable {
     /// Cursor for pagination (ending before this ID)
     public let endingBefore: String?
     
-    /// Filter by receiver ID
-    public let receiverId: String?
-    
+    /// Filter by customer ID
+    public let customerId: String?
+
     public init(
         limit: String? = nil,
         offset: String? = nil,
         startingAfter: String? = nil,
         endingBefore: String? = nil,
-        receiverId: String? = nil
+        customerId: String? = nil
     ) {
         self.limit = limit
         self.offset = offset
         self.startingAfter = startingAfter
         self.endingBefore = endingBefore
-        self.receiverId = receiverId
+        self.customerId = customerId
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case limit
         case offset
         case startingAfter = "starting_after"
         case endingBefore = "ending_before"
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
     }
-    
+
     /// Converts to query parameters dictionary
     func toQueryParameters() -> [String: String] {
         var params: [String: String] = [:]
@@ -351,8 +351,8 @@ public struct ListPayinQuotesInput: Codable, Sendable {
         if let endingBefore = endingBefore {
             params["ending_before"] = endingBefore
         }
-        if let receiverId = receiverId {
-            params["receiver_id"] = receiverId
+        if let customerId = customerId {
+            params["customer_id"] = customerId
         }
         return params
     }

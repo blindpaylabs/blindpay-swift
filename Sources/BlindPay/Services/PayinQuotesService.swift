@@ -29,7 +29,7 @@ public final class PayinQuotesService: Sendable {
     /// Example:
     /// ```swift
     /// let input = CreatePayinQuoteInput(
-    ///     receiverId: "re_123",
+    ///     customerId: "re_123",
     ///     blockchainWalletId: "bw_123",
     ///     paymentMethod: .pix,
     ///     currencyType: .sender,
@@ -94,7 +94,7 @@ public final class PayinQuotesService: Sendable {
     /// ```swift
     /// let params = ListPayinQuotesInput(
     ///     limit: "50",
-    ///     receiverId: "re_123"
+    ///     customerId: "re_123"
     /// )
     /// let response = try await blindPay.instances.payins.quotes.list(params: params)
     /// if let quotes = response.data {

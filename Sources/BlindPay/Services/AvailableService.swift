@@ -103,7 +103,7 @@ public final class AvailableService: Sendable {
     /// Retrieves all available NAICS business industry codes
     ///
     /// This method fetches a list of NAICS (North American Industry Classification System)
-    /// codes that can be used to classify a receiver's business industry.
+    /// codes that can be used to classify a customer's business industry.
     ///
     /// - Returns: An `APIResponse` containing an array of `NaicsCode` objects
     /// - Throws: `BlindPayError` if the request fails

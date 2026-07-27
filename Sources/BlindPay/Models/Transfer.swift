@@ -86,14 +86,14 @@ public struct Transfer: Codable, Sendable, Equatable {
     /// Receiver amount
     public let receiverAmount: Double?
 
-    /// Receiver network
-    public let receiverNetwork: String?
+    /// Customer network
+    public let customerNetwork: String?
 
-    /// Receiver token
-    public let receiverToken: String?
+    /// Customer token
+    public let customerToken: String?
 
-    /// Receiver wallet address
-    public let receiverWalletAddress: String?
+    /// Customer wallet address
+    public let customerWalletAddress: String?
 
     /// Timestamp when the transfer was created
     public let createdAt: String?
@@ -104,8 +104,8 @@ public struct Transfer: Codable, Sendable, Equatable {
     /// External identifier
     public let externalId: String?
 
-    /// Receiver ID
-    public let receiverId: String?
+    /// Customer ID
+    public let customerId: String?
 
     /// Address
     public let address: String?
@@ -142,13 +142,13 @@ public struct Transfer: Codable, Sendable, Equatable {
         senderToken: String? = nil,
         senderAmount: Double? = nil,
         receiverAmount: Double? = nil,
-        receiverNetwork: String? = nil,
-        receiverToken: String? = nil,
-        receiverWalletAddress: String? = nil,
+        customerNetwork: String? = nil,
+        customerToken: String? = nil,
+        customerWalletAddress: String? = nil,
         createdAt: String? = nil,
         updatedAt: String? = nil,
         externalId: String? = nil,
-        receiverId: String? = nil,
+        customerId: String? = nil,
         address: String? = nil,
         network: String? = nil,
         partnerFeeAmount: Double? = nil,
@@ -170,13 +170,13 @@ public struct Transfer: Codable, Sendable, Equatable {
         self.senderToken = senderToken
         self.senderAmount = senderAmount
         self.receiverAmount = receiverAmount
-        self.receiverNetwork = receiverNetwork
-        self.receiverToken = receiverToken
-        self.receiverWalletAddress = receiverWalletAddress
+        self.customerNetwork = customerNetwork
+        self.customerToken = customerToken
+        self.customerWalletAddress = customerWalletAddress
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.externalId = externalId
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.address = address
         self.network = network
         self.partnerFeeAmount = partnerFeeAmount
@@ -200,13 +200,13 @@ public struct Transfer: Codable, Sendable, Equatable {
         case senderToken = "sender_token"
         case senderAmount = "sender_amount"
         case receiverAmount = "receiver_amount"
-        case receiverNetwork = "receiver_network"
-        case receiverToken = "receiver_token"
-        case receiverWalletAddress = "receiver_wallet_address"
+        case customerNetwork = "customer_network"
+        case customerToken = "customer_token"
+        case customerWalletAddress = "customer_wallet_address"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case externalId = "external_id"
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case address
         case network
         case partnerFeeAmount = "partner_fee_amount"
@@ -246,14 +246,14 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Sender token
     public let senderToken: StablecoinToken
 
-    /// Receiver wallet address
-    public let receiverWalletAddress: String
+    /// Customer wallet address
+    public let customerWalletAddress: String
 
-    /// Receiver token
-    public let receiverToken: StablecoinToken
+    /// Customer token
+    public let customerToken: StablecoinToken
 
-    /// Receiver network
-    public let receiverNetwork: Network
+    /// Customer network
+    public let customerNetwork: Network
 
     /// Request amount
     public let requestAmount: Double
@@ -270,9 +270,9 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     public init(
         walletId: String,
         senderToken: StablecoinToken,
-        receiverWalletAddress: String,
-        receiverToken: StablecoinToken,
-        receiverNetwork: Network,
+        customerWalletAddress: String,
+        customerToken: StablecoinToken,
+        customerNetwork: Network,
         requestAmount: Double,
         coverFees: Bool,
         amountReference: String,
@@ -280,9 +280,9 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     ) {
         self.walletId = walletId
         self.senderToken = senderToken
-        self.receiverWalletAddress = receiverWalletAddress
-        self.receiverToken = receiverToken
-        self.receiverNetwork = receiverNetwork
+        self.customerWalletAddress = customerWalletAddress
+        self.customerToken = customerToken
+        self.customerNetwork = customerNetwork
         self.requestAmount = requestAmount
         self.coverFees = coverFees
         self.amountReference = amountReference
@@ -292,9 +292,9 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     enum CodingKeys: String, CodingKey {
         case walletId = "wallet_id"
         case senderToken = "sender_token"
-        case receiverWalletAddress = "receiver_wallet_address"
-        case receiverToken = "receiver_token"
-        case receiverNetwork = "receiver_network"
+        case customerWalletAddress = "customer_wallet_address"
+        case customerToken = "customer_token"
+        case customerNetwork = "customer_network"
         case requestAmount = "request_amount"
         case coverFees = "cover_fees"
         case amountReference = "amount_reference"

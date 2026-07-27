@@ -53,7 +53,7 @@ public final class WebhookEndpointsService: Sendable {
     /// ```swift
     /// let input = CreateWebhookEndpointInput(
     ///     url: "https://example.com/webhook",
-    ///     events: [.receiverNew, .payoutNew]
+    ///     events: [.customerNew, .payoutNew]
     /// )
     /// let response = try await blindPay.instances.webhookEndpoints.create(data: input)
     /// if let created = response.data {

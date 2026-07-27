@@ -21,7 +21,6 @@ blindpay-swift/
       Available.swift                   # Rail, BankAccountType, AccountClass, RecipientRelationship, NaicsCode, RailResponse, BankDetailKey, BankDetailItem, BankDetailField, SwiftCodeResponse.
       Instance.swift                    # InstanceMemberRole, InstanceMember, UpdateInstanceInput, UpdateMemberRoleInput, VoidResponse.
       Customer.swift                    # KYCType, CustomerType, IDDocType, ProofOfAddressDocType, SourceOfFundsDocType, PurposeOfTransactions, OwnerRole, CustomerOwner, CreateCustomerInput, Customer (full model), UpdateCustomerInput, response types, ListCustomersResponse.
-      ApiKey.swift                      # ApiKeyPermission, ApiKey, CreateApiKeyInput, CreateApiKeyResponse.
       BankAccount.swift                 # BankAccount, CreateBankAccountInput, CreateBankAccountResponse, SpeiProtocol, TransfersType + related enums.
       BlockchainWallet.swift            # BlockchainWallet, CreateBlockchainWalletInput, BlockchainWalletSignMessageResponse, asset trustline types, mint USDB types, Solana delegate types.
       CustodialWallet.swift             # CustodialWallet, CreateCustodialWalletInput, WalletTokenBalance, CustodialWalletBalanceResponse.
@@ -40,9 +39,8 @@ blindpay-swift/
       WebhookEndpoint.swift             # WebhookEvent, WebhookEndpoint, CreateWebhookEndpointInput, CreateWebhookEndpointResponse, WebhookEndpointSecret, WebhookPortalAccess, DeleteWebhookEndpointResponse.
     Services/
       AvailableService.swift            # Top-level service. No instanceId. Methods: getRails, getBankDetails, getSwiftCode.
-      InstancesService.swift            # Instance-scoped service. Holds sub-services (apiKeys, partnerFees, quotes, webhookEndpoints, payins, payouts, termsOfService). Direct methods for members, asset trustline, mint, delegate.
+      InstancesService.swift            # Instance-scoped service. Holds sub-services (partnerFees, quotes, webhookEndpoints, payins, payouts, termsOfService). Direct methods for members, asset trustline, mint, delegate.
       CustomersService.swift            # Customer-scoped service. Holds sub-services (blockchainWallets, virtualAccounts, bankAccounts, custodialWallets). No direct methods -- purely a sub-service container. Created via the customers(customerId:) factory on the BlindPay client.
-      ApiKeysService.swift              # CRUD for API keys. Instance-scoped.
       BankAccountsService.swift         # CRUD for bank accounts. Customer-scoped. Holds sub-service: offrampWallets.
       BlockchainWalletsService.swift    # CRUD for blockchain wallets + getSignMessage. Customer-scoped.
       CustodialWalletsService.swift     # CRUD + getBalance for custodial wallets. Customer-scoped.
@@ -69,7 +67,6 @@ blindpay-swift/
 BlindPay
   .available                         -> AvailableService
   .instances                         -> InstancesService
-    .apiKeys                           -> ApiKeysService
     .partnerFees                       -> PartnerFeesService
     .quotes                            -> QuotesService
     .webhookEndpoints                  -> WebhookEndpointsService
@@ -94,7 +91,7 @@ IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a fl
 ### Naming
 
 - **Files**: PascalCase matching the primary type. Model files go in `Models/`, service files in `Services/`.
-- **Service classes**: `{Resource}Service` (e.g., `ApiKeysService`, `BlockchainWalletsService`). Plural nouns.
+- **Service classes**: `{Resource}Service` (e.g., `PartnerFeesService`, `BlockchainWalletsService`). Plural nouns.
 - **Model structs**: Match the API resource name. PascalCase. (e.g., `BlockchainWallet`, `PartnerFee`).
 - **Input structs**: `Create{Resource}Input`, `Update{Resource}Input`, `List{Resource}Input`, `Delete{Resource}Input`.
 - **Response types**: `Create{Resource}Response`, `{Resource}Response`, `List{Resource}Response`. For list responses returning raw arrays, use `typealias {Resource}sResponse = [{Resource}]`.
@@ -288,15 +285,15 @@ All `.swift` files under `Sources/BlindPay/` are automatically included by SPM. 
 2. **Add the method** to the service class file. Match the method signature pattern of existing methods.
 3. **Add the convenience method** to `BlindPay.swift` with full doc comments. This is mandatory -- the facade must mirror every service method.
 
-Example -- adding `update(id:data:)` to `ApiKeysService`:
+Example -- adding `update(id:data:)` to `PartnerFeesService`:
 
-In `ApiKey.swift`, add `UpdateApiKeyInput` and `UpdateApiKeyResponse`.
+In `PartnerFee.swift`, add `UpdatePartnerFeeInput` and `UpdatePartnerFeeResponse`.
 
-In `ApiKeysService.swift`:
+In `PartnerFeesService.swift`:
 ```swift
-public func update(id: String, data: UpdateApiKeyInput) async throws -> APIResponse<UpdateApiKeyResponse> {
+public func update(id: String, data: UpdatePartnerFeeInput) async throws -> APIResponse<UpdatePartnerFeeResponse> {
     return try await apiClient.request(
-        endpoint: "/v1/instances/\(instanceId)/api-keys/\(id)",
+        endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
         method: .put,
         body: data
     )
@@ -305,9 +302,9 @@ public func update(id: String, data: UpdateApiKeyInput) async throws -> APIRespo
 
 In `BlindPay.swift`, add:
 ```swift
-public func updateApiKey(id: String, data: UpdateApiKeyInput) async throws -> APIResponse<UpdateApiKeyResponse> {
+public func updatePartnerFee(id: String, data: UpdatePartnerFeeInput) async throws -> APIResponse<UpdatePartnerFeeResponse> {
     return try await apiClient.request(
-        endpoint: "/v1/instances/\(instanceId)/api-keys/\(id)",
+        endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
         method: .put,
         body: data
     )
@@ -456,6 +453,32 @@ struct InvoiceTests {
     }
 }
 ```
+
+---
+
+## 8b. API Contract Check
+
+`.api-sync/spec-snapshot.json` is a committed copy of the OpenAPI spec this SDK is
+synced against. `.api-sync/check-contract.swift` is a dependency-free script (Foundation
+only) that verifies the SDK doesn't lie about the wire contract:
+
+- **Direction A (hard failure)**: every wire key the SDK declares -- `CodingKeys` string
+  values and `params["..."]` query-parameter literals -- must exist as a property name or
+  a parameter name somewhere in the snapshot, unless listed in `.api-sync/allow-list.json`.
+- **Direction B (hard failure)**: mapped enums (currently `WebhookEvent` and
+  `CurrencyType`) must cover every enum member the spec declares for them. Extend the
+  `mappedEnums` array in the script to add more.
+
+Run it locally:
+
+```bash
+swift .api-sync/check-contract.swift
+```
+
+When the spec changes (a sync PR), replace `.api-sync/spec-snapshot.json` with the new
+spec. If a genuinely pre-existing divergence can't be fixed in that PR, add an entry to
+`.api-sync/allow-list.json` with a `reason` and `owner` -- never use it to silence
+something the sync should actually fix.
 
 ---
 

@@ -146,7 +146,7 @@ public final class BlindPay: Sendable {
     /// Updates the instance with new data
     ///
     /// This method updates the instance's name and optionally sets a redirect URL
-    /// for receiver invites.
+    /// for customer invites.
     ///
     /// - Parameter data: The update data containing the instance name and optional redirect URL
     /// - Returns: An `APIResponse` with a void response indicating success
@@ -156,7 +156,7 @@ public final class BlindPay: Sendable {
     /// ```swift
     /// let updateData = UpdateInstanceInput(
     ///     name: "My Updated Instance",
-    ///     receiverInviteRedirectUrl: "https://example.com/redirect"
+    ///     customerInviteRedirectUrl: "https://example.com/redirect"
     /// )
     /// let response = try await blindPay.updateInstance(data: updateData)
     /// if let error = response.error {
@@ -385,107 +385,6 @@ public final class BlindPay: Sendable {
         )
     }
     
-    /// Lists all API keys for the instance
-    ///
-    /// This method fetches a list of all API keys associated with the instance.
-    /// Note that the token is only returned when creating or getting a single key.
-    ///
-    /// - Returns: An `APIResponse` containing an array of `ApiKey` objects
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.listApiKeys()
-    /// if let keys = response.data {
-    ///     for key in keys {
-    ///         print("\(key.name) - Last used: \(key.lastUsedAt ?? "Never")")
-    ///     }
-    /// }
-    /// ```
-    public func listApiKeys() async throws -> APIResponse<ApiKeysResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/api-keys",
-            method: .get
-        )
-    }
-    
-    /// Creates a new API key for the instance
-    ///
-    /// This method creates a new API key with the specified name and permissions.
-    /// The token is only returned once when the key is created.
-    ///
-    /// - Parameter data: The input data containing the key name, permission, and optional IP whitelist
-    /// - Returns: An `APIResponse` containing the created API key with its token
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let input = CreateApiKeyInput(
-    ///     name: "My API Key",
-    ///     permission: .fullAccess,
-    ///     ipWhitelist: ["192.168.1.1"]
-    /// )
-    /// let response = try await blindPay.createApiKey(data: input)
-    /// if let created = response.data {
-    ///     print("Created key: \(created.id)")
-    ///     print("Token: \(created.token)") // Save this token securely!
-    /// }
-    /// ```
-    public func createApiKey(data: CreateApiKeyInput) async throws -> APIResponse<CreateApiKeyResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/api-keys",
-            method: .post,
-            body: data
-        )
-    }
-    
-    /// Retrieves a specific API key by ID
-    ///
-    /// This method fetches the details of a specific API key, including its token.
-    ///
-    /// - Parameter id: The unique identifier of the API key
-    /// - Returns: An `APIResponse` containing the `ApiKey` object
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.getApiKey(id: "key_123")
-    /// if let key = response.data {
-    ///     print("Key name: \(key.name)")
-    ///     print("Token: \(key.token)")
-    /// }
-    /// ```
-    public func getApiKey(id: String) async throws -> APIResponse<ApiKey> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/api-keys/\(id)",
-            method: .get
-        )
-    }
-    
-    /// Deletes an API key
-    ///
-    /// This method permanently deletes an API key. This action cannot be undone.
-    ///
-    /// - Parameter id: The unique identifier of the API key to delete
-    /// - Returns: An `APIResponse` with a void response indicating success
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.deleteApiKey(id: "key_123")
-    /// if let error = response.error {
-    ///     print("Error: \(error.message)")
-    /// } else {
-    ///     print("API key deleted successfully")
-    /// }
-    /// ```
-    public func deleteApiKey(id: String) async throws -> APIResponse<VoidResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/api-keys/\(id)",
-            method: .delete
-        )
-    }
-    
     // MARK: - Partner Fees Service Methods
     
     /// Lists all partner fees for the instance
@@ -698,7 +597,7 @@ public final class BlindPay: Sendable {
     /// ```swift
     /// let input = CreateWebhookEndpointInput(
     ///     url: "https://example.com/webhook",
-    ///     events: [.receiverNew, .payoutNew]
+    ///     events: [.customerNew, .payoutNew]
     /// )
     /// let response = try await blindPay.createWebhookEndpoint(data: input)
     /// if let created = response.data {
@@ -895,7 +794,7 @@ public final class BlindPay: Sendable {
     /// Example:
     /// ```swift
     /// let input = CreatePayinQuoteInput(
-    ///     receiverId: "re_123",
+    ///     customerId: "re_123",
     ///     blockchainWalletId: "bw_123",
     ///     paymentMethod: .pix,
     ///     currencyType: .sender,
@@ -960,7 +859,7 @@ public final class BlindPay: Sendable {
     /// ```swift
     /// let params = ListPayinQuotesInput(
     ///     limit: "50",
-    ///     receiverId: "re_123"
+    ///     customerId: "re_123"
     /// )
     /// let response = try await blindPay.listPayinQuotes(params: params)
     /// if let quotes = response.data {
@@ -1383,9 +1282,9 @@ public final class BlindPay: Sendable {
     ///   6. Click on the request to view details
     ///   7. Go to the **Preview** or **Response** tab
     ///   8. Look for the `tos_id` field in the JSON response (format: `to_...`)
-    ///   9. Use this TOS ID when creating receivers or other operations that require it
+    ///   9. Use this TOS ID when creating customers or other operations that require it
     ///
-    /// - Parameter data: The input data containing idempotency key, optional receiver ID, and optional redirect URL
+    /// - Parameter data: The input data containing idempotency key, optional customer ID, and optional redirect URL
     /// - Returns: An `APIResponse` containing the terms of service URL
     /// - Throws: `BlindPayError` if the request fails
     ///
@@ -1393,7 +1292,7 @@ public final class BlindPay: Sendable {
     /// ```swift
     /// let input = InitiateTosInput(
     ///     idempotencyKey: "123e4567-e89b-12d3-a456-426614174000",
-    ///     receiverId: "re_000000000000",
+    ///     customerId: "re_000000000000",
     ///     redirectUrl: "https://example.com/redirect"
     /// )
     /// let response = try await blindPay.initiateTermsOfService(data: input)

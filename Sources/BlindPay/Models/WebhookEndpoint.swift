@@ -9,12 +9,6 @@ import Foundation
 
 /// Represents a webhook event type
 public enum WebhookEvent: String, Codable, Sendable {
-    @available(*, deprecated, message: "use .customerNew")
-    case receiverNew = "receiver.new"
-    @available(*, deprecated, message: "use .customerUpdate")
-    case receiverUpdate = "receiver.update"
-    @available(*, deprecated, message: "use .customerDelete")
-    case receiverDelete = "receiver.delete"
     case customerNew = "customer.new"
     case customerUpdate = "customer.update"
     case customerDelete = "customer.delete"
@@ -146,58 +140,6 @@ public struct DeleteWebhookEndpointResponse: Codable, Sendable {
 
     public init(success: Bool) {
         self.success = success
-    }
-}
-
-/// Webhook payload for receiver deletion events
-public struct ReceiverDeleteWebhookOut: Codable, Sendable, Equatable {
-    /// Event type
-    public let event: String
-
-    /// Instance ID
-    public let instanceId: String
-
-    /// Receiver ID that was deleted
-    public let receiverId: String
-
-    /// Receiver name
-    public let receiverName: String
-
-    /// Receiver email
-    public let receiverEmail: String
-
-    /// Deletion timestamp
-    public let deletedAt: String
-
-    /// User ID who performed the deletion
-    public let deletedBy: String
-
-    public init(
-        event: String,
-        instanceId: String,
-        receiverId: String,
-        receiverName: String,
-        receiverEmail: String,
-        deletedAt: String,
-        deletedBy: String
-    ) {
-        self.event = event
-        self.instanceId = instanceId
-        self.receiverId = receiverId
-        self.receiverName = receiverName
-        self.receiverEmail = receiverEmail
-        self.deletedAt = deletedAt
-        self.deletedBy = deletedBy
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case event
-        case instanceId = "instance_id"
-        case receiverId = "receiver_id"
-        case receiverName = "receiver_name"
-        case receiverEmail = "receiver_email"
-        case deletedAt = "deleted_at"
-        case deletedBy = "deleted_by"
     }
 }
 
