@@ -527,7 +527,7 @@ public struct CustomerOwner: Codable, Sendable, Equatable {
         case idDocFrontFile = "id_doc_front_file"
         case idDocBackFile = "id_doc_back_file"
         case instanceId = "instance_id"
-        case customerId = "customer_id"
+        case customerId = "receiver_id"
         case proofOfAddressDocType = "proof_of_address_doc_type"
         case proofOfAddressDocFile = "proof_of_address_doc_file"
         case ownershipPercentage = "ownership_percentage"
