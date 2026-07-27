@@ -527,12 +527,72 @@ public struct CustomerOwner: Codable, Sendable, Equatable {
         case idDocFrontFile = "id_doc_front_file"
         case idDocBackFile = "id_doc_back_file"
         case instanceId = "instance_id"
-        case customerId = "receiver_id"
+        case customerId = "customer_id"
+        case receiverId = "receiver_id"
         case proofOfAddressDocType = "proof_of_address_doc_type"
         case proofOfAddressDocFile = "proof_of_address_doc_file"
         case ownershipPercentage = "ownership_percentage"
         case title
         case taxType = "tax_type"
+    }
+
+    // The deployed API still returns `receiver_id` here (nested owners[] is not
+    // covered by the customer_id alias middleware); post-#1799 it will send
+    // `customer_id` instead. Accept either on decode, emit `customer_id` on encode.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        firstName = try container.decode(String.self, forKey: .firstName)
+        lastName = try container.decode(String.self, forKey: .lastName)
+        role = try container.decodeIfPresent(OwnerRole.self, forKey: .role)
+        dateOfBirth = try container.decodeIfPresent(String.self, forKey: .dateOfBirth)
+        taxId = try container.decodeIfPresent(String.self, forKey: .taxId)
+        addressLine1 = try container.decode(String.self, forKey: .addressLine1)
+        addressLine2 = try container.decodeIfPresent(String.self, forKey: .addressLine2)
+        city = try container.decode(String.self, forKey: .city)
+        stateProvinceRegion = try container.decode(String.self, forKey: .stateProvinceRegion)
+        country = try container.decode(Country.self, forKey: .country)
+        postalCode = try container.decode(String.self, forKey: .postalCode)
+        idDocCountry = try container.decode(Country.self, forKey: .idDocCountry)
+        idDocType = try container.decode(IDDocType.self, forKey: .idDocType)
+        idDocFrontFile = try container.decode(String.self, forKey: .idDocFrontFile)
+        idDocBackFile = try container.decodeIfPresent(String.self, forKey: .idDocBackFile)
+        instanceId = try container.decodeIfPresent(String.self, forKey: .instanceId)
+        let decodedCustomerId = try container.decodeIfPresent(String.self, forKey: .customerId)
+        let decodedReceiverId = try container.decodeIfPresent(String.self, forKey: .receiverId)
+        customerId = decodedCustomerId ?? decodedReceiverId
+        proofOfAddressDocType = try container.decodeIfPresent(ProofOfAddressDocType.self, forKey: .proofOfAddressDocType)
+        proofOfAddressDocFile = try container.decodeIfPresent(String.self, forKey: .proofOfAddressDocFile)
+        ownershipPercentage = try container.decodeIfPresent(Int.self, forKey: .ownershipPercentage)
+        title = try container.decodeIfPresent(String.self, forKey: .title)
+        taxType = try container.decodeIfPresent(OwnerTaxType.self, forKey: .taxType)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(id, forKey: .id)
+        try container.encode(firstName, forKey: .firstName)
+        try container.encode(lastName, forKey: .lastName)
+        try container.encodeIfPresent(role, forKey: .role)
+        try container.encodeIfPresent(dateOfBirth, forKey: .dateOfBirth)
+        try container.encodeIfPresent(taxId, forKey: .taxId)
+        try container.encode(addressLine1, forKey: .addressLine1)
+        try container.encodeIfPresent(addressLine2, forKey: .addressLine2)
+        try container.encode(city, forKey: .city)
+        try container.encode(stateProvinceRegion, forKey: .stateProvinceRegion)
+        try container.encode(country, forKey: .country)
+        try container.encode(postalCode, forKey: .postalCode)
+        try container.encode(idDocCountry, forKey: .idDocCountry)
+        try container.encode(idDocType, forKey: .idDocType)
+        try container.encode(idDocFrontFile, forKey: .idDocFrontFile)
+        try container.encodeIfPresent(idDocBackFile, forKey: .idDocBackFile)
+        try container.encodeIfPresent(instanceId, forKey: .instanceId)
+        try container.encodeIfPresent(customerId, forKey: .customerId)
+        try container.encodeIfPresent(proofOfAddressDocType, forKey: .proofOfAddressDocType)
+        try container.encodeIfPresent(proofOfAddressDocFile, forKey: .proofOfAddressDocFile)
+        try container.encodeIfPresent(ownershipPercentage, forKey: .ownershipPercentage)
+        try container.encodeIfPresent(title, forKey: .title)
+        try container.encodeIfPresent(taxType, forKey: .taxType)
     }
 }
 

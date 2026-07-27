@@ -65,7 +65,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         case address
         case bankAccountId = "bank_account_id"
         case instanceId = "instance_id"
-        case customerId = "receiver_id"
+        case customerId = "customer_id"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
