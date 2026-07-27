@@ -546,6 +546,9 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Has virtual account
   public let hasVirtualAccount: Bool?
 
+  /// Legal name of the sending instance (originator), shown on the receipt
+  public let senderLegalName: String?
+
   public init(
     id: String,
     receiverId: String,
@@ -618,7 +621,8 @@ public struct Payout: Codable, Sendable, Equatable {
     swiftAccountNumberIban: String? = nil,
     transfersAccount: String? = nil,
     transfersType: TransfersType? = nil,
-    hasVirtualAccount: Bool? = nil
+    hasVirtualAccount: Bool? = nil,
+    senderLegalName: String? = nil
   ) {
     self.id = id
     self.receiverId = receiverId
@@ -692,6 +696,7 @@ public struct Payout: Codable, Sendable, Equatable {
     self.transfersAccount = transfersAccount
     self.transfersType = transfersType
     self.hasVirtualAccount = hasVirtualAccount
+    self.senderLegalName = senderLegalName
   }
 
   enum CodingKeys: String, CodingKey {
@@ -767,6 +772,7 @@ public struct Payout: Codable, Sendable, Equatable {
     case transfersAccount = "transfers_account"
     case transfersType = "transfers_type"
     case hasVirtualAccount = "has_virtual_account"
+    case senderLegalName = "sender_legal_name"
   }
 }
 
