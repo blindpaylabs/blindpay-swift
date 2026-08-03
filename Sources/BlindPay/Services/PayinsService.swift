@@ -36,7 +36,7 @@ public final class PayinsService: Sendable {
     /// let params = ListPayinsInput(
     ///     limit: "50",
     ///     status: .processing,
-    ///     receiverId: "re_123"
+    ///     customerId: "re_123"
     /// )
     /// let response = try await blindPay.instances.payins.list(params: params)
     /// if let result = response.data {

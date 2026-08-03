@@ -249,13 +249,13 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     
     /// Contract information
     public let contract: QuoteContract
-    
-    /// Receiver local amount
-    public let receiverLocalAmount: Double
-    
+
+    /// Customer local amount
+    public let customerLocalAmount: Double
+
     /// Description
     public let description: String
-    
+
     public init(
         id: String,
         expiresAt: Int,
@@ -266,7 +266,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         partnerFeeAmount: Double,
         flatFee: Double,
         contract: QuoteContract,
-        receiverLocalAmount: Double,
+        customerLocalAmount: Double,
         description: String
     ) {
         self.id = id
@@ -278,10 +278,10 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         self.partnerFeeAmount = partnerFeeAmount
         self.flatFee = flatFee
         self.contract = contract
-        self.receiverLocalAmount = receiverLocalAmount
+        self.customerLocalAmount = customerLocalAmount
         self.description = description
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case expiresAt = "expires_at"
@@ -292,7 +292,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         case partnerFeeAmount = "partner_fee_amount"
         case flatFee = "flat_fee"
         case contract
-        case receiverLocalAmount = "receiver_local_amount"
+        case customerLocalAmount = "customer_local_amount"
         case description
     }
 }

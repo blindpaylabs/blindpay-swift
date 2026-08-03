@@ -333,8 +333,8 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Unique identifier for the payout
   public let id: String
 
-  /// Receiver ID
-  public let receiverId: String
+  /// Customer ID
+  public let customerId: String
 
   /// Status of the payout
   public let status: PayoutStatus
@@ -429,8 +429,8 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Total fee amount
   public let totalFeeAmount: Double?
 
-  /// Receiver local amount (in smallest currency unit)
-  public let receiverLocalAmount: Int?
+  /// Customer local amount (in smallest currency unit)
+  public let customerLocalAmount: Int?
 
   /// Currency
   public let currency: Currency
@@ -546,12 +546,9 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Has virtual account
   public let hasVirtualAccount: Bool?
 
-  /// Legal name of the sending instance (originator), shown on the receipt
-  public let senderLegalName: String?
-
   public init(
     id: String,
-    receiverId: String,
+    customerId: String,
     status: PayoutStatus,
     senderWalletAddress: String,
     signedTransaction: String? = nil,
@@ -583,7 +580,7 @@ public struct Payout: Codable, Sendable, Equatable {
     commercialQuotation: Double? = nil,
     blindpayQuotation: Double? = nil,
     totalFeeAmount: Double? = nil,
-    receiverLocalAmount: Int? = nil,
+    customerLocalAmount: Int? = nil,
     currency: Currency,
     transactionDocumentFile: String? = nil,
     transactionDocumentType: TransactionDocumentType? = nil,
@@ -621,11 +618,10 @@ public struct Payout: Codable, Sendable, Equatable {
     swiftAccountNumberIban: String? = nil,
     transfersAccount: String? = nil,
     transfersType: TransfersType? = nil,
-    hasVirtualAccount: Bool? = nil,
-    senderLegalName: String? = nil
+    hasVirtualAccount: Bool? = nil
   ) {
     self.id = id
-    self.receiverId = receiverId
+    self.customerId = customerId
     self.status = status
     self.senderWalletAddress = senderWalletAddress
     self.signedTransaction = signedTransaction
@@ -657,7 +653,7 @@ public struct Payout: Codable, Sendable, Equatable {
     self.commercialQuotation = commercialQuotation
     self.blindpayQuotation = blindpayQuotation
     self.totalFeeAmount = totalFeeAmount
-    self.receiverLocalAmount = receiverLocalAmount
+    self.customerLocalAmount = customerLocalAmount
     self.currency = currency
     self.transactionDocumentFile = transactionDocumentFile
     self.transactionDocumentType = transactionDocumentType
@@ -696,12 +692,11 @@ public struct Payout: Codable, Sendable, Equatable {
     self.transfersAccount = transfersAccount
     self.transfersType = transfersType
     self.hasVirtualAccount = hasVirtualAccount
-    self.senderLegalName = senderLegalName
   }
 
   enum CodingKeys: String, CodingKey {
     case id
-    case receiverId = "receiver_id"
+    case customerId = "customer_id"
     case status
     case senderWalletAddress = "sender_wallet_address"
     case signedTransaction = "signed_transaction"
@@ -733,7 +728,7 @@ public struct Payout: Codable, Sendable, Equatable {
     case commercialQuotation = "commercial_quotation"
     case blindpayQuotation = "blindpay_quotation"
     case totalFeeAmount = "total_fee_amount"
-    case receiverLocalAmount = "receiver_local_amount"
+    case customerLocalAmount = "customer_local_amount"
     case currency
     case transactionDocumentFile = "transaction_document_file"
     case transactionDocumentType = "transaction_document_type"
@@ -772,7 +767,6 @@ public struct Payout: Codable, Sendable, Equatable {
     case transfersAccount = "transfers_account"
     case transfersType = "transfers_type"
     case hasVirtualAccount = "has_virtual_account"
-    case senderLegalName = "sender_legal_name"
   }
 }
 
@@ -813,8 +807,8 @@ public struct CreatePayoutResponse: Codable, Sendable {
   /// Liquidity tracking information
   public let trackingLiquidity: PayoutTrackingLiquidity?
 
-  /// Receiver ID
-  public let receiverId: String?
+  /// Customer ID
+  public let customerId: String?
 
   public init(
     id: String,
@@ -825,7 +819,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
     trackingTransaction: PayoutTrackingTransaction,
     trackingPartnerFee: PayoutTrackingPartnerFee? = nil,
     trackingLiquidity: PayoutTrackingLiquidity? = nil,
-    receiverId: String? = nil
+    customerId: String? = nil
   ) {
     self.id = id
     self.status = status
@@ -835,7 +829,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
     self.trackingTransaction = trackingTransaction
     self.trackingPartnerFee = trackingPartnerFee
     self.trackingLiquidity = trackingLiquidity
-    self.receiverId = receiverId
+    self.customerId = customerId
   }
 
   enum CodingKeys: String, CodingKey {
@@ -847,7 +841,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
     case trackingTransaction = "tracking_transaction"
     case trackingPartnerFee = "tracking_partner_fee"
     case trackingLiquidity = "tracking_liquidity"
-    case receiverId = "receiver_id"
+    case customerId = "customer_id"
   }
 }
 
@@ -895,9 +889,6 @@ public struct ListPayoutsInput: Codable, Sendable {
   /// Cursor for pagination (ending before this ID)
   public let endingBefore: String?
 
-  /// Filter by receiver ID
-  public let receiverId: String?
-
   /// Filter by customer ID
   public let customerId: String?
 
@@ -909,7 +900,6 @@ public struct ListPayoutsInput: Codable, Sendable {
     offset: String? = nil,
     startingAfter: String? = nil,
     endingBefore: String? = nil,
-    receiverId: String? = nil,
     customerId: String? = nil,
     status: PayoutStatus? = nil
   ) {
@@ -917,7 +907,6 @@ public struct ListPayoutsInput: Codable, Sendable {
     self.offset = offset
     self.startingAfter = startingAfter
     self.endingBefore = endingBefore
-    self.receiverId = receiverId
     self.customerId = customerId
     self.status = status
   }
@@ -927,7 +916,6 @@ public struct ListPayoutsInput: Codable, Sendable {
     case offset
     case startingAfter = "starting_after"
     case endingBefore = "ending_before"
-    case receiverId = "receiver_id"
     case customerId = "customer_id"
     case status
   }
@@ -946,9 +934,6 @@ public struct ListPayoutsInput: Codable, Sendable {
     }
     if let endingBefore = endingBefore {
       params["ending_before"] = endingBefore
-    }
-    if let receiverId = receiverId {
-      params["receiver_id"] = receiverId
     }
     if let customerId = customerId {
       params["customer_id"] = customerId

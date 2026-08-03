@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    name: Build, test, and check API contract
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: swift --version
+        run: swift --version
+
+      - name: swift build
+        run: swift build
+
+      - name: swift test
+        run: swift test
+
+      - name: API contract check
+        run: swift .api-sync/check-contract.swift

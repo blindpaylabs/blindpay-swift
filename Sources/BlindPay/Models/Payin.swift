@@ -370,8 +370,8 @@ public struct Payin: Codable, Sendable, Equatable {
   /// Unique identifier for the payin
   public let id: String
 
-  /// Receiver ID
-  public let receiverId: String
+  /// Customer ID
+  public let customerId: String
 
   /// PIX code for payment
   public let pixCode: String?
@@ -492,7 +492,7 @@ public struct Payin: Codable, Sendable, Equatable {
 
   public init(
     id: String,
-    receiverId: String,
+    customerId: String,
     pixCode: String? = nil,
     memoCode: String? = nil,
     clabe: String? = nil,
@@ -534,7 +534,7 @@ public struct Payin: Codable, Sendable, Equatable {
     pseTaxId: String? = nil
   ) {
     self.id = id
-    self.receiverId = receiverId
+    self.customerId = customerId
     self.pixCode = pixCode
     self.memoCode = memoCode
     self.clabe = clabe
@@ -578,7 +578,7 @@ public struct Payin: Codable, Sendable, Equatable {
 
   enum CodingKeys: String, CodingKey {
     case id
-    case receiverId = "receiver_id"
+    case customerId = "customer_id"
     case pixCode = "pix_code"
     case memoCode = "memo_code"
     case clabe
@@ -648,9 +648,6 @@ public struct ListPayinsInput: Codable, Sendable {
   /// Cursor for pagination (ending before this ID)
   public let endingBefore: String?
 
-  /// Filter by receiver ID
-  public let receiverId: String?
-
   /// Filter by customer ID
   public let customerId: String?
 
@@ -662,7 +659,6 @@ public struct ListPayinsInput: Codable, Sendable {
     offset: String? = nil,
     startingAfter: String? = nil,
     endingBefore: String? = nil,
-    receiverId: String? = nil,
     customerId: String? = nil,
     status: PayinStatus? = nil
   ) {
@@ -670,7 +666,6 @@ public struct ListPayinsInput: Codable, Sendable {
     self.offset = offset
     self.startingAfter = startingAfter
     self.endingBefore = endingBefore
-    self.receiverId = receiverId
     self.customerId = customerId
     self.status = status
   }
@@ -680,7 +675,6 @@ public struct ListPayinsInput: Codable, Sendable {
     case offset
     case startingAfter = "starting_after"
     case endingBefore = "ending_before"
-    case receiverId = "receiver_id"
     case customerId = "customer_id"
     case status
   }
@@ -699,9 +693,6 @@ public struct ListPayinsInput: Codable, Sendable {
     }
     if let endingBefore = endingBefore {
       params["ending_before"] = endingBefore
-    }
-    if let receiverId = receiverId {
-      params["receiver_id"] = receiverId
     }
     if let customerId = customerId {
       params["customer_id"] = customerId
@@ -759,8 +750,8 @@ public struct CreatePayinResponse: Codable, Sendable {
   /// BlindPay bank details
   public let blindpayBankDetails: BlindPayBankDetails
 
-  /// Receiver ID
-  public let receiverId: String?
+  /// Customer ID
+  public let customerId: String?
 
   /// Receiver amount
   public let receiverAmount: Int?
@@ -785,7 +776,7 @@ public struct CreatePayinResponse: Codable, Sendable {
     trackingTransaction: PayinTrackingTransaction,
     trackingPartnerFee: PayinTrackingPartnerFee? = nil,
     blindpayBankDetails: BlindPayBankDetails,
-    receiverId: String? = nil,
+    customerId: String? = nil,
     receiverAmount: Int? = nil,
     paymentMethod: PaymentMethod? = nil,
     billingFee: Int? = nil,
@@ -801,7 +792,7 @@ public struct CreatePayinResponse: Codable, Sendable {
     self.trackingTransaction = trackingTransaction
     self.trackingPartnerFee = trackingPartnerFee
     self.blindpayBankDetails = blindpayBankDetails
-    self.receiverId = receiverId
+    self.customerId = customerId
     self.receiverAmount = receiverAmount
     self.paymentMethod = paymentMethod
     self.billingFee = billingFee
@@ -819,7 +810,7 @@ public struct CreatePayinResponse: Codable, Sendable {
     case trackingTransaction = "tracking_transaction"
     case trackingPartnerFee = "tracking_partner_fee"
     case blindpayBankDetails = "blindpay_bank_details"
-    case receiverId = "receiver_id"
+    case customerId = "customer_id"
     case receiverAmount = "receiver_amount"
     case paymentMethod = "payment_method"
     case billingFee = "billing_fee"

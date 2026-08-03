@@ -84,8 +84,8 @@ public struct UpdateInstanceInput: Codable, Sendable {
     /// Name of the instance
     public let name: String
 
-    /// Optional redirect URL for receiver invites
-    public let receiverInviteRedirectUrl: String?
+    /// Optional redirect URL for customer invites
+    public let customerInviteRedirectUrl: String?
 
     /// Whether email notifications are enabled (optional)
     public let emailNotifications: Bool?
@@ -95,19 +95,19 @@ public struct UpdateInstanceInput: Codable, Sendable {
 
     public init(
         name: String,
-        receiverInviteRedirectUrl: String? = nil,
+        customerInviteRedirectUrl: String? = nil,
         emailNotifications: Bool? = nil,
         requirePasskey: Bool? = nil
     ) {
         self.name = name
-        self.receiverInviteRedirectUrl = receiverInviteRedirectUrl
+        self.customerInviteRedirectUrl = customerInviteRedirectUrl
         self.emailNotifications = emailNotifications
         self.requirePasskey = requirePasskey
     }
 
     enum CodingKeys: String, CodingKey {
         case name
-        case receiverInviteRedirectUrl = "receiver_invite_redirect_url"
+        case customerInviteRedirectUrl = "customer_invite_redirect_url"
         case emailNotifications = "email_notifications"
         case requirePasskey = "require_passkey"
     }

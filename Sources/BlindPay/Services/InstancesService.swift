@@ -12,10 +12,7 @@ import Foundation
 public final class InstancesService: Sendable {
     private let apiClient: APIClient
     private let instanceId: String
-    
-    /// API keys management service
-    public let apiKeys: ApiKeysService
-    
+
     /// Partner fees management service
     public let partnerFees: PartnerFeesService
     
@@ -37,7 +34,6 @@ public final class InstancesService: Sendable {
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
-        self.apiKeys = ApiKeysService(apiClient: apiClient, instanceId: instanceId)
         self.partnerFees = PartnerFeesService(apiClient: apiClient, instanceId: instanceId)
         self.quotes = QuotesService(apiClient: apiClient, instanceId: instanceId)
         self.webhookEndpoints = WebhookEndpointsService(apiClient: apiClient, instanceId: instanceId)
@@ -73,7 +69,7 @@ public final class InstancesService: Sendable {
     /// Updates the instance with new data
     ///
     /// This method updates the instance's name and optionally sets a redirect URL
-    /// for receiver invites.
+    /// for customer invites.
     ///
     /// - Parameter data: The update data containing the instance name and optional redirect URL
     /// - Returns: An `APIResponse` with a void response indicating success
@@ -83,7 +79,7 @@ public final class InstancesService: Sendable {
     /// ```swift
     /// let updateData = UpdateInstanceInput(
     ///     name: "My Updated Instance",
-    ///     receiverInviteRedirectUrl: "https://example.com/redirect"
+    ///     customerInviteRedirectUrl: "https://example.com/redirect"
     /// )
     /// let response = try await blindPay.instances.update(data: updateData)
     /// if let error = response.error {

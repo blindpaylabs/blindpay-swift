@@ -12,21 +12,21 @@ public struct InitiateTosInput: Codable, Sendable {
     /// Idempotency key for the request (UUID format)
     public let idempotencyKey: String
     
-    /// Optional receiver ID (15 characters)
-    public let receiverId: String?
-    
+    /// Optional customer ID (15 characters)
+    public let customerId: String?
+
     /// Optional redirect URL (URI format)
     public let redirectUrl: String?
-    
-    public init(idempotencyKey: String, receiverId: String? = nil, redirectUrl: String? = nil) {
+
+    public init(idempotencyKey: String, customerId: String? = nil, redirectUrl: String? = nil) {
         self.idempotencyKey = idempotencyKey
-        self.receiverId = receiverId
+        self.customerId = customerId
         self.redirectUrl = redirectUrl
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case idempotencyKey = "idempotency_key"
-        case receiverId = "receiver_id"
+        case customerId = "customer_id"
         case redirectUrl = "redirect_url"
     }
 }
