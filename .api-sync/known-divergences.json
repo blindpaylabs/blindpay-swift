@@ -1,0 +1,99 @@
+[
+  {
+    "enum": "BankAccountType",
+    "kind": "value-mismatch",
+    "owner": "eric@blindpay.com",
+    "reason": "LIVE DEFECT: the API contract and payout code branch on the wire value \"saving\" (singular; see packages/api-contract/src/bank-account.schema.ts in blindpay-v2 and the payout code's account_type === 'saving' check). This SDK's BankAccountType.savings encodes \"savings\" (plural), so creating a savings bank account through this SDK is rejected by the API today. node and go already use the correct value; python and php have the same defect as this repo. Fix is deliberately deferred to a separate, reviewed PR per repo (changing an existing public enum's raw value needs its own scrutiny, not a mechanical sync-infra change) rather than silently auto-corrected here.",
+    "sdkValue": "savings",
+    "specValue": "saving"
+  },
+  {
+    "enum": "BusinessIndustry",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New NAICS code added to the business_industry enum. Deferred to keep this PR's enum changes limited to the explicitly reviewed set; a 150+ member enum gaining one more code is low risk but out of this PR's charter.",
+    "specValues": [
+      "446120"
+    ]
+  },
+  {
+    "enum": "Currency",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "EUR was added to the fx-rate and payin-quote currency enums. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "EUR"
+    ]
+  },
+  {
+    "enum": "EstimatedAnnualRevenue",
+    "kind": "value-mismatch",
+    "owner": "eric@blindpay.com",
+    "reason": "Likely a decade-off typo from when this case was authored: every other band's upper bound matches the spec exactly (50000000_249999999 is the band directly below), so the top band should start at 250,000,000 not 2,500,000,000. Deferred to a follow-up PR rather than silently auto-corrected here.",
+    "sdkValue": "2500000000_plus",
+    "specValue": "250000000_plus"
+  },
+  {
+    "enum": "EstimatedTimeOfArrival",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New estimated-arrival bucket between the existing 5_min and 30_min bands. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "5_30_min"
+    ]
+  },
+  {
+    "enum": "KYCStatus",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New compliance workflow status (approved pending an outstanding RFI). Deliberately deferred: KYC status is compliance-sensitive and this sync-infrastructure PR is scoped to the pre-identified 4-field delta plus the two divergences (BankAccountType, BankingPartner) explicitly reviewed for this PR.",
+    "specValues": [
+      "approved_rfi"
+    ]
+  },
+  {
+    "enum": "ManualExecutionStatus",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK currently declares only \"failed\"; spec's payin manual_execution_status also allows \"concluded\" and \"pending\". Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "concluded",
+      "pending"
+    ]
+  },
+  {
+    "enum": "PaymentType",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "SEPA payout rail exists in the spec's PayoutOut.type enum (and in the BankAccount-side Rail enum already modeled) but no SEPA payout operation or fee options are modeled anywhere else in this SDK yet (see GetFeesOut.sepa in unmodeled.json). Deferred as a package with that broader SEPA-payout gap rather than added in isolation.",
+    "specValues": [
+      "sepa"
+    ]
+  },
+  {
+    "enum": "SupportingDocumentType",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "Limit-increase supporting-document catalog was expanded from 6 to 15 document types. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "business_accounts_receivable",
+      "business_contract",
+      "business_merchant_processor_statement",
+      "business_shareholder_loan",
+      "individual_blockchain_wallet_statement",
+      "individual_crypto_exchange_statement",
+      "individual_employment_letter",
+      "individual_investment_statement",
+      "individual_pay_stub"
+    ]
+  },
+  {
+    "enum": "TrackingStep",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New payout tracking step. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "pending_review"
+    ]
+  }
+]

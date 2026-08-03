@@ -99,6 +99,8 @@ public struct CreateQuoteInput: Codable, Sendable {
     /// Transaction document type
     public let transactionDocumentType: TransactionDocumentType
     
+    public let refundWalletAddress: String?
+
     public init(
         bankAccountId: String,
         currencyType: CurrencyType,
@@ -110,7 +112,8 @@ public struct CreateQuoteInput: Codable, Sendable {
         partnerFeeId: String? = nil,
         transactionDocumentFile: String? = nil,
         transactionDocumentId: String? = nil,
-        transactionDocumentType: TransactionDocumentType
+        transactionDocumentType: TransactionDocumentType,
+        refundWalletAddress: String? = nil
     ) {
         self.bankAccountId = bankAccountId
         self.currencyType = currencyType
@@ -123,6 +126,7 @@ public struct CreateQuoteInput: Codable, Sendable {
         self.transactionDocumentFile = transactionDocumentFile
         self.transactionDocumentId = transactionDocumentId
         self.transactionDocumentType = transactionDocumentType
+        self.refundWalletAddress = refundWalletAddress
     }
     
     enum CodingKeys: String, CodingKey {
@@ -137,6 +141,7 @@ public struct CreateQuoteInput: Codable, Sendable {
         case transactionDocumentFile = "transaction_document_file"
         case transactionDocumentId = "transaction_document_id"
         case transactionDocumentType = "transaction_document_type"
+        case refundWalletAddress = "refund_wallet_address"
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -153,6 +158,7 @@ public struct CreateQuoteInput: Codable, Sendable {
         try container.encodeIfPresent(transactionDocumentFile, forKey: .transactionDocumentFile)
         try container.encodeIfPresent(transactionDocumentId, forKey: .transactionDocumentId)
         try container.encode(transactionDocumentType, forKey: .transactionDocumentType)
+        try container.encodeIfPresent(refundWalletAddress, forKey: .refundWalletAddress)
     }
 }
 
