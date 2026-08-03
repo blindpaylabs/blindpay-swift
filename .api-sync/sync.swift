@@ -1110,8 +1110,13 @@ case .apply:
         report["bump"] = bump.rawValue
     }
 
-    if let snapshotData = try? JSONSerialization.data(withJSONObject: newSpec, options: [.prettyPrinted, .sortedKeys]) {
-        try? snapshotData.write(to: URL(fileURLWithPath: snapshotPath))
+    // Refresh the snapshot by copying the source spec file's bytes verbatim
+    // (never decode-then-re-encode): the snapshot is a committed, human-reviewed
+    // artifact, and a JSONSerialization round trip would reformat and reorder
+    // every key, turning "nothing in the spec changed" into a multi-thousand-line
+    // diff that defeats the point of committing it at all.
+    if let specData = FileManager.default.contents(atPath: specPath) {
+        try? specData.write(to: URL(fileURLWithPath: snapshotPath))
     }
 
     if let rp = reportPath {

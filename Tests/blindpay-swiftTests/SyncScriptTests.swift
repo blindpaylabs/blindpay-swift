@@ -569,6 +569,46 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(apply.stdout.contains("enum member \"inactive\" removed"))
 }
 
+// MARK: - Snapshot refresh copies bytes verbatim (never a decode/re-encode round trip)
+
+@Test func applyRefreshesSnapshotAsByteIdenticalCopyOfSpecFile() {
+    let dir = makeFixtureDir()
+    writeAllFixtureSources(dir)
+    // Scoped to just ThingOut/FixtureStatus, matching the hand-crafted spec
+    // below -- not the full baseSpecMap, which references five other schemas
+    // this minimal spec doesn't define.
+    let minimalMap: [String: Any] = [
+        "enums": [
+            ["spec": ["schema": "ThingOut", "property": "status"], "sdk": ["file": "Models/Thing.swift", "symbol": "FixtureStatus"]],
+        ],
+        "types": [
+            ["spec": "ThingOut", "sdk": [["file": "Models/Thing.swift", "symbol": "FixtureThing"]]],
+        ],
+        "ignore": ["schemas": [] as [Any]],
+    ]
+    writeJSON(dir + "/spec-map.json", minimalMap)
+    writeJSON(dir + "/unmodeled.json", [] as [Any])
+    writeJSON(dir + "/known-divergences.json", [] as [Any])
+
+    // Deliberately non-canonical formatting (unsorted keys, unusual spacing,
+    // no trailing newline) that a JSONSerialization round trip would rewrite.
+    // If sync.swift ever regresses to decode-then-re-encode when refreshing
+    // the snapshot, this byte-for-byte comparison catches it immediately.
+    let handCraftedSpec = """
+    {"paths":{"/things":{"get":{"responses":{"200":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ThingOut"}}}}}}}},"openapi":"3.0.0","info":{"version":"1.0","title":"fixture"},"components":{"schemas":{"ThingOut":{"required":[],"type":"object","properties":{"status":{"enum":["active","inactive"],"type":"string"},"name":{"type":"string"},"id":{"type":"string"}}}}}}
+    """
+    write(dir + "/spec-current.json", handCraftedSpec)
+    write(dir + "/spec-snapshot.json", handCraftedSpec) // same content, so there is no pending drift
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+
+    let specBytes = FileManager.default.contents(atPath: dir + "/spec-current.json")
+    let snapshotBytes = FileManager.default.contents(atPath: dir + "/spec-snapshot.json")
+    #expect(specBytes != nil)
+    #expect(snapshotBytes == specBytes)
+}
+
 // MARK: - Bump classification
 
 @Test func bumpIsNoneWhenSpecIsUnchanged() {
