@@ -13,10 +13,10 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
     public let id: String
     
     /// Display name for the wallet
-    public let name: String
+    public let name: String?
     
     /// Blockchain network
-    public let network: Network
+    public let network: Network?
     
     /// Customer ID this wallet belongs to
     public let customerId: String
@@ -32,8 +32,8 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
     
     public init(
         id: String,
-        name: String,
-        network: Network,
+        name: String? = nil,
+        network: Network? = nil,
         customerId: String,
         address: String? = nil,
         isAccountAbstraction: Bool? = nil,
@@ -255,4 +255,3 @@ public struct PrepareDelegateSolanaResponse: Codable, Sendable, Equatable {
         self.debug = debug
     }
 }
-

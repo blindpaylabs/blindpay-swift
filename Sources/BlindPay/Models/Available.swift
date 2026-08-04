@@ -178,14 +178,14 @@ public struct BankDetailField: Codable, Sendable, Equatable {
     public let items: [BankDetailItem]?
 
     /// Whether this field is required
-    public let required: Bool
+    public let required: Bool?
 
     public init(
         label: String,
         regex: String,
         key: BankDetailKey,
         items: [BankDetailItem]? = nil,
-        required: Bool
+        required: Bool? = nil
     ) {
         self.label = label
         self.regex = regex

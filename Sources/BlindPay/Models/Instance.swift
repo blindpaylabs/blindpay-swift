@@ -30,7 +30,7 @@ public struct InstanceMember: Codable, Sendable, Equatable {
     public let firstName: String
     
     /// Middle name of the member (may be empty)
-    public let middleName: String
+    public let middleName: String?
     
     /// Last name of the member
     public let lastName: String
@@ -39,7 +39,7 @@ public struct InstanceMember: Codable, Sendable, Equatable {
     public let imageUrl: String
     
     /// Timestamp when the member was created
-    public let createdAt: String
+    public let createdAt: String?
     
     /// Role assigned to the member
     public let role: InstanceMemberRole
@@ -48,10 +48,10 @@ public struct InstanceMember: Codable, Sendable, Equatable {
         id: String,
         email: String,
         firstName: String,
-        middleName: String,
+        middleName: String? = nil,
         lastName: String,
         imageUrl: String,
-        createdAt: String,
+        createdAt: String? = nil,
         role: InstanceMemberRole
     ) {
         self.id = id
@@ -155,4 +155,3 @@ public struct MigrateInstanceOwnershipResponse: Codable, Sendable, Equatable {
 public struct VoidResponse: Codable, Sendable {
     public init() {}
 }
-

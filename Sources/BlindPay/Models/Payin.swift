@@ -50,7 +50,7 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
   public let step: String
 
   /// Status of the step
-  public let status: String
+  public let status: String?
 
   /// External transaction ID
   public let externalId: String?
@@ -81,7 +81,7 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
 
   public init(
     step: String,
-    status: String,
+    status: String? = nil,
     externalId: String? = nil,
     completedAt: String? = nil,
     senderName: String? = nil,
@@ -407,10 +407,10 @@ public struct Payin: Codable, Sendable, Equatable {
   public let trackingPartnerFee: PayinTrackingPartnerFee?
 
   /// Timestamp when the payin was created
-  public let createdAt: String
+  public let createdAt: String?
 
   /// Timestamp when the payin was last updated
-  public let updatedAt: String
+  public let updatedAt: String?
 
   /// Image URL
   public let imageUrl: String?
@@ -504,8 +504,8 @@ public struct Payin: Codable, Sendable, Equatable {
     trackingPayment: PayinTrackingPayment? = nil,
     trackingComplete: PayinTrackingComplete? = nil,
     trackingPartnerFee: PayinTrackingPartnerFee? = nil,
-    createdAt: String,
-    updatedAt: String,
+    createdAt: String? = nil,
+    updatedAt: String? = nil,
     imageUrl: String? = nil,
     firstName: String? = nil,
     lastName: String? = nil,

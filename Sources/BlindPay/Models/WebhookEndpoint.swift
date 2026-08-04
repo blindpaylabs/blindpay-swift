@@ -52,10 +52,10 @@ public struct WebhookEndpoint: Codable, Sendable, Equatable {
     public let instanceId: String
     
     /// Timestamp when the endpoint was created
-    public let createdAt: String
+    public let createdAt: String?
     
     /// Timestamp when the endpoint was last updated
-    public let updatedAt: String
+    public let updatedAt: String?
     
     public init(
         id: String,
@@ -63,8 +63,8 @@ public struct WebhookEndpoint: Codable, Sendable, Equatable {
         events: [WebhookEvent],
         lastEventAt: String? = nil,
         instanceId: String,
-        createdAt: String,
-        updatedAt: String
+        createdAt: String? = nil,
+        updatedAt: String? = nil
     ) {
         self.id = id
         self.url = url
@@ -142,4 +142,3 @@ public struct DeleteWebhookEndpointResponse: Codable, Sendable {
         self.success = success
     }
 }
-

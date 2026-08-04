@@ -367,10 +367,10 @@ public struct Payout: Codable, Sendable, Equatable {
   public let trackingPartnerFee: PayoutTrackingPartnerFee?
 
   /// Timestamp when the payout was created
-  public let createdAt: String
+  public let createdAt: String?
 
   /// Timestamp when the payout was last updated
-  public let updatedAt: String
+  public let updatedAt: String?
 
   /// Image URL
   public let imageUrl: String?
@@ -394,10 +394,10 @@ public struct Payout: Codable, Sendable, Equatable {
   public let description: String?
 
   /// Sender amount (in smallest currency unit)
-  public let senderAmount: Int
+  public let senderAmount: Int?
 
   /// Receiver amount (in smallest currency unit)
-  public let receiverAmount: Int
+  public let receiverAmount: Int?
 
   /// Partner fee amount (in smallest currency unit)
   public let partnerFeeAmount: Int?
@@ -559,8 +559,8 @@ public struct Payout: Codable, Sendable, Equatable {
     trackingLiquidity: PayoutTrackingLiquidity? = nil,
     trackingComplete: PayoutTrackingComplete? = nil,
     trackingPartnerFee: PayoutTrackingPartnerFee? = nil,
-    createdAt: String,
-    updatedAt: String,
+    createdAt: String? = nil,
+    updatedAt: String? = nil,
     imageUrl: String? = nil,
     firstName: String? = nil,
     lastName: String? = nil,
@@ -568,8 +568,8 @@ public struct Payout: Codable, Sendable, Equatable {
     network: Network,
     token: StablecoinToken,
     description: String? = nil,
-    senderAmount: Int,
-    receiverAmount: Int,
+    senderAmount: Int? = nil,
+    receiverAmount: Int? = nil,
     partnerFeeAmount: Int? = nil,
     partnerFeeId: String? = nil,
     billingFeeAmount: Double? = nil,
@@ -1060,4 +1060,3 @@ public struct SubmitPayoutDocumentsResponse: Codable, Sendable {
         self.success = success
     }
 }
-

@@ -233,47 +233,47 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     public let id: String
     
     /// Expiration timestamp
-    public let expiresAt: Int
+    public let expiresAt: Int?
     
     /// Commercial quotation
-    public let commercialQuotation: Double
+    public let commercialQuotation: Double?
     
     /// BlindPay quotation
-    public let blindpayQuotation: Double
+    public let blindpayQuotation: Double?
     
     /// Receiver amount
-    public let receiverAmount: Double
+    public let receiverAmount: Double?
     
     /// Sender amount
-    public let senderAmount: Double
+    public let senderAmount: Double?
     
     /// Partner fee amount
-    public let partnerFeeAmount: Double
+    public let partnerFeeAmount: Double?
     
     /// Flat fee
-    public let flatFee: Double
+    public let flatFee: Double?
     
     /// Contract information
-    public let contract: QuoteContract
+    public let contract: QuoteContract?
 
     /// Customer local amount
-    public let customerLocalAmount: Double
+    public let customerLocalAmount: Double?
 
     /// Description
-    public let description: String
+    public let description: String?
 
     public init(
         id: String,
-        expiresAt: Int,
-        commercialQuotation: Double,
-        blindpayQuotation: Double,
-        receiverAmount: Double,
-        senderAmount: Double,
-        partnerFeeAmount: Double,
-        flatFee: Double,
-        contract: QuoteContract,
-        customerLocalAmount: Double,
-        description: String
+        expiresAt: Int? = nil,
+        commercialQuotation: Double? = nil,
+        blindpayQuotation: Double? = nil,
+        receiverAmount: Double? = nil,
+        senderAmount: Double? = nil,
+        partnerFeeAmount: Double? = nil,
+        flatFee: Double? = nil,
+        contract: QuoteContract? = nil,
+        customerLocalAmount: Double? = nil,
+        description: String? = nil
     ) {
         self.id = id
         self.expiresAt = expiresAt
@@ -351,25 +351,25 @@ public struct GetFxRateInput: Codable, Sendable {
 /// Response for getting FX rate
 public struct GetFxRateResponse: Codable, Sendable, Equatable {
     /// Commercial quotation
-    public let commercialQuotation: Double
+    public let commercialQuotation: Double?
     
     /// BlindPay quotation
-    public let blindpayQuotation: Double
+    public let blindpayQuotation: Double?
     
     /// Result amount
     public let resultAmount: Double
     
     /// Instance flat fee
-    public let instanceFlatFee: Double
+    public let instanceFlatFee: Double?
     
     /// Instance percentage fee
     public let instancePercentageFee: Double
     
     public init(
-        commercialQuotation: Double,
-        blindpayQuotation: Double,
+        commercialQuotation: Double? = nil,
+        blindpayQuotation: Double? = nil,
         resultAmount: Double,
-        instanceFlatFee: Double,
+        instanceFlatFee: Double? = nil,
         instancePercentageFee: Double
     ) {
         self.commercialQuotation = commercialQuotation
@@ -471,4 +471,3 @@ public struct AnyCodable: Codable, Equatable, @unchecked Sendable {
         }
     }
 }
-

@@ -98,10 +98,10 @@ public struct FeesResponse: Codable, Sendable, Equatable {
     public let solana: FeeOptions?
 
     /// Timestamp when the fees were created
-    public let createdAt: String
+    public let createdAt: String?
 
     /// Timestamp when the fees were last updated
-    public let updatedAt: String
+    public let updatedAt: String?
 
     public init(
         id: String,
@@ -123,8 +123,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         arbitrum: FeeOptions? = nil,
         stellar: FeeOptions? = nil,
         solana: FeeOptions? = nil,
-        createdAt: String,
-        updatedAt: String
+        createdAt: String? = nil,
+        updatedAt: String? = nil
     ) {
         self.id = id
         self.instanceId = instanceId

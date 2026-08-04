@@ -49,28 +49,28 @@ public struct PayinQuote: Codable, Sendable, Equatable {
     public let currencyType: CurrencyType
     
     /// Expiration timestamp
-    public let expiresAt: Int
+    public let expiresAt: Int?
     
     /// Currency
     public let currency: Currency?
     
     /// Commercial quotation
-    public let commercialQuotation: Double
+    public let commercialQuotation: Double?
     
     /// BlindPay quotation
-    public let blindpayQuotation: Double
+    public let blindpayQuotation: Double?
     
     /// Receiver amount
-    public let receiverAmount: Double
+    public let receiverAmount: Double?
 
     /// Sender amount
-    public let senderAmount: Double
+    public let senderAmount: Double?
 
     /// Partner fee amount
-    public let partnerFeeAmount: Double
+    public let partnerFeeAmount: Double?
 
     /// Flat fee
-    public let flatFee: Double
+    public let flatFee: Double?
 
     /// Total fee amount
     public let totalFeeAmount: Double?
@@ -110,14 +110,14 @@ public struct PayinQuote: Codable, Sendable, Equatable {
         requestAmount: Int,
         coverFees: Bool? = nil,
         currencyType: CurrencyType,
-        expiresAt: Int,
+        expiresAt: Int? = nil,
         currency: Currency? = nil,
-        commercialQuotation: Double,
-        blindpayQuotation: Double,
-        receiverAmount: Double,
-        senderAmount: Double,
-        partnerFeeAmount: Double,
-        flatFee: Double,
+        commercialQuotation: Double? = nil,
+        blindpayQuotation: Double? = nil,
+        receiverAmount: Double? = nil,
+        senderAmount: Double? = nil,
+        partnerFeeAmount: Double? = nil,
+        flatFee: Double? = nil,
         totalFeeAmount: Double? = nil,
         customerLocalAmount: Double? = nil,
         payerRules: PayinQuotePayerRules? = nil,
@@ -201,7 +201,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
     public let customerId: String
 
     /// Blockchain wallet ID
-    public let blockchainWalletId: String
+    public let blockchainWalletId: String?
 
     /// Payment method
     public let paymentMethod: PaymentMethod
@@ -235,7 +235,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
 
     public init(
         customerId: String,
-        blockchainWalletId: String,
+        blockchainWalletId: String? = nil,
         paymentMethod: PaymentMethod,
         currencyType: CurrencyType,
         network: Network? = nil,
@@ -357,4 +357,3 @@ public struct ListPayinQuotesInput: Codable, Sendable {
         return params
     }
 }
-
