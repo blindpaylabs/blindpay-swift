@@ -47,6 +47,7 @@ var unmodeledPath = ".api-sync/unmodeled.json"
 var knownDivergencesPath = ".api-sync/known-divergences.json"
 var enumExclusionsPath = ".api-sync/enum-exclusions.json"
 var nestedOmissionsPath = ".api-sync/nested-omissions.json"
+var operationExclusionsPath = ".api-sync/operation-exclusions.json"
 var reportPath: String? = nil
 
 do {
@@ -68,6 +69,7 @@ do {
         case "--known-divergences": i += 1; if i < args.count { knownDivergencesPath = args[i] }
         case "--enum-exclusions": i += 1; if i < args.count { enumExclusionsPath = args[i] }
         case "--nested-omissions": i += 1; if i < args.count { nestedOmissionsPath = args[i] }
+        case "--operation-exclusions": i += 1; if i < args.count { operationExclusionsPath = args[i] }
         case "--report": i += 1; if i < args.count { reportPath = args[i] }
         default: break
         }
@@ -544,7 +546,7 @@ func swiftType(for node: [String: Any]) -> String {
 
 // MARK: - Findings
 
-enum FindingKind: String { case applicableEnumCase = "applicable-enum-case", applicableField = "applicable-field", needsHuman = "needs-human" }
+enum FindingKind: String { case applicableEnumCase = "applicable-enum-case", applicableField = "applicable-field", operationInsert = "operation-insert", needsHuman = "needs-human" }
 
 struct Finding {
     let kind: FindingKind
@@ -557,6 +559,10 @@ struct Finding {
     var fieldName: String? = nil
     var fieldWireKey: String? = nil
     var fieldTypeText: String? = nil
+    // Operation-insert payload (re-classified from spec at apply time; only the
+    // method/path identity needs to survive the Finding round trip):
+    var opMethod: String? = nil
+    var opPath: String? = nil
 }
 
 // MARK: - Load configuration
@@ -623,6 +629,22 @@ let nestedOmissionSet: Set<String> = Set(nestedOmissionsRaw.compactMap { entry -
 })
 func isNestedOmissionExcluded(locator: String, field: String) -> Bool {
     nestedOmissionSet.contains("\(locator)\u{0}\(field)")
+}
+
+// operation-exclusions.json: honest ledger of spec operations with no SDK
+// method at all that predate operation-insert (this scaffolding cannot tell
+// "always been uncovered" apart from "just appeared" without a two-spec
+// diff, so pre-existing gaps must be recorded explicitly the same way
+// enum-exclusions.json/nested-omissions.json record other pre-existing
+// gaps) or that a human has deliberately deferred after triage. Keyed by
+// "METHOD /path" using the exact spec path template.
+let operationExclusionsRaw = (loadJSON(operationExclusionsPath) as? [[String: Any]]) ?? []
+let operationExclusionSet: Set<String> = Set(operationExclusionsRaw.compactMap { entry -> String? in
+    guard let method = entry.str("method"), let path = entry.str("path") else { return nil }
+    return "\(method.uppercased()) \(path)"
+})
+func isOperationExcluded(method: String, path: String) -> Bool {
+    operationExclusionSet.contains("\(method.uppercased()) \(path)")
 }
 
 // Amount-shaped fields on the three cents-converting hand-rolled encoders:
@@ -891,6 +913,16 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
         }
     }
 
+    // New operations with no SDK endpoint literal at all (operation-insert):
+    // computed against this single `spec` argument (--check passes the
+    // committed snapshot, --apply passes the new spec), so it needs no
+    // old-vs-new diff to notice "an operation exists with no SDK method" --
+    // unlike new-*schema* detection below, which genuinely cannot tell
+    // "always uncovered" apart from "just appeared" without two specs.
+    let (opApplicable, opNeedsHuman) = operationCoverageFindings(spec: spec)
+    applicable.append(contentsOf: opApplicable)
+    needsHuman.append(contentsOf: opNeedsHuman)
+
     return (applicable, needsHuman)
 }
 
@@ -953,6 +985,719 @@ func reachableSchemaNames(_ spec: [String: Any]) -> Set<String> {
     return reachable
 }
 
+// MARK: - Operation-insert: classifying and generating brand-new operations
+//
+// For every spec operation with no matching SDK endpoint literal, decide
+// STANDARD (auto-generatable, becomes an `.operationInsert` applicable
+// Finding) vs NON-STANDARD (needs-human, with a precise reason). STANDARD
+// requires ALL of:
+//   - request/response bodies are JSON-only (or absent),
+//   - no query parameters (query-parameter struct synthesis isn't
+//     implemented yet -- an honest, explicit boundary, not a silent gap),
+//   - the operation's path resolves, by longest fixed-segment prefix match,
+//     to an EXISTING Services/*.swift file,
+//   - every schema the request/response touches (transitively through
+//     named $ref) is a plain object/array/string/number/boolean composition
+//     with no enum, oneOf/anyOf/allOf-with-multiple-substantive-branches,
+//     or inline (un-named) nested object shape.
+// Everything else is needs-human with a specific reason string.
+
+func specOperations(_ spec: [String: Any]) -> [(method: String, path: String, op: [String: Any])] {
+    var result: [(method: String, path: String, op: [String: Any])] = []
+    for (path, opsAny) in paths(of: spec) {
+        guard let ops = opsAny as? [String: Any] else { continue }
+        for method in ["get", "post", "put", "delete", "patch"] {
+            if let op = ops[method] as? [String: Any] {
+                result.append((method, path, op))
+            }
+        }
+    }
+    return result
+}
+
+/// True if `node` is a JSON Schema composition (`allOf`/`anyOf`/`oneOf`) whose
+/// only purpose is the common "nullable $ref" idiom this spec uses elsewhere
+/// (a substantive branch plus a bare `{"type": "null"}` sibling). Returns the
+/// single substantive branch in that case; returns `node` unchanged when it
+/// isn't a composition at all; returns nil for genuine multi-branch
+/// polymorphism, which the generator cannot express.
+func effectiveSchemaNode(_ node: [String: Any]) -> [String: Any]? {
+    guard let branches = (node["allOf"] as? [Any]) ?? (node["anyOf"] as? [Any]) ?? (node["oneOf"] as? [Any]) else {
+        return node
+    }
+    let dicts = branches.compactMap { $0 as? [String: Any] }
+    let substantive = dicts.filter { ($0["type"] as? String) != "null" }
+    return substantive.count == 1 ? substantive[0] : nil
+}
+
+/// Recursively verifies `node` (already possibly a $ref) is expressible with
+/// the object/array/string/number/boolean/nullable-ref composition the
+/// generator (and its model synthesis in swiftTypeForSchema below) knows how
+/// to render. Returns nil when expressible, else a precise reason.
+///
+/// `allowInlineObject` distinguishes "this object node is the just-resolved
+/// body of a named $ref schema" (fine -- its OWN properties are what get
+/// checked, individually, as non-inline) from "this object node appears
+/// directly, with no $ref, as a property/items value" (not fine -- the
+/// generator has no way to name and place an anonymous nested struct).
+func checkSchemaExpressible(_ nodeIn: [String: Any], spec: [String: Any], visited: inout Set<String>, allowInlineObject: Bool = false) -> String? {
+    guard let node = effectiveSchemaNode(nodeIn) else {
+        return "uses a oneOf/anyOf/allOf/discriminator composition with more than one substantive branch, not supported by the generator"
+    }
+    if node["enum"] != nil {
+        return "is enum-constrained; enum naming/placement requires a human decision"
+    }
+    if let items = node.dict("items"), items["enum"] != nil {
+        return "is an array of an enum-constrained item; enum naming/placement requires a human decision"
+    }
+    if let ref = node.str("$ref") {
+        guard ref.hasPrefix("#/components/schemas/") else {
+            return "uses a $ref outside #/components/schemas, not supported by the generator"
+        }
+        let name = String(ref.dropFirst("#/components/schemas/".count))
+        if visited.contains(name) { return nil } // recursive/self-referencing schema already in progress
+        // Already hand-mapped to an existing SDK type (spec-map.json types[]):
+        // swiftTypeForSchema reuses that symbol outright rather than
+        // regenerating it, so its shape needs no mechanical-expressibility
+        // check here either -- it may well use conventions (a real enum,
+        // etc.) beyond what the generator itself could produce from scratch.
+        if specMapTypes.contains(where: { $0.str("spec") == name }) { return nil }
+        visited.insert(name)
+        guard let target = schemas(of: spec)[name] as? [String: Any] else {
+            return "references unknown schema \"\(name)\""
+        }
+        return checkSchemaExpressible(target, spec: spec, visited: &visited, allowInlineObject: true)
+    }
+    let type = node["type"] as? String
+    if type == "array" {
+        guard let items = node.dict("items") else { return "array schema is missing \"items\"" }
+        return checkSchemaExpressible(items, spec: spec, visited: &visited, allowInlineObject: false)
+    }
+    if type == "object" || (type == nil && node["properties"] != nil) {
+        guard allowInlineObject else {
+            return "uses an inline (un-named) object shape; the generator only supports named component schemas (\"$ref\") for objects"
+        }
+        guard let props = node.dict("properties") else { return nil } // free-form object (no properties): renders as [String: String]
+        for (propName, propNodeAny) in props.sorted(by: { $0.key < $1.key }) {
+            guard let propNode = propNodeAny as? [String: Any] else { continue }
+            if let reason = checkSchemaExpressible(propNode, spec: spec, visited: &visited, allowInlineObject: false) {
+                return "property \"\(propName)\" \(reason)"
+            }
+        }
+        return nil
+    }
+    if let type = type, ["string", "integer", "number", "boolean"].contains(type) {
+        return nil
+    }
+    if node["format"] != nil || node.isEmpty {
+        return nil
+    }
+    return "uses an unrecognized schema shape (type: \(type ?? "nil"))"
+}
+
+/// The full set of media types under an operation's requestBody/response
+/// "content" map, or empty if there is none (no body / 204, both fine).
+func mediaTypes(of contentHolder: [String: Any]?) -> Set<String> {
+    guard let content = contentHolder?.dict("content") else { return [] }
+    return Set(content.keys)
+}
+
+/// True if `types` is either empty (no body) or exactly {"application/json"}.
+func isJSONOnly(_ types: Set<String>) -> Bool {
+    types.isEmpty || types == ["application/json"]
+}
+
+/// `normalizedSegments`, minus the leading "v1" (every real path in this
+/// SDK's spec) and "e" (the customer-trackable facade prefix) generic
+/// boilerplate segments -- those alone are never a meaningful resource
+/// match (every service shares them), so the prefix-match threshold below
+/// counts significant segments only.
+func significantSegments(_ path: String) -> [String] {
+    var segs = normalizedSegments(path)
+    if segs.first == "v1" { segs.removeFirst() }
+    if segs.first == "e" { segs.removeFirst() }
+    return segs
+}
+
+/// The Services/*.swift file whose existing endpoint literals share the
+/// longest fixed-segment path prefix with `path`, plus how many `{param}`
+/// placeholders fall within that shared prefix (i.e. how many of the new
+/// operation's path parameters the matched service's own init(...) already
+/// binds as stored properties, e.g. instanceId/customerId).
+func matchExistingService(path: String, usages: [EndpointUsage]) -> (file: String, boundParamCount: Int)? {
+    let target = significantSegments(path)
+    var best: (len: Int, file: String)? = nil
+    // Only Services/*.swift files are eligible generation targets (per the
+    // task's own scope: never invent a new service file, and never target
+    // the flat Core/BlindPay.swift facade instead of the real nested
+    // service it mirrors) -- restricting the candidate pool here, not just
+    // preferring it on ties, keeps this deterministic regardless of file
+    // scan order. Checked as a path COMPONENT (not substring) so it matches
+    // both "Sources/BlindPay/Services/X.swift" and, in the test fixture
+    // harness, a bare relative "Services/X.swift".
+    let serviceUsages = usages.filter { $0.file.split(separator: "/").dropLast().contains("Services") }
+    for u in serviceUsages {
+        let candidate = significantSegments(u.template)
+        var common = 0
+        while common < target.count, common < candidate.count, target[common] == candidate[common] {
+            common += 1
+        }
+        if common > (best?.len ?? 0) {
+            best = (common, u.file)
+        }
+    }
+    guard let b = best, b.len >= 1 else { return nil }
+    let boundParamCount = target.prefix(b.len).filter { $0 == "*" }.count
+    return (b.file, boundParamCount)
+}
+
+/// Extracts the ordered, non-"apiClient" parameter names from a service
+/// class's `init(apiClient: APIClient, ...)` declaration -- these are the
+/// stored properties (instanceId, customerId, ...) already bound for every
+/// method on that service, in the same order its path always nests them.
+func boundProperties(of serviceFile: String) -> [String] {
+    guard let content = try? String(contentsOfFile: serviceFile, encoding: .utf8) else { return [] }
+    guard let range = content.range(of: #"init\(([^)]*)\)"#, options: .regularExpression) else { return [] }
+    var inner = String(content[range])
+    inner.removeFirst("init(".count)
+    inner.removeLast() // trailing ")"
+    var names: [String] = []
+    for part in inner.split(separator: ",") {
+        let trimmed = part.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let colon = trimmed.firstIndex(of: ":") else { continue }
+        let name = String(trimmed[trimmed.startIndex..<colon]).trimmingCharacters(in: .whitespaces)
+        if name.isEmpty || name == "apiClient" { continue }
+        names.append(name)
+    }
+    return names
+}
+
+/// Rewrites `path`'s `{param}` placeholders into a Swift string-interpolated
+/// endpoint template: the first `boundNames.count` placeholders become
+/// `\(boundNames[i])` (already-bound service properties, in order); any
+/// remaining placeholders become new method parameters, named from their
+/// own OpenAPI path-param name.
+func buildEndpointTemplate(path: String, boundNames: [String]) -> (template: String, extraParams: [String]) {
+    var extraParams: [String] = []
+    var boundIdx = 0
+    let segments = path.components(separatedBy: "/")
+    var outSegments: [String] = []
+    for segment in segments {
+        if segment.hasPrefix("{") && segment.hasSuffix("}") {
+            let raw = String(segment.dropFirst().dropLast())
+            if boundIdx < boundNames.count {
+                outSegments.append("\\(\(boundNames[boundIdx]))")
+                boundIdx += 1
+            } else {
+                let swiftName = deriveCamelName(from: raw.replacingOccurrences(of: "-", with: "_"))
+                extraParams.append(swiftName)
+                outSegments.append("\\(\(swiftName))")
+            }
+        } else {
+            outSegments.append(segment)
+        }
+    }
+    return (outSegments.joined(separator: "/"), extraParams)
+}
+
+/// Deterministic method-name derivation from HTTP verb + path shape, since
+/// this spec carries no `operationId`. Mirrors the repo's existing
+/// hand-written convention as closely as a mechanical rule can: the base
+/// collection/item route gets the plain CRUD verb (list/get/create/update/
+/// delete); a further, non-parameter path segment beyond the resource itself
+/// (an RPC-style sub-action, e.g. ".../secret", ".../authorize") gets that
+/// verb prefixed onto the segment's camelCase name.
+func deriveMethodName(method: String, path: String, resourceSegment: String, responseIsArray: Bool) -> String {
+    let segments = path.split(separator: "/").map(String.init)
+    let lastSegment = segments.last ?? ""
+    let isTrailingParam = lastSegment.hasPrefix("{") && lastSegment.hasSuffix("}")
+    let lastFixed = segments.reversed().first { !($0.hasPrefix("{") && $0.hasSuffix("}")) } ?? ""
+    let lastFixedCamel = deriveCamelName(from: lastFixed.replacingOccurrences(of: "-", with: "_"))
+    let suffixPascal = lastFixedCamel.prefix(1).uppercased() + lastFixedCamel.dropFirst()
+    let isBaseResource = lastFixed == resourceSegment
+
+    switch method {
+    case "get":
+        if isTrailingParam { return "get" }
+        if isBaseResource { return responseIsArray ? "list" : "get" }
+        return "get" + suffixPascal
+    case "post":
+        return isBaseResource ? "create" : "create" + suffixPascal
+    case "put", "patch":
+        return (isBaseResource || isTrailingParam) ? "update" : "update" + suffixPascal
+    case "delete":
+        return "delete"
+    default:
+        return "operation"
+    }
+}
+
+enum OperationClassification { case standard, nonStandard(String) }
+
+/// Classifies one uncovered spec operation. Does not mutate anything; safe
+/// to call from both --check (against the committed snapshot) and --apply
+/// (against the new spec).
+func classifyNewOperation(method: String, path: String, op: [String: Any], spec: [String: Any], usages: [EndpointUsage]) -> OperationClassification {
+    if let params = op.arr("parameters") {
+        for p in params {
+            guard let pd = p as? [String: Any] else { continue }
+            if pd.str("in") == "query" {
+                return .nonStandard("has query parameter \"\(pd.str("name") ?? "?")\"; query-parameter struct synthesis is not supported by the generator")
+            }
+        }
+    }
+
+    let requestBody = op.dict("requestBody")
+    let requestMediaTypes = mediaTypes(of: requestBody)
+    if !isJSONOnly(requestMediaTypes) {
+        let bad = requestMediaTypes.subtracting(["application/json"]).sorted().joined(separator: ", ")
+        return .nonStandard("\(bad) request body not supported by the generator (JSON-only)")
+    }
+
+    if let responses = op.dict("responses") {
+        for (code, respAny) in responses.sorted(by: { $0.key < $1.key }) {
+            guard let resp = respAny as? [String: Any] else { continue }
+            let types = mediaTypes(of: resp)
+            if !isJSONOnly(types) {
+                let bad = types.subtracting(["application/json"]).sorted().joined(separator: ", ")
+                return .nonStandard("\(bad) response body (status \(code)) not supported by the generator (JSON-only)")
+            }
+        }
+    }
+
+    guard matchExistingService(path: path, usages: usages) != nil else {
+        let tag = (op.arr("tags")?.first as? String) ?? "<none>"
+        return .nonStandard("no existing service matches tag \"\(tag)\" or path prefix \"\(path)\"")
+    }
+
+    var visited = Set<String>()
+    if let schema = requestBody?.dict("content")?.dict("application/json")?.dict("schema") {
+        if let reason = checkSchemaExpressible(schema, spec: spec, visited: &visited) {
+            return .nonStandard("request body schema \(reason)")
+        }
+    }
+    if let responses = op.dict("responses") {
+        for code in ["200", "201", "202"] {
+            if let schema = responses.dict(code)?.dict("content")?.dict("application/json")?.dict("schema") {
+                if let reason = checkSchemaExpressible(schema, spec: spec, visited: &visited) {
+                    return .nonStandard("response body (status \(code)) schema \(reason)")
+                }
+            }
+        }
+    }
+    return .standard
+}
+
+/// Every named component schema transitively touched (via $ref) by an
+/// operation that classifies STANDARD -- these are about to get their own
+/// spec-map.json types[] entry synthesized by applyOperationInsertions, so
+/// the plain "new schema, not yet in spec-map.json" gate below must not
+/// also flag them as a second, redundant needs-human finding.
+func schemaNamesTouchedByOperationInserts(spec: [String: Any]) -> Set<String> {
+    var touched = Set<String>()
+    let usages = scanEndpointUsages(under: servicesPath)
+    let usageKeys = Set(usages.map { "\($0.method).\(normalizedSegments($0.template).joined(separator: "/"))" })
+    for (method, path, op) in specOperations(spec) {
+        let key = "\(method).\(normalizedSegments(path).joined(separator: "/"))"
+        if usageKeys.contains(key) { continue }
+        if isOperationExcluded(method: method, path: path) { continue }
+        guard case .standard = classifyNewOperation(method: method, path: path, op: op, spec: spec, usages: usages) else { continue }
+        var visited = Set<String>()
+        if let schema = op.dict("requestBody")?.dict("content")?.dict("application/json")?.dict("schema") {
+            _ = checkSchemaExpressible(schema, spec: spec, visited: &visited)
+        }
+        if let responses = op.dict("responses") {
+            for code in ["200", "201", "202"] {
+                if let schema = responses.dict(code)?.dict("content")?.dict("application/json")?.dict("schema") {
+                    _ = checkSchemaExpressible(schema, spec: spec, visited: &visited)
+                }
+            }
+        }
+        touched.formUnion(visited)
+    }
+    return touched
+}
+
+/// Scans the spec for operations with no matching SDK endpoint literal
+/// (reusing the same normalized-segment matching as --coverage-report),
+/// skips anything recorded in operation-exclusions.json, and classifies the
+/// rest as either an applicable `.operationInsert` finding or needs-human.
+func operationCoverageFindings(spec: [String: Any]) -> (applicable: [Finding], needsHuman: [Finding]) {
+    var applicable: [Finding] = []
+    var needsHuman: [Finding] = []
+    let usages = scanEndpointUsages(under: servicesPath)
+    let usageKeys = Set(usages.map { "\($0.method).\(normalizedSegments($0.template).joined(separator: "/"))" })
+
+    for (method, path, op) in specOperations(spec).sorted(by: { $0.path == $1.path ? $0.method < $1.method : $0.path < $1.path }) {
+        let key = "\(method).\(normalizedSegments(path).joined(separator: "/"))"
+        if usageKeys.contains(key) { continue }
+        if isOperationExcluded(method: method, path: path) { continue }
+        switch classifyNewOperation(method: method, path: path, op: op, spec: spec, usages: usages) {
+        case .standard:
+            applicable.append(Finding(
+                kind: .operationInsert,
+                message: "new operation \"\(method.uppercased()) \(path)\" has no SDK method; auto-generatable (operation-insert)",
+                opMethod: method, opPath: path))
+        case .nonStandard(let reason):
+            needsHuman.append(Finding(kind: .needsHuman, message: "new operation \"\(method.uppercased()) \(path)\" needs a human decision: \(reason)"))
+        }
+    }
+    return (applicable, needsHuman)
+}
+
+// MARK: - Operation-insert: model + method generation (--apply only)
+
+struct GeneratedField { let wireKey: String; let swiftName: String; let swiftType: String; let required: Bool }
+struct GeneratedStruct { let schemaName: String; let swiftName: String; let isInput: Bool; let fields: [GeneratedField] }
+
+/// Swift symbol name for a named component schema, following this repo's
+/// existing spec-map.json convention: an "...In" input schema becomes
+/// "...Input"; an "...Out" output schema drops the suffix outright (see
+/// CustomerOut -> Customer, CreateCustomerIn -> CreateCustomerInput).
+func swiftStructName(for schemaName: String) -> String {
+    if schemaName.hasSuffix("In") { return String(schemaName.dropLast(2)) + "Input" }
+    if schemaName.hasSuffix("Out") { return String(schemaName.dropLast(3)) }
+    return schemaName
+}
+
+/// Resolves a schema node to a Swift type-text (e.g. "String", "Int",
+/// "[Foo]"), synthesizing a new struct (appended to `generated`) for any
+/// not-yet-mapped named object schema it touches. Reuses an already-mapped
+/// spec-map.json symbol, or an already-scheduled-this-run symbol, whenever
+/// the same named schema recurs. Returns nil if the node turns out not to be
+/// expressible after all (should not happen once checkSchemaExpressible has
+/// already accepted it, but stays honest rather than crashing).
+func swiftTypeForSchema(_ nodeIn: [String: Any], spec: [String: Any], scanned: [String: ScannedType], isInputContext: Bool, generated: inout [GeneratedStruct], generatedNames: inout Set<String>) -> String? {
+    guard let node = effectiveSchemaNode(nodeIn) else { return nil }
+
+    if let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/") {
+        let refName = String(ref.dropFirst("#/components/schemas/".count))
+        if let existing = specMapTypes.first(where: { $0.str("spec") == refName }),
+           let sdkSites = existing["sdk"] as? [[String: Any]], let symbol = sdkSites.first?.str("symbol") {
+            return symbol
+        }
+        let swiftName = swiftStructName(for: refName)
+        if generatedNames.contains(refName) { return swiftName }
+        guard let target = schemas(of: spec)[refName] as? [String: Any] else { return nil }
+        guard let targetProps = target.dict("properties") else {
+            // Named schema with no properties at all (free-form map): render
+            // the same conservative fallback swiftType() already uses for a
+            // brand-new optional field on an existing struct.
+            return "[String: String]"
+        }
+        generatedNames.insert(refName)
+        let required = requiredOf(target)
+        var fields: [GeneratedField] = []
+        for (propName, propNodeAny) in targetProps.sorted(by: { $0.key < $1.key }) {
+            guard let propNode = propNodeAny as? [String: Any] else { continue }
+            guard let fieldType = swiftTypeForSchema(propNode, spec: spec, scanned: scanned, isInputContext: isInputContext, generated: &generated, generatedNames: &generatedNames) else { return nil }
+            let isRequired = required.contains(propName)
+            fields.append(GeneratedField(wireKey: propName, swiftName: deriveCamelName(from: propName), swiftType: isRequired ? fieldType : fieldType + "?", required: isRequired))
+        }
+        generated.append(GeneratedStruct(schemaName: refName, swiftName: swiftName, isInput: isInputContext, fields: fields))
+        return swiftName
+    }
+
+    let type = node["type"] as? String
+    switch type {
+    case "array":
+        guard let items = node.dict("items") else { return nil }
+        guard let itemType = swiftTypeForSchema(items, spec: spec, scanned: scanned, isInputContext: isInputContext, generated: &generated, generatedNames: &generatedNames) else { return nil }
+        return "[\(itemType)]"
+    case "string": return "String"
+    case "integer": return "Int"
+    case "number": return "Double"
+    case "boolean": return "Bool"
+    default: return nil
+    }
+}
+
+/// Renders one synthesized struct's full Swift source text, matching the
+/// convention read from Sources/BlindPay/Models/*.swift: plain Codable
+/// output structs decode-only; input structs additionally get a hand-rolled
+/// `encode(to:)` that omits absent optionals via encodeIfPresent (the same
+/// style already used in e.g. Quote.swift/PayinQuote.swift) rather than
+/// emitting an explicit JSON null.
+func renderGeneratedStruct(_ s: GeneratedStruct) -> String {
+    var lines: [String] = []
+    lines.append("/// Auto-generated by sync.swift (operation-insert) from spec schema \"\(s.schemaName)\".")
+    lines.append("public struct \(s.swiftName): Codable, Sendable, Equatable {")
+    for f in s.fields {
+        lines.append("    public let \(f.swiftName): \(f.swiftType)")
+    }
+    lines.append("")
+    lines.append("    public init(")
+    for (i, f) in s.fields.enumerated() {
+        let def = f.required ? "" : " = nil"
+        let comma = i < s.fields.count - 1 ? "," : ""
+        lines.append("        \(f.swiftName): \(f.swiftType)\(def)\(comma)")
+    }
+    lines.append("    ) {")
+    for f in s.fields {
+        lines.append("        self.\(f.swiftName) = \(f.swiftName)")
+    }
+    lines.append("    }")
+    lines.append("")
+    lines.append("    enum CodingKeys: String, CodingKey {")
+    for f in s.fields {
+        lines.append(f.swiftName == f.wireKey ? "        case \(f.swiftName)" : "        case \(f.swiftName) = \"\(f.wireKey)\"")
+    }
+    lines.append("    }")
+    if s.isInput {
+        lines.append("")
+        lines.append("    public func encode(to encoder: Encoder) throws {")
+        lines.append("        var container = encoder.container(keyedBy: CodingKeys.self)")
+        for f in s.fields {
+            if f.required {
+                lines.append("        try container.encode(\(f.swiftName), forKey: .\(f.swiftName))")
+            } else {
+                lines.append("        try container.encodeIfPresent(\(f.swiftName), forKey: .\(f.swiftName))")
+            }
+        }
+        lines.append("    }")
+    }
+    lines.append("}")
+    return lines.joined(separator: "\n")
+}
+
+/// The Models/*.swift file a service's structs live in, by this repo's 1:1
+/// naming convention (PartnerFeesService.swift -> PartnerFee.swift,
+/// AvailableService.swift -> Available.swift): strip the "Service" suffix,
+/// then try the exact name and its singular (trailing "s" dropped) against
+/// the actual Models/ file list.
+func modelFileFor(serviceFile: String, sourcesPath: String) -> String? {
+    let base = (serviceFile as NSString).lastPathComponent.replacingOccurrences(of: "Service.swift", with: "")
+    let candidates = [base, base.hasSuffix("s") ? String(base.dropLast()) : base]
+    for candidate in candidates {
+        let path = sourcesPath + "/" + candidate + ".swift"
+        if FileManager.default.fileExists(atPath: path) { return path }
+    }
+    return nil
+}
+
+/// Renders one new service method's full Swift source text.
+func renderServiceMethod(name: String, extraParams: [String], hasBody: Bool, bodyRequired: Bool, inputTypeName: String?, outputTypeName: String, httpMethod: String, endpointTemplate: String, opMethod: String, opPath: String) -> String {
+    var sigParams = extraParams.map { "\($0): String" }
+    if hasBody, let inputTypeName = inputTypeName {
+        sigParams.append(bodyRequired ? "data: \(inputTypeName)" : "data: \(inputTypeName)? = nil")
+    }
+    var lines: [String] = []
+    lines.append("    /// Auto-generated by sync.swift (operation-insert) for \(opMethod.uppercased()) \(opPath).")
+    lines.append("    public func \(name)(\(sigParams.joined(separator: ", "))) async throws -> APIResponse<\(outputTypeName)> {")
+    lines.append("        return try await apiClient.request(")
+    lines.append("            endpoint: \"\(endpointTemplate)\",")
+    lines.append("            method: .\(httpMethod)\(hasBody ? "," : "")")
+    if hasBody {
+        lines.append("            body: data")
+    }
+    lines.append("        )")
+    lines.append("    }")
+    return lines.joined(separator: "\n")
+}
+
+struct OperationInsertPlan {
+    let serviceFile: String
+    let modelFile: String
+    let methodText: String
+    let newStructs: [GeneratedStruct]
+}
+
+/// Re-derives the full generation plan for one already-classified-STANDARD
+/// operation. Re-classifying at apply time (rather than threading a plan
+/// through Finding) keeps Finding a plain value type and keeps --check and
+/// --apply sharing exactly one source of truth for "is this operation
+/// STANDARD". `generatedNames`/`generated` are threaded across the whole
+/// --apply batch so two operations that reference the same nested schema
+/// don't synthesize it twice.
+func planOperationInsert(method: String, path: String, op: [String: Any], spec: [String: Any], scanned: [String: ScannedType], usages: [EndpointUsage], generatedNames: inout Set<String>) -> OperationInsertPlan? {
+    guard let (serviceFile, _) = matchExistingService(path: path, usages: usages) else { return nil }
+    guard let modelFile = modelFileFor(serviceFile: serviceFile, sourcesPath: sourcesPath) else { return nil }
+    let boundNames = boundProperties(of: serviceFile)
+    let (endpointTemplate, extraParams) = buildEndpointTemplate(path: path, boundNames: boundNames)
+
+    var generated: [GeneratedStruct] = []
+
+    var inputTypeName: String? = nil
+    var bodyRequired = false
+    if let rb = op.dict("requestBody") {
+        bodyRequired = (rb["required"] as? Bool) ?? false
+        if let schema = rb.dict("content")?.dict("application/json")?.dict("schema") {
+            inputTypeName = swiftTypeForSchema(schema, spec: spec, scanned: scanned, isInputContext: true, generated: &generated, generatedNames: &generatedNames)
+        }
+    }
+
+    var outputTypeName = "VoidResponse"
+    var responseIsArray = false
+    if let responses = op.dict("responses") {
+        for code in ["200", "201", "202"] {
+            if let schema = responses.dict(code)?.dict("content")?.dict("application/json")?.dict("schema") {
+                if let t = swiftTypeForSchema(schema, spec: spec, scanned: scanned, isInputContext: false, generated: &generated, generatedNames: &generatedNames) {
+                    outputTypeName = t
+                    responseIsArray = (effectiveSchemaNode(schema)?["type"] as? String) == "array"
+                }
+                break
+            }
+        }
+    }
+
+    // Resource segment (for method-name derivation): the first fixed path
+    // segment appearing after every bound-param placeholder has been
+    // consumed, e.g. ".../{instance_id}/customers/{customer_id}/rfi" with
+    // boundNames = [instanceId, customerId] -> "rfi".
+    var boundIdx = 0
+    var resourceSegment = ""
+    var foundResource = false
+    for seg in path.components(separatedBy: "/") where !seg.isEmpty {
+        if seg.hasPrefix("{") && seg.hasSuffix("}") {
+            boundIdx += 1
+            continue
+        }
+        if boundIdx >= boundNames.count, !foundResource {
+            resourceSegment = seg
+            foundResource = true
+        }
+    }
+
+    let name = deriveMethodName(method: method, path: path, resourceSegment: resourceSegment, responseIsArray: responseIsArray)
+    let hasBody = op.dict("requestBody") != nil
+    let methodText = renderServiceMethod(
+        name: name, extraParams: extraParams, hasBody: hasBody, bodyRequired: bodyRequired,
+        inputTypeName: inputTypeName, outputTypeName: outputTypeName, httpMethod: method,
+        endpointTemplate: endpointTemplate, opMethod: method, opPath: path)
+
+    return OperationInsertPlan(serviceFile: serviceFile, modelFile: modelFile, methodText: methodText, newStructs: generated)
+}
+
+// MARK: - JSON-array text splicing (spec-map.json), without a JSON round trip
+//
+// Appending new spec-map.json entries by JSONSerialization-decode-then-
+// re-encode would reformat and reorder the *entire* curated file, the exact
+// noisy-diff failure mode the snapshot byte-copy invariant above exists to
+// avoid for spec-snapshot.json. spec-map.json is hand-edited and its
+// formatting matters too, so new entries are spliced into the raw text
+// instead, preserving every existing byte.
+
+/// Finds the index in `text` matching `openIndex` (which must point at
+/// `open`), honoring JSON string-literal escaping so a "{"/"}" or "["/"]"
+/// character inside a quoted string (e.g. a "{instance_id}" path template)
+/// is never mistaken for a structural bracket.
+func findMatchingBracket(_ text: String, openIndex: String.Index, open: Character, close: Character) -> String.Index? {
+    var depth = 0
+    var inString = false
+    var escaped = false
+    var i = openIndex
+    while i < text.endIndex {
+        let c = text[i]
+        if inString {
+            if escaped { escaped = false } else if c == "\\" { escaped = true } else if c == "\"" { inString = false }
+        } else {
+            if c == "\"" { inString = true }
+            else if c == open { depth += 1 }
+            else if c == close {
+                depth -= 1
+                if depth == 0 { return i }
+            }
+        }
+        i = text.index(after: i)
+    }
+    return nil
+}
+
+/// Appends `newEntryBlocks` (each pre-rendered, indented JSON object text,
+/// no trailing comma) to the JSON array introduced by `arrayKeyPattern`
+/// (a regex matching the key and colon only, e.g. `"\"types\"\s*:"` --
+/// tolerant of incidental whitespace so it isn't wedded to one specific
+/// serializer's formatting), splicing raw text rather than round-tripping
+/// through JSONSerialization.
+func appendToJSONArray(_ rawText: String, arrayKeyPattern: String, newEntryBlocks: [String]) -> String? {
+    guard !newEntryBlocks.isEmpty else { return rawText }
+    guard let keyRange = rawText.range(of: arrayKeyPattern, options: .regularExpression) else { return nil }
+    guard let openBracket = rawText.range(of: "[", range: keyRange.upperBound..<rawText.endIndex) else { return nil }
+    guard let closeIdx = findMatchingBracket(rawText, openIndex: openBracket.lowerBound, open: "[", close: "]") else { return nil }
+
+    var insertAt = closeIdx
+    while insertAt > openBracket.upperBound {
+        let prev = rawText.index(before: insertAt)
+        if rawText[prev].isWhitespace { insertAt = prev } else { break }
+    }
+    let isEmpty = insertAt == openBracket.upperBound
+    let joined = newEntryBlocks.joined(separator: ",\n")
+    let insertion = (isEmpty ? "" : ",") + "\n" + joined
+
+    var result = rawText
+    result.insert(contentsOf: insertion, at: insertAt)
+    return result
+}
+
+/// Renders one spec-map.json `types[]` entry block for a newly generated
+/// struct, at the file's existing 4-space entry indent.
+func renderSpecMapTypeEntry(schemaName: String, symbol: String, modelFile: String) -> String {
+    "    {\n      \"sdk\": [\n        {\n          \"file\": \"\(modelFile)\",\n          \"symbol\": \"\(symbol)\"\n        }\n      ],\n      \"spec\": \"\(schemaName)\"\n    }"
+}
+
+/// Applies every operation-insert Finding: inserts the new method into its
+/// service file (before the class's final closing brace), appends any newly
+/// synthesized model structs to their model file, and appends spec-map.json
+/// `types[]` entries for them -- all via raw text edits, matching
+/// applyFindings' own style, so a second --apply run (nothing left to do)
+/// is a true no-op.
+func applyOperationInsertions(_ findings: [Finding], spec: [String: Any], scanned: [String: ScannedType]) {
+    let opFindings = findings.filter { $0.kind == .operationInsert }
+    guard !opFindings.isEmpty else { return }
+    let usages = scanEndpointUsages(under: servicesPath)
+
+    var generatedNames = Set<String>() // schema names already scheduled this run
+    var serviceFileMethods: [String: [String]] = [:]
+    var modelFileStructs: [String: [GeneratedStruct]] = [:]
+
+    for finding in opFindings {
+        guard let method = finding.opMethod, let path = finding.opPath,
+              let op = paths(of: spec).dict(path)?[method] as? [String: Any] else { continue }
+        guard let plan = planOperationInsert(method: method, path: path, op: op, spec: spec, scanned: scanned, usages: usages, generatedNames: &generatedNames) else { continue }
+        serviceFileMethods[plan.serviceFile, default: []].append(plan.methodText)
+        for s in plan.newStructs {
+            modelFileStructs[plan.modelFile, default: []].append(s)
+        }
+    }
+
+    // 1. Insert new methods before each affected service class's final "}".
+    for (file, methodTexts) in serviceFileMethods {
+        guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }
+        var lines = content.components(separatedBy: "\n")
+        guard let closeIdx = lines.lastIndex(where: { $0.trimmingCharacters(in: .whitespaces) == "}" }) else { continue }
+        var insertion: [String] = []
+        for text in methodTexts {
+            insertion.append("")
+            insertion.append(contentsOf: text.components(separatedBy: "\n"))
+        }
+        lines.insert(contentsOf: insertion, at: closeIdx)
+        try? lines.joined(separator: "\n").write(toFile: file, atomically: true, encoding: .utf8)
+    }
+
+    // 2. Append new struct definitions to each affected model file.
+    for (file, structs) in modelFileStructs {
+        guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }
+        var text = content
+        if !text.hasSuffix("\n") { text += "\n" }
+        for s in structs {
+            text += "\n" + renderGeneratedStruct(s) + "\n"
+        }
+        try? text.write(toFile: file, atomically: true, encoding: .utf8)
+    }
+
+    // 3. Append spec-map.json types[] entries for every newly generated struct.
+    let allNewStructs = modelFileStructs.values.flatMap { $0 }
+    if !allNewStructs.isEmpty, let mapText = try? String(contentsOfFile: specMapPath, encoding: .utf8) {
+        let modelFileByStructName: [String: String] = Dictionary(uniqueKeysWithValues: modelFileStructs.flatMap { file, structs in structs.map { ($0.schemaName, file) } })
+        let blocks = allNewStructs.map { s -> String in
+            renderSpecMapTypeEntry(schemaName: s.schemaName, symbol: s.swiftName, modelFile: modelFileByStructName[s.schemaName] ?? "")
+        }
+        if let updated = appendToJSONArray(mapText, arrayKeyPattern: #""types"\s*:"#, newEntryBlocks: blocks) {
+            try? updated.write(toFile: specMapPath, atomically: true, encoding: .utf8)
+        }
+    }
+}
+
 // MARK: - Removal / new-schema / new-operation / type-change detection (--apply only)
 
 func mappedSchemaBaseNames() -> Set<String> {
@@ -974,9 +1719,10 @@ func detectStructuralChanges(old: [String: Any], new: [String: Any]) -> [Finding
     let newSchemas = schemas(of: new)
     let known = mappedSchemaBaseNames()
     let reachable = reachableSchemaNames(new)
+    let operationInsertTouched = schemaNamesTouchedByOperationInserts(spec: new)
 
     for name in newSchemas.keys.sorted() where oldSchemas[name] == nil {
-        if known.contains(name) { continue }
+        if known.contains(name) || operationInsertTouched.contains(name) { continue }
         // Unreachable orphan schemas (not $ref'd from any path, webhook, or
         // shared component section, even transitively) require no SDK work:
         // nothing in the public surface can ever produce or accept one.
@@ -984,17 +1730,15 @@ func detectStructuralChanges(old: [String: Any], new: [String: Any]) -> [Finding
         findings.append(Finding(kind: .needsHuman, message: "new schema \"\(name)\" present in spec, not present in spec-map.json (types or ignore) -- needs mapping"))
     }
 
+    // New operations are handled by operationCoverageFindings (called from
+    // reconcile(), against `new`) instead of here: that path classifies
+    // each one STANDARD (operation-insert, auto-generatable) vs
+    // NON-STANDARD (needs-human with a precise reason) rather than always
+    // needing a human, and --check needs the exact same single-spec logic
+    // (it has no "old" spec to diff against), so the classification has to
+    // live somewhere both modes call.
     let oldPaths = paths(of: old)
     let newPaths = paths(of: new)
-    for (path, newOps) in newPaths.sorted(by: { $0.key < $1.key }) {
-        guard let newOpsDict = newOps as? [String: Any] else { continue }
-        let oldOpsDict = oldPaths[path] as? [String: Any] ?? [:]
-        for method in newOpsDict.keys.sorted() where ["get", "post", "put", "delete", "patch"].contains(method) {
-            if oldOpsDict[method] == nil {
-                findings.append(Finding(kind: .needsHuman, message: "new operation \"\(method.uppercased()) \(path)\" present in spec -- needs mapping/naming decision"))
-            }
-        }
-    }
     for (path, oldOps) in oldPaths.sorted(by: { $0.key < $1.key }) {
         guard let oldOpsDict = oldOps as? [String: Any] else { continue }
         let newOpsDict = newPaths[path] as? [String: Any] ?? [:]
@@ -1552,6 +2296,17 @@ func validateMap(spec: [String: Any], scanned: [String: ScannedType]) -> [String
     }
     errors.append(contentsOf: enumCoverageErrors(spec: spec, scanned: scanned))
     errors.append(contentsOf: nestedShapeErrors(spec: spec))
+
+    for entry in operationExclusionsRaw {
+        guard let method = entry.str("method"), let path = entry.str("path") else {
+            errors.append("malformed operation-exclusions entry: \(entry)"); continue
+        }
+        guard let ops = paths(of: spec)[path] as? [String: Any], ops[method.lowercased()] != nil else {
+            errors.append("operation-exclusions entry \"\(method) \(path)\" does not exist in the spec (stale exclusion)")
+            continue
+        }
+    }
+
     return errors
 }
 
@@ -1620,7 +2375,14 @@ case .apply:
         report["bump"] = "none"
     } else {
         applyFindings(applicable)
-        let bump = classifyBump(old: snapshot, new: newSpec)
+        applyOperationInsertions(applicable, spec: newSpec, scanned: scanned)
+        let hasOperationInsert = applicable.contains { $0.kind == .operationInsert }
+        // A brand-new endpoint is a new backward-compatible capability, so
+        // operation-insert always forces at least a minor bump -- even in
+        // the (structurally impossible in practice, since a new operation
+        // implies new paths) edge case where classifyBump's own paths-diff
+        // check wouldn't otherwise notice.
+        let bump = hasOperationInsert ? Bump.minor : classifyBump(old: snapshot, new: newSpec)
         print("sync --apply: applied \(applicable.count) change(s), bump=\(bump.rawValue)")
         for f in applicable { print("  - \(f.message)") }
         report["appliedCount"] = applicable.count
