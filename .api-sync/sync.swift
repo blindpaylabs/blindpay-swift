@@ -30,7 +30,7 @@ import Foundation
 
 // MARK: - CLI args
 
-enum Mode { case check, apply, validateMap, coverageReport }
+enum Mode { case check, apply, validateMap, coverageReport, auditTypes }
 
 var mode: Mode = .check
 var snapshotPath = ".api-sync/spec-snapshot.json"
@@ -56,6 +56,7 @@ do {
         case "--apply": mode = .apply
         case "--validate-map": mode = .validateMap
         case "--coverage-report": mode = .coverageReport
+        case "--audit-types": mode = .auditTypes
         case "--snapshot": i += 1; if i < args.count { snapshotPath = args[i] }
         case "--spec": i += 1; if i < args.count { specPath = args[i] }
         case "--sources": i += 1; if i < args.count { sourcesPath = args[i] }
@@ -448,6 +449,38 @@ func findCallableRanges(_ lines: [String], containingLineWith marker: String, fr
     return (sigEnd, bodyStart, bodyEnd)
 }
 
+/// The exact (line, character offset) position of the opening "(" (offset
+/// points just past it) and the matching closing ")" of a callable's
+/// parameter list, found by tracking paren depth character by character
+/// -- independent of where "{" falls, unlike findCallableRanges above.
+/// This matters because a parameter list can be entirely on one line
+/// (`public init(id: String, name: String) {`, common for small structs
+/// like CustomerLimits.swift's PayinLimits) or spread one-per-line
+/// (common for larger structs); appending a new parameter must handle both
+/// without assuming the closing paren is ever on its own line.
+struct ParamListRange { let openLine: Int; let openOffset: Int; let closeLine: Int; let closeOffset: Int }
+
+func findParamListRange(_ lines: [String], containingLineWith marker: String, from: Int, to: Int) -> ParamListRange? {
+    guard let declLine = (from...to).first(where: { lines[$0].contains(marker) }) else { return nil }
+    var depth = 0
+    var openLine = -1, openOffset = -1
+    for i in declLine...to {
+        let chars = Array(lines[i])
+        for (j, ch) in chars.enumerated() {
+            if ch == "(" {
+                depth += 1
+                if depth == 1, openLine == -1 { openLine = i; openOffset = j + 1 }
+            } else if ch == ")" {
+                depth -= 1
+                if depth == 0, openLine != -1 {
+                    return ParamListRange(openLine: openLine, openOffset: openOffset, closeLine: i, closeOffset: j)
+                }
+            }
+        }
+    }
+    return nil
+}
+
 // MARK: - Identifier derivation
 
 let swiftKeywords: Set<String> = ["as", "do", "is", "in", "for", "case", "self", "Self", "class", "struct", "enum", "func", "var", "let", "if", "else", "return", "import", "public", "private", "internal", "static", "protocol", "extension", "guard", "switch", "default", "break", "continue", "true", "false", "nil", "try", "catch", "throw", "throws", "async", "await", "operator", "where", "repeat", "while"]
@@ -549,6 +582,19 @@ func isKnownDivergence(enumName: String, value: String) -> Bool {
     divergenceEntries.contains { $0.enumName == enumName && $0.values.contains(value) }
 }
 
+// known-divergences.json also carries field-level "type-conversion" entries
+// (schema locator + field, e.g. the three cents-converting hand-rolled
+// encoders' amount fields, where the spec's wire type is deliberately
+// narrower than the Swift property's type). Keyed separately from the
+// enum-kind entries above, which use "enum" rather than "schema"/"field".
+let typeDivergenceSet: Set<String> = Set(knownDivergencesRaw.compactMap { entry -> String? in
+    guard let schema = entry.str("schema"), let field = entry.str("field") else { return nil }
+    return "\(schema)\u{0}\(field)"
+})
+func isKnownTypeDivergence(locator: String, field: String) -> Bool {
+    typeDivergenceSet.contains("\(locator)\u{0}\(field)")
+}
+
 // Amount-shaped fields on the three cents-converting hand-rolled encoders:
 // adding one of these mechanically would silently guess at unit conversion,
 // so it is routed to NEEDS_HUMAN instead of auto-applied. Plain String/Bool/
@@ -558,6 +604,174 @@ func looksAmountShaped(name: String, typeText: String) -> Bool {
     let n = name.lowercased()
     let t = typeText.replacingOccurrences(of: "?", with: "")
     return (t == "Double" || t == "Int") && (n.contains("amount") || n.contains("fee"))
+}
+
+// MARK: - Type-compatibility check
+//
+// Presence checks alone (does the SDK model this wire key at all) miss the
+// more dangerous half of "type change": an EXISTING, already-modeled
+// property whose spec type changed shape. A spec type change is a silent
+// Codable decode failure at runtime for every consumer, and nothing else in
+// this patcher (or check-contract.swift) looks at property types at all.
+
+/// Every SDK enum symbol name registered anywhere in spec-map.json's enums[],
+/// regardless of which single schema+property it is anchored to for coverage
+/// checking. The same enum (e.g. Country, KYCType) is reused verbatim across
+/// dozens of mapped schemas that each repeat the same spec "enum" array, so
+/// type-checking must recognize the symbol globally rather than only at its
+/// one canonical anchor -- otherwise every non-canonical occurrence looks
+/// like a spurious "spec says string, SDK says Country" mismatch.
+let registeredEnumSymbols: Set<String> = Set(specMapEnums.compactMap {
+    ($0.dict("sdk"))?.str("symbol")
+})
+
+/// (baseType, nullable) from a JSON Schema node, handling the plain "type"
+/// string, the ["x", "null"] union array, "anyOf"/"oneOf" branches (common in
+/// this spec for e.g. date-time fields with a null branch), "$ref" (always a
+/// named object schema in this spec), and -- when a node has none of those --
+/// falling back to "format" (implies string) or the JSON runtime type of
+/// "example" as a last-resort heuristic. An entirely empty node (`{}`) means
+/// "unconstrained" per JSON Schema semantics, so it is treated as matching
+/// any SDK type. Returns a nil base only when truly nothing on the node
+/// hints at a type and the node is not empty.
+func specTypeInfo(_ node: [String: Any]) -> (base: String?, nullable: Bool) {
+    if node.isEmpty {
+        return ("any", false)
+    }
+    if node["$ref"] != nil {
+        // Every named schema this spec references is an object.
+        return ("object", false)
+    }
+    if let t = node["type"] as? String {
+        return (t == "null" ? nil : t, t == "null")
+    }
+    if let arr = node["type"] as? [Any] {
+        let strs = arr.compactMap { $0 as? String }
+        return (strs.first(where: { $0 != "null" }), strs.contains("null"))
+    }
+    if let branches = (node["anyOf"] as? [Any]) ?? (node["oneOf"] as? [Any]) ?? (node["allOf"] as? [Any]) {
+        // anyOf/oneOf: a value matching any one branch is valid, so nullable
+        // is true if ANY branch allows null. allOf technically means every
+        // branch must hold simultaneously, but in practice this spec only
+        // uses it to combine a "$ref" with a "{"type": [x, "null"]}" sibling
+        // to express a nullable reference, so the same aggregation applies.
+        var nullable = false
+        var base: String? = nil
+        for branch in branches {
+            guard let b = branch as? [String: Any] else { continue }
+            let (branchBase, branchNullable) = specTypeInfo(b)
+            if branchNullable { nullable = true }
+            if base == nil, let branchBase = branchBase { base = branchBase }
+        }
+        return (base, nullable)
+    }
+    if node["format"] != nil {
+        return ("string", false)
+    }
+    switch node["example"] {
+    case is String: return ("string", false)
+    case is Bool: return ("boolean", false)
+    case is Int, is Double: return ("number", false)
+    case is [Any]: return ("array", false)
+    case is [String: Any]: return ("object", false)
+    default: break
+    }
+    return (nil, false)
+}
+
+func isSwiftOptional(_ typeText: String) -> Bool {
+    typeText.trimmingCharacters(in: .whitespaces).hasSuffix("?")
+}
+
+func swiftBaseType(_ typeText: String) -> String {
+    var t = typeText.trimmingCharacters(in: .whitespaces)
+    if t.hasSuffix("?") { t.removeLast() }
+    return t
+}
+
+/// Returns nil when the spec property's declared type and the SDK property's
+/// declared Swift type still correspond; otherwise a human-readable mismatch
+/// reason. Deliberately conservative: anything this cannot map with
+/// confidence (an unrecognized spec type) is treated as a mismatch too, per
+/// "where you cannot decide, classify as needs-human rather than silently
+/// passing."
+///
+/// Nullability here is strictly the property's own type-level signal
+/// ("type": [x, "null"], or an anyOf/oneOf branch of type "null") -- a
+/// separate OpenAPI mechanism from the schema's "required" array, which
+/// `detectStructuralChanges` already tracks on its own (a required-ness
+/// CHANGE between old and new spec is its own needs-human category).
+///
+/// `strictNullability` selects which direction of mismatch is reported:
+///   - false (used by the CI-gating --check/--apply path): only "spec now
+///     allows null but the SDK is non-optional" is a mismatch. This SDK has
+///     ~70 fields that are deliberately non-optional even though the spec's
+///     type doesn't literally include "null" and/or the field isn't in
+///     "required" (created_at/updated_at, nested tracking objects, etc.) --
+///     a long-standing, harmless style choice (Optional gracefully accepts a
+///     present non-null value either way), not a type change. Gating on it
+///     would require ~70 known-divergences.json entries whose only content
+///     is "this is fine", which is pure noise, not a curated signal.
+///   - true (used by --audit-types, non-blocking): both directions are
+///     reported, for full visibility into where the SDK's current type
+///     surface disagrees with the spec at all, regardless of which side is
+///     "stricter".
+func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText: String, strictNullability: Bool) -> String? {
+    let (specBase, specNullable) = specTypeInfo(propNode)
+    let swiftOptional = isSwiftOptional(swiftTypeText)
+    let swiftBase = swiftBaseType(swiftTypeText)
+
+    let nullabilityMismatch = strictNullability ? (specNullable != swiftOptional) : (specNullable && !swiftOptional)
+    if nullabilityMismatch {
+        let specSide = specNullable ? "spec allows null" : "spec does not allow null"
+        let sdkSide = swiftOptional ? "SDK declares optional \(swiftTypeText)" : "SDK declares non-optional \(swiftTypeText)"
+        return "nullability mismatch for \"\(propName)\": \(specSide), \(sdkSide)"
+    }
+
+    let specHasEnum = propNode["enum"] != nil
+    let swiftIsRegisteredEnum = registeredEnumSymbols.contains(swiftBase)
+
+    if swiftIsRegisteredEnum {
+        if !specHasEnum {
+            return "spec property \"\(propName)\" is no longer enum-valued, but SDK declares registered enum type \(swiftTypeText)"
+        }
+        // Spec is still enum-valued (wire representation is its declared base
+        // type, normally "string") and the SDK is one of our registered spec
+        // enums: compatible. Per-value coverage is the enum reconciliation
+        // loop's job, not this type-shape check's.
+        return nil
+    }
+
+    guard let specBase = specBase else {
+        return "spec property \"\(propName)\" has no resolvable JSON type (SDK declares \(swiftTypeText))"
+    }
+
+    let primitiveTypes: Set<String> = ["String", "Int", "Double", "Bool"]
+    switch specBase {
+    case "any":
+        // An entirely empty schema node places no constraint at all (JSON
+        // Schema semantics: `{}` validates any value), so any SDK type
+        // corresponds to it.
+        return nil
+    case "string":
+        return swiftBase == "String" ? nil : "spec type \"string\" vs SDK type \(swiftBase)"
+    case "integer":
+        return swiftBase == "Int" ? nil : "spec type \"integer\" vs SDK type \(swiftBase)"
+    case "number":
+        // JSON Schema does not distinguish integral from fractional "number"
+        // values, and several already-modeled amount fields intentionally
+        // use Int (smallest-unit) for a "number" property; both are safe.
+        return (swiftBase == "Double" || swiftBase == "Int") ? nil : "spec type \"number\" vs SDK type \(swiftBase)"
+    case "boolean":
+        return swiftBase == "Bool" ? nil : "spec type \"boolean\" vs SDK type \(swiftBase)"
+    case "array":
+        return swiftBase.hasPrefix("[") ? nil : "spec type \"array\" vs SDK type \(swiftBase)"
+    case "object":
+        return (primitiveTypes.contains(swiftBase) || swiftBase.hasPrefix("["))
+            ? "spec type \"object\" vs SDK type \(swiftBase)" : nil
+    default:
+        return "unrecognized spec type \"\(specBase)\" for SDK type \(swiftBase)"
+    }
 }
 
 // MARK: - Reconciliation
@@ -612,11 +826,21 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
                 needsHuman.append(Finding(kind: .needsHuman, message: "spec-map type \"\(symbol)\" (for \(locator)) not found in sources (anchor not found)"))
                 continue
             }
-            let modeledWireKeys = Set(scannedType.properties.map { prop -> String in
-                scannedType.codingKeysWireKeyOf[prop.name] ?? prop.name
-            })
+            var propertyByWireKey: [String: ScannedProperty] = [:]
+            for prop in scannedType.properties {
+                let wireKey = scannedType.codingKeysWireKeyOf[prop.name] ?? prop.name
+                propertyByWireKey[wireKey] = prop
+            }
             for (propName, propNode) in specProps.sorted(by: { $0.key < $1.key }) {
-                if modeledWireKeys.contains(propName) { continue }
+                if let modeled = propertyByWireKey[propName] {
+                    guard let propNodeDict = propNode as? [String: Any] else { continue }
+                    if isKnownTypeDivergence(locator: locator, field: propName) { continue }
+                    if let reason = typeMismatchReason(propName: propName, propNode: propNodeDict, swiftTypeText: modeled.typeText, strictNullability: false) {
+                        needsHuman.append(Finding(kind: .needsHuman,
+                            message: "\(symbol).\(modeled.name) (spec property \"\(propName)\" on \(locator)) type mismatch: \(reason)"))
+                    }
+                    continue
+                }
                 if unmodeledSet.contains("\(locator)\u{0}\(propName)") { continue }
                 if required.contains(propName) {
                     needsHuman.append(Finding(kind: .needsHuman,
@@ -860,24 +1084,40 @@ func applyFindings(_ findings: [Finding]) {
             shift += 1
         }
 
-        // 3. init parameter + assignment.
-        let (sigEnd, initStart, initEnd) = findCallableRanges(lines, containingLineWith: "public init(", from: declIdx, to: closeIdx + shift)
-        if sigEnd != -1 {
-            var lastParamIdx = -1
-            for i in stride(from: sigEnd - 1, through: declIdx, by: -1) {
-                let t = lines[i].trimmingCharacters(in: .whitespaces)
-                if !t.isEmpty && t != "(" { lastParamIdx = i; break }
-            }
-            if lastParamIdx != -1 {
-                let paramIndent = indentOf(lines[lastParamIdx])
-                var trimmed = lines[lastParamIdx]
-                if !trimmed.trimmingCharacters(in: .whitespaces).hasSuffix(",") {
-                    trimmed += ","
-                    lines[lastParamIdx] = trimmed
+        // 3. init parameter (always appended last -- Swift requires labeled
+        //    arguments in declaration order, so a new parameter inserted
+        //    anywhere but the end would silently break every existing call
+        //    site that passes any parameter declared after it) + assignment.
+        if let range = findParamListRange(lines, containingLineWith: "public init(", from: declIdx, to: closeIdx + shift) {
+            let newParamText = "\(name): \(typeText) = nil"
+            if range.openLine == range.closeLine {
+                // Single-line signature (e.g. CustomerLimits.swift's small
+                // structs): splice the new parameter in before the ")" on
+                // that same line.
+                let chars = Array(lines[range.closeLine])
+                let existingParams = String(chars[range.openOffset..<range.closeOffset]).trimmingCharacters(in: .whitespaces)
+                let insertText = existingParams.isEmpty ? newParamText : ", " + newParamText
+                let before = String(chars[0..<range.closeOffset])
+                let after = String(chars[range.closeOffset...])
+                lines[range.closeLine] = before + insertText + after
+            } else {
+                // Multi-line signature, one parameter per line: append a new
+                // line right before the line holding the closing ")".
+                var lastParamIdx = -1
+                for i in stride(from: range.closeLine - 1, through: range.openLine, by: -1) {
+                    let t = lines[i].trimmingCharacters(in: .whitespaces)
+                    if !t.isEmpty { lastParamIdx = i; break }
                 }
-                lines.insert("\(paramIndent)\(name): \(typeText) = nil", at: lastParamIdx + 1)
-                shift += 1
+                if lastParamIdx != -1 {
+                    let paramIndent = indentOf(lines[lastParamIdx])
+                    if !lines[lastParamIdx].trimmingCharacters(in: .whitespaces).hasSuffix(",") {
+                        lines[lastParamIdx] += ","
+                    }
+                    lines.insert("\(paramIndent)\(newParamText)", at: lastParamIdx + 1)
+                    shift += 1
+                }
             }
+
             let (_, newInitStart, newInitEnd) = findCallableRanges(lines, containingLineWith: "public init(", from: declIdx, to: closeIdx + shift)
             if newInitEnd != -1 {
                 var lastAssignIdx = newInitStart
@@ -888,7 +1128,6 @@ func applyFindings(_ findings: [Finding]) {
                 lines.insert("\(assignIndent)self.\(name) = \(name)", at: lastAssignIdx + 1)
                 shift += 1
             }
-            _ = initStart; _ = initEnd
         }
 
         // 4. encode(to:) line, when the struct has a hand-rolled encoder.
@@ -966,6 +1205,76 @@ func scanEndpointUsages(under path: String) -> [EndpointUsage] {
         }
     }
     return usages
+}
+
+// MARK: - Type audit (non-blocking; full STATE-based type comparison)
+//
+// The gating type check (in reconcile(), used by --check/--apply) is
+// deliberately asymmetric: it only flags a property where the spec now
+// allows null but the SDK is non-optional (a real decode-crash risk), so
+// that gating a PR doesn't require ~70 known-divergences.json entries whose
+// only content is "the SDK is fine being stricter than the spec's required
+// array here". That asymmetry is exactly why this separate, non-blocking
+// mode exists: gating tells you about NEW drift from a synced baseline, not
+// whether today's SDK type surface already disagrees with the spec at all
+// (the same blindness event-diffing had before state reconciliation
+// replaced it). --audit-types compares every mapped property SYMMETRICALLY
+// (both nullability directions) and prints everything, cross-referencing
+// known-divergences.json so a reader can see at a glance what is already
+// triaged versus new.
+struct TypeAuditFinding {
+    let locator: String
+    let symbol: String
+    let field: String
+    let propertyName: String
+    let reason: String
+}
+
+func auditTypes(spec: [String: Any], scanned: [String: ScannedType]) -> [TypeAuditFinding] {
+    var findings: [TypeAuditFinding] = []
+    for entry in specMapTypes {
+        guard let locator = entry.str("spec"), let sdkSites = entry["sdk"] as? [[String: Any]] else { continue }
+        guard let node = try? resolveLocator(locator, in: spec) else { continue }
+        let specProps = propertiesOf(node)
+        if specProps.isEmpty { continue }
+
+        for site in sdkSites {
+            guard let symbol = site.str("symbol"), let scannedType = scanned[symbol], scannedType.kind == "struct" else { continue }
+            var propertyByWireKey: [String: ScannedProperty] = [:]
+            for prop in scannedType.properties {
+                let wireKey = scannedType.codingKeysWireKeyOf[prop.name] ?? prop.name
+                propertyByWireKey[wireKey] = prop
+            }
+            for (propName, propNode) in specProps.sorted(by: { $0.key < $1.key }) {
+                guard let modeled = propertyByWireKey[propName], let propNodeDict = propNode as? [String: Any] else { continue }
+                if let reason = typeMismatchReason(propName: propName, propNode: propNodeDict, swiftTypeText: modeled.typeText, strictNullability: true) {
+                    findings.append(TypeAuditFinding(locator: locator, symbol: symbol, field: propName, propertyName: modeled.name, reason: reason))
+                }
+            }
+        }
+    }
+    return findings
+}
+
+func printTypeAudit(spec: [String: Any], scanned: [String: ScannedType]) {
+    let findings = auditTypes(spec: spec, scanned: scanned)
+    let recorded = findings.filter { isKnownTypeDivergence(locator: $0.locator, field: $0.field) }
+    let unrecorded = findings.filter { !isKnownTypeDivergence(locator: $0.locator, field: $0.field) }
+
+    print("sync --audit-types (non-blocking): \(findings.count) mismatch(es) across the mapped surface")
+    print("  \(recorded.count) already recorded in known-divergences.json, \(unrecorded.count) NOT YET recorded")
+    if !unrecorded.isEmpty {
+        print("\n  Not yet recorded in known-divergences.json:")
+        for f in unrecorded.sorted(by: { $0.locator == $1.locator ? $0.field < $1.field : $0.locator < $1.locator }) {
+            print("    - \(f.symbol).\(f.propertyName) (spec property \"\(f.field)\" on \(f.locator)): \(f.reason)")
+        }
+    }
+    if !recorded.isEmpty {
+        print("\n  Already recorded (see known-divergences.json for the reason):")
+        for f in recorded.sorted(by: { $0.locator == $1.locator ? $0.field < $1.field : $0.locator < $1.locator }) {
+            print("    - \(f.symbol).\(f.propertyName) (spec property \"\(f.field)\" on \(f.locator))")
+        }
+    }
 }
 
 func printCoverageReport(spec: [String: Any], servicesPath: String) {
@@ -1048,6 +1357,11 @@ let snapshot = loadJSONRequired(snapshotPath) as! [String: Any]
 switch mode {
 case .coverageReport:
     printCoverageReport(spec: snapshot, servicesPath: servicesPath)
+    exit(0)
+
+case .auditTypes:
+    let scanned = scanSources(under: sourcesPath)
+    printTypeAudit(spec: snapshot, scanned: scanned)
     exit(0)
 
 case .validateMap:

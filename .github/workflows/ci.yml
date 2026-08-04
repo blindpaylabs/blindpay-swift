@@ -43,3 +43,7 @@ jobs:
       - name: API sync coverage report (non-blocking)
         continue-on-error: true
         run: swift .api-sync/sync.swift --coverage-report
+
+      - name: API sync type audit (non-blocking)
+        continue-on-error: true
+        run: swift .api-sync/sync.swift --audit-types

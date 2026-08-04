@@ -189,6 +189,48 @@ public struct CreateQuoteInput: Codable, Sendable {
 }
 """
 
+private let fixtureMultiParamSource = """
+import Foundation
+
+public struct FixtureMultiParam: Codable, Sendable {
+    public let id: String
+    public let alpha: String?
+    public let beta: Int?
+    public let gamma: Bool?
+
+    public init(
+        id: String,
+        alpha: String? = nil,
+        beta: Int? = nil,
+        gamma: Bool? = nil
+    ) {
+        self.id = id
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case alpha
+        case beta
+        case gamma
+    }
+}
+"""
+
+private let fixtureNumericSource = """
+import Foundation
+
+public struct FixtureNumeric: Codable, Sendable {
+    public let count: Int
+
+    public init(count: Int) {
+        self.count = count
+    }
+}
+"""
+
 private func writeAllFixtureSources(_ dir: String) {
     write(dir + "/Models/Thing.swift", fixtureThingSource)
     write(dir + "/Models/Bare.swift", fixtureBareSource)
@@ -196,6 +238,8 @@ private func writeAllFixtureSources(_ dir: String) {
     write(dir + "/Models/EncodeIfPresent.swift", fixtureEncodeIfPresentSource)
     write(dir + "/Models/IfLetEncode.swift", fixtureIfLetEncodeSource)
     write(dir + "/Models/AmountEncoder.swift", fixtureAmountEncoderSource)
+    write(dir + "/Models/MultiParam.swift", fixtureMultiParamSource)
+    write(dir + "/Models/Numeric.swift", fixtureNumericSource)
 }
 
 // MARK: - Fixture spec / spec-map builders
@@ -216,6 +260,9 @@ private func baseSpec(extraSchemas: [String: Any] = [:], extraPaths: [String: An
         "EncodeIfPresentOut": schema(["id": ["type": "string"], "note": ["type": "string"]]),
         "IfLetEncodeOut": schema(["id": ["type": "string"], "note": ["type": "string"]]),
         "CreateQuoteInputOut": schema(["id": ["type": "string"]]),
+        "MultiParamOut": schema(["id": ["type": "string"], "alpha": ["type": "string"],
+                                 "beta": ["type": "integer"], "gamma": ["type": "boolean"]]),
+        "NumericOut": schema(["count": ["type": "number"]]),
     ]
     for (k, v) in extraSchemas { schemas[k] = v }
     var paths: [String: Any] = [
@@ -236,6 +283,8 @@ private let baseSpecMap: [String: Any] = [
         ["spec": "EncodeIfPresentOut", "sdk": [["file": "Models/EncodeIfPresent.swift", "symbol": "FixtureEncodeIfPresent"]]],
         ["spec": "IfLetEncodeOut", "sdk": [["file": "Models/IfLetEncode.swift", "symbol": "FixtureIfLetEncode"]]],
         ["spec": "CreateQuoteInputOut", "sdk": [["file": "Models/AmountEncoder.swift", "symbol": "CreateQuoteInput"]]],
+        ["spec": "MultiParamOut", "sdk": [["file": "Models/MultiParam.swift", "symbol": "FixtureMultiParam"]]],
+        ["spec": "NumericOut", "sdk": [["file": "Models/Numeric.swift", "symbol": "FixtureNumeric"]]],
     ],
     "ignore": ["schemas": [] as [Any]],
 ]
@@ -607,6 +656,112 @@ private func commonArgs(_ dir: String) -> [String] {
     let snapshotBytes = FileManager.default.contents(atPath: dir + "/spec-snapshot.json")
     #expect(specBytes != nil)
     #expect(snapshotBytes == specBytes)
+}
+
+// MARK: - Init parameter is always appended at the end (never inserted mid-signature)
+
+@Test func newInitParameterIsAppendedLastAndExistingParametersAreUnmovedOnAStructWithSeveralParameters() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["MultiParamOut"] = schema(["id": ["type": "string"], "alpha": ["type": "string"],
+                                       "beta": ["type": "integer"], "gamma": ["type": "boolean"],
+                                       "delta": ["type": "string"]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+
+    let source = readSource(dir, "Models/MultiParam.swift")
+    let initRange = source.range(of: "public init(")!
+    let closeParenRange = source.range(of: ")", range: initRange.upperBound..<source.endIndex)!
+    let signature = String(source[initRange.upperBound..<closeParenRange.lowerBound])
+    let paramLabels = signature.components(separatedBy: ",").map {
+        $0.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: ":").first ?? ""
+    }
+    #expect(paramLabels == ["id", "alpha", "beta", "gamma", "delta"])
+    #expect(source.contains("delta: String? = nil"))
+}
+
+// MARK: - Type mismatch detection
+
+@Test func stringToIntegerOnAPlainPropertyIsNeedsHuman() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["ThingOut"] = schema(["id": ["type": "string"], "name": ["type": "integer"],
+                                  "status": ["type": "string", "enum": ["active", "inactive"]]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("type mismatch"))
+    #expect(apply.stdout.contains("spec type \"integer\" vs SDK type String"))
+}
+
+@Test func nullableSpecPropertyAgainstNonOptionalSDKTypeIsNeedsHuman() {
+    // This is the direction --check/--apply gate on: the spec relaxes a
+    // property to allow null while the SDK stays non-optional, which is a
+    // real Codable decode-crash risk. (The reverse direction -- SDK optional
+    // while the spec's type still excludes null -- is a long-standing,
+    // harmless convention across ~70 fields in this SDK; --audit-types
+    // reports that direction too, non-blockingly, for full visibility.)
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["ThingOut"] = schema(["id": ["type": "string"], "name": ["type": ["string", "null"]],
+                                  "status": ["type": "string", "enum": ["active", "inactive"]]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: baseSpec()) // FixtureThing.name is non-optional String
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("nullability mismatch"))
+    #expect(apply.stdout.contains("spec allows null"))
+}
+
+@Test func enumTypedPropertyChangingToABareStringIsNeedsHuman() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["ThingOut"] = schema(["id": ["type": "string"], "name": ["type": "string"],
+                                  "status": ["type": "string"]]) // "enum" removed
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: baseSpec()) // FixtureThing.status: FixtureStatus (a registered enum)
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("no longer enum-valued"))
+}
+
+@Test func numberSpecTypeAgainstIntSDKTypeIsDeliberatelyCompatible() {
+    // A case this checker treats as compatible on purpose: JSON Schema does
+    // not distinguish integral from fractional "number" values, and this SDK
+    // has existing fields that are Int (smallest-unit) against a spec
+    // "number" property.
+    let dir = makeFixtureDir()
+    setupBaseline(dir) // baseSpec() already has NumericOut.count: "number" vs FixtureNumeric.count: Int
+    let check = runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(check.exitCode == 0)
+    #expect(check.stdout.isEmpty)
 }
 
 // MARK: - Bump classification
