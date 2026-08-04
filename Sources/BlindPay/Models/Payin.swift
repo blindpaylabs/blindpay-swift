@@ -475,8 +475,8 @@ public struct Payin: Codable, Sendable, Equatable {
   /// Whether this is an OTC transaction
   public let isOtc: Bool?
 
-  /// Billing fee amount
-  public let billingFeeAmount: String?
+  /// Billing fee amount (in smallest currency unit)
+  public let billingFeeAmount: Int?
 
   /// PSE document type
   public let pseDocumentType: String?
@@ -527,7 +527,7 @@ public struct Payin: Codable, Sendable, Equatable {
     network: Network? = nil,
     blindpayBankDetails: BlindPayBankDetails? = nil,
     isOtc: Bool? = nil,
-    billingFeeAmount: String? = nil,
+    billingFeeAmount: Int? = nil,
     pseDocumentType: String? = nil,
     pseFullName: String? = nil,
     psePaymentLink: String? = nil,
