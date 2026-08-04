@@ -19,7 +19,7 @@ jobs:
       - name: Fetch spec-current.json from api-sync-data
         run: |
           git fetch origin api-sync-data
-          git show origin/api-sync-data:.api-sync/spec-current.json > .api-sync/spec-current.json
+          git show origin/api-sync-data:.api-sync/spec-current.json > /tmp/api-sync-spec-current.json
 
       - name: Verify delivery manifest
         env:
@@ -29,22 +29,22 @@ jobs:
         run: |
           set -euo pipefail
 
-          if ! git show origin/api-sync-data:.api-sync/delivery.json > .api-sync/delivery.json 2>/dev/null; then
+          if ! git show origin/api-sync-data:.api-sync/delivery.json > /tmp/api-sync-delivery.json 2>/dev/null; then
             echo "::error::api-sync-data branch is missing .api-sync/delivery.json -- refusing to sync against an unverified spec"
             exit 1
           fi
-          if [ ! -s .api-sync/spec-current.json ]; then
+          if [ ! -s /tmp/api-sync-spec-current.json ]; then
             echo "::error::api-sync-data branch is missing or has an empty .api-sync/spec-current.json"
             exit 1
           fi
 
           echo "=== delivery manifest ==="
-          cat .api-sync/delivery.json
+          cat /tmp/api-sync-delivery.json
 
-          manifest_repo=$(jq -r '.source_repository // ""' .api-sync/delivery.json)
-          manifest_sha=$(jq -r '.source_sha // ""' .api-sync/delivery.json)
-          manifest_spec_sha256=$(jq -r '.spec_sha256 // ""' .api-sync/delivery.json)
-          manifest_generated_at=$(jq -r '.generated_at // ""' .api-sync/delivery.json)
+          manifest_repo=$(jq -r '.source_repository // ""' /tmp/api-sync-delivery.json)
+          manifest_sha=$(jq -r '.source_sha // ""' /tmp/api-sync-delivery.json)
+          manifest_spec_sha256=$(jq -r '.spec_sha256 // ""' /tmp/api-sync-delivery.json)
+          manifest_generated_at=$(jq -r '.generated_at // ""' /tmp/api-sync-delivery.json)
 
           if [ -z "$manifest_repo" ] || [ -z "$manifest_sha" ] || [ -z "$manifest_spec_sha256" ] || [ -z "$manifest_generated_at" ]; then
             echo "::error::delivery.json is missing one or more required fields (source_repository, source_sha, spec_sha256, generated_at)"
@@ -55,7 +55,7 @@ jobs:
             exit 1
           fi
 
-          actual_sha256=$(shasum -a 256 .api-sync/spec-current.json | cut -d' ' -f1)
+          actual_sha256=$(shasum -a 256 /tmp/api-sync-spec-current.json | cut -d' ' -f1)
           if [ "$actual_sha256" != "$manifest_spec_sha256" ]; then
             echo "::error::spec-current.json sha256 ($actual_sha256) does not match delivery.json's spec_sha256 ($manifest_spec_sha256) -- the fetched spec does not match what was recorded as delivered"
             exit 1
@@ -90,7 +90,7 @@ jobs:
         id: sync
         run: |
           set +e
-          swift .api-sync/sync.swift --apply --spec .api-sync/spec-current.json --report /tmp/sync-report.json
+          swift .api-sync/sync.swift --apply --spec /tmp/api-sync-spec-current.json --report /tmp/sync-report.json
           status=$?
           set -e
           echo "=== sync report ==="

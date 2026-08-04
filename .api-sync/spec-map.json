@@ -538,20 +538,8 @@
         "schema": "RfiSection"
       },
       {
-        "reason": "Part of the unmodeled RFI family.",
-        "schema": "CreateRfiBody"
-      },
-      {
-        "reason": "Part of the unmodeled RFI family.",
-        "schema": "CreateInstanceRfiBody"
-      },
-      {
         "reason": "Part of the unmodeled RFI family (GET /v1/instances/{id}/rfi).",
         "schema": "InstanceRfi"
-      },
-      {
-        "reason": "RFI/compliance decision surface, not modeled by this SDK.",
-        "schema": "KycDecisionBody"
       },
       {
         "reason": "POST /v1/upload/analyze has no SDK coverage. UploadAnalyzeIn/Out models existed briefly in v3.2.0 and were deleted in v4.0.0; never wired to a service method.",
@@ -562,180 +550,12 @@
         "schema": "UploadAnalyzeOut"
       },
       {
-        "reason": "Unreferenced by any public operation or webhook (zero $ref in the spec) -- an orphan schema. funding_end_to_end_id and payer_tax_id live only here; there is no SDK home for them.",
-        "schema": "LedgerOperation"
-      },
-      {
-        "reason": "API keys resource (ApiKey/ApiKeysService) was deleted wholesale from the SDK in v4.0.0 (see CHANGELOG); this is deliberate, not an oversight.",
-        "schema": "ApiKeyPublic"
-      },
-      {
-        "reason": "See ApiKeyPublic.",
-        "schema": "CreateApiKeyIn"
-      },
-      {
-        "reason": "See ApiKeyPublic.",
-        "schema": "CreateApiKeyOut"
-      },
-      {
-        "reason": "Backoffice/audit-log surface; not part of this customer-facing SDK's resource set.",
-        "schema": "AuditLog"
-      },
-      {
-        "reason": "See AuditLog.",
-        "schema": "AuditLogOut"
-      },
-      {
-        "reason": "See AuditLog.",
-        "schema": "AuditActor"
-      },
-      {
-        "reason": "Billing/invoicing dashboard surface; not modeled by this SDK.",
-        "schema": "BillingDetails"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "BillingSubscription"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "CollectInvoiceBody"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "CollectInvoiceSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "CreatePortalSessionSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "CreateRecurringItemSchemaIn"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "CurrentUsageSchema"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "GetInvoicePdfSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "GetInvoiceSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "GetInvoicesSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "InvoiceItemSchema"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "PayInvoiceSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "RecurringItem"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "UpdateRecurringItemSchemaIn"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "AddonItemSchema"
-      },
-      {
-        "reason": "See BillingDetails (saved payment method for invoice billing, not a BlindPay bank account).",
-        "schema": "PaymentMethodSchemaOut"
-      },
-      {
-        "reason": "See BillingDetails.",
-        "schema": "PaymentRoute"
-      },
-      {
-        "reason": "Dashboard complaint-intake surface; not modeled by this SDK.",
-        "schema": "CreateComplaintIn"
-      },
-      {
-        "reason": "Dashboard feedback surface; not modeled by this SDK.",
-        "schema": "CreateFeedbackIn"
-      },
-      {
-        "reason": "See CreateFeedbackIn.",
-        "schema": "FeedbackActor"
-      },
-      {
-        "reason": "See CreateFeedbackIn.",
-        "schema": "FeedbackOut"
-      },
-      {
-        "reason": "See CreateFeedbackIn.",
-        "schema": "FeedbackWithActorOut"
-      },
-      {
-        "reason": "Internal compliance-ops override surface; not modeled by this SDK.",
-        "schema": "ManualReviewSkip"
-      },
-      {
-        "reason": "Instance creation is an account/dashboard-level operation, not exposed to an API-key holder (there is no createInstance in InstancesService).",
-        "schema": "InstanceIn"
-      },
-      {
-        "reason": "No getInstance operation is implemented by this SDK (only getMembers, update, delete, member management).",
-        "schema": "InstanceOut"
-      },
-      {
-        "reason": "Dashboard-facing instance summary; not modeled by this SDK.",
-        "schema": "ExternalInstanceOut"
-      },
-      {
-        "reason": "Dashboard onboarding surface; not modeled by this SDK.",
-        "schema": "ExternalOnboardingInfo"
-      },
-      {
-        "reason": "Dashboard-only instance-management operation; no SDK method exists.",
-        "schema": "CopyInstanceMembersIn"
-      },
-      {
-        "reason": "See CopyInstanceMembersIn.",
-        "schema": "CopyInstanceMembersOut"
-      },
-      {
-        "reason": "Dashboard-only instance-management operation; no SDK method exists.",
-        "schema": "CreateInstanceOnboardingInviteIn"
-      },
-      {
-        "reason": "Dashboard-only instance-management operation; no SDK method exists.",
-        "schema": "CreateInviteIn"
-      },
-      {
-        "reason": "Internal OTC pricing configuration; not modeled by this SDK.",
-        "schema": "UpdateDynamicRateOtcIn"
-      },
-      {
-        "reason": "Internal wallet-monitoring surface; not modeled by this SDK.",
-        "schema": "MonitoredWallet"
-      },
-      {
-        "reason": "Internal usage/billing metric; not modeled by this SDK.",
-        "schema": "VirtualAccountsUsage"
-      },
-      {
         "reason": "Webhook payload for wallet.inbound; see the *WebhookOut group reason.",
         "schema": "WalletInboundSchemaOut"
       },
       {
         "reason": "Internal wallet-token metadata; no corresponding SDK method returns this shape.",
         "schema": "WalletTokenOut"
-      },
-      {
-        "reason": "Dashboard/portal session surface; not modeled by this SDK.",
-        "schema": "CreateExternalCustomerTokenIn"
       },
       {
         "reason": "Generic error envelope; not a resource schema (handled by BlindPayError/APIError, which are already core, not mapped).",
@@ -746,14 +566,6 @@
         "schema": "Success"
       },
       {
-        "reason": "No corresponding SDK operation found (accept-tos is driven by the hosted TOS portal, not an API call this SDK wraps).",
-        "schema": "AcceptTosIn"
-      },
-      {
-        "reason": "See AcceptTosIn.",
-        "schema": "AcceptTosOut"
-      },
-      {
         "reason": "Webhook payload; see the *WebhookOut group reason.",
         "schema": "TosAcceptWebhookOut"
       },
@@ -762,20 +574,12 @@
         "schema": "AdditionalInfoItem"
       },
       {
-        "reason": "Appears to be a legacy/duplicate of CreateTransferOut in the dashboard-facing surface; the SDK's CreateTransferResponse is verified against CreateTransferOut.",
-        "schema": "CreateTransferSchemaOut"
-      },
-      {
         "reason": "Webhook payload schema; this SDK does not model incoming webhook payloads (WebhookEndpoint CRUD + WebhookEvent enum only).",
         "schema": "BankAccountWebhookOut"
       },
       {
         "reason": "Webhook payload schema; see BankAccountWebhookOut.",
         "schema": "BlockchainWalletWebhookOut"
-      },
-      {
-        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
-        "schema": "CircleTransactionWebhookOut"
       },
       {
         "reason": "Webhook payload schema; see BankAccountWebhookOut.",
