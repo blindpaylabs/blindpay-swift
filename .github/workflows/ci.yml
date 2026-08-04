@@ -23,3 +23,27 @@ jobs:
 
       - name: API contract check
         run: swift .api-sync/check-contract.swift
+
+      - name: API sync map validity
+        run: swift .api-sync/sync.swift --validate-map
+
+      - name: API sync state check
+        run: swift .api-sync/sync.swift --check
+
+      - name: API sync determinism proof
+        run: |
+          rm -rf /tmp/sync-determinism-a /tmp/sync-determinism-b
+          mkdir -p /tmp/sync-determinism-a /tmp/sync-determinism-b
+          git archive HEAD | tar -x -C /tmp/sync-determinism-a
+          git archive HEAD | tar -x -C /tmp/sync-determinism-b
+          (cd /tmp/sync-determinism-a && swift .api-sync/sync.swift --apply --spec .api-sync/spec-snapshot.json --report /tmp/sync-determinism-a/report.json)
+          (cd /tmp/sync-determinism-b && swift .api-sync/sync.swift --apply --spec .api-sync/spec-snapshot.json --report /tmp/sync-determinism-b/report.json)
+          diff -rq /tmp/sync-determinism-a /tmp/sync-determinism-b
+
+      - name: API sync coverage report (non-blocking)
+        continue-on-error: true
+        run: swift .api-sync/sync.swift --coverage-report
+
+      - name: API sync type audit (non-blocking)
+        continue-on-error: true
+        run: swift .api-sync/sync.swift --audit-types

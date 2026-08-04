@@ -1,0 +1,475 @@
+[
+  {
+    "field": "required",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "AvailableBankDetails",
+    "symbol": "BankDetailField.required"
+  },
+  {
+    "enum": "BankAccountType",
+    "kind": "value-mismatch",
+    "owner": "eric@blindpay.com",
+    "reason": "LIVE DEFECT: the API contract and payout code branch on the wire value \"saving\" (singular; see packages/api-contract/src/bank-account.schema.ts in blindpay-v2 and the payout code's account_type === 'saving' check). This SDK's BankAccountType.savings encodes \"savings\" (plural), so creating a savings bank account through this SDK is rejected by the API today. node and go already use the correct value; python and php have the same defect as this repo. Fix is deliberately deferred to a separate, reviewed PR per repo (changing an existing public enum's raw value needs its own scrutiny, not a mechanical sync-infra change) rather than silently auto-corrected here.",
+    "sdkValue": "savings",
+    "specValue": "saving"
+  },
+  {
+    "field": "name",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "BlockchainWalletOut",
+    "symbol": "BlockchainWallet.name"
+  },
+  {
+    "field": "network",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "BlockchainWalletOut",
+    "symbol": "BlockchainWallet.network"
+  },
+  {
+    "enum": "BusinessIndustry",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New NAICS code added to the business_industry enum. Deferred to keep this PR's enum changes limited to the explicitly reviewed set; a 150+ member enum gaining one more code is low risk but out of this PR's charter.",
+    "specValues": [
+      "446120"
+    ]
+  },
+  {
+    "field": "blockchain_wallet_id",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteIn",
+    "symbol": "CreatePayinQuoteInput.blockchainWalletId"
+  },
+  {
+    "field": "request_amount",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "CreatePayinQuoteIn",
+    "symbol": "CreatePayinQuoteInput.requestAmount"
+  },
+  {
+    "field": "blindpay_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.blindpayQuotation"
+  },
+  {
+    "field": "commercial_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.commercialQuotation"
+  },
+  {
+    "field": "expires_at",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.expiresAt"
+  },
+  {
+    "field": "flat_fee",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.flatFee"
+  },
+  {
+    "field": "partner_fee_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.partnerFeeAmount"
+  },
+  {
+    "field": "receiver_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.receiverAmount"
+  },
+  {
+    "field": "sender_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote.senderAmount"
+  },
+  {
+    "field": "cover_fees",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreateTransferQuoteIn",
+    "symbol": "CreateTransferQuoteInput.coverFees"
+  },
+  {
+    "field": "request_amount",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "CreateTransferQuoteIn",
+    "symbol": "CreateTransferQuoteInput.requestAmount"
+  },
+  {
+    "field": "expires_at",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "CreateTransferQuoteOut",
+    "symbol": "CreateTransferQuoteResponse.expiresAt"
+  },
+  {
+    "enum": "Currency",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "EUR was added to the fx-rate and payin-quote currency enums. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "EUR"
+    ]
+  },
+  {
+    "enum": "EstimatedAnnualRevenue",
+    "kind": "value-mismatch",
+    "owner": "eric@blindpay.com",
+    "reason": "Likely a decade-off typo from when this case was authored: every other band's upper bound matches the spec exactly (50000000_249999999 is the band directly below), so the top band should start at 250,000,000 not 2,500,000,000. Deferred to a follow-up PR rather than silently auto-corrected here.",
+    "sdkValue": "2500000000_plus",
+    "specValue": "250000000_plus"
+  },
+  {
+    "enum": "EstimatedTimeOfArrival",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New estimated-arrival bucket between the existing 5_min and 30_min bands. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "5_30_min"
+    ]
+  },
+  {
+    "field": "payin_flat",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "FeeOptions",
+    "symbol": "FeeOptions.payinFlat"
+  },
+  {
+    "field": "payin_percentage",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "FeeOptions",
+    "symbol": "FeeOptions.payinPercentage"
+  },
+  {
+    "field": "payout_flat",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "FeeOptions",
+    "symbol": "FeeOptions.payoutFlat"
+  },
+  {
+    "field": "payout_percentage",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "FeeOptions",
+    "symbol": "FeeOptions.payoutPercentage"
+  },
+  {
+    "field": "middle_name",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "GET /v1/instances/{id}/members#response.200[]",
+    "symbol": "InstanceMember.middleName"
+  },
+  {
+    "enum": "KYCStatus",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New compliance workflow status (approved pending an outstanding RFI). Deliberately deferred: KYC status is compliance-sensitive and this sync-infrastructure PR is scoped to the pre-identified 4-field delta plus the two divergences (BankAccountType, BankingPartner) explicitly reviewed for this PR.",
+    "specValues": [
+      "approved_rfi"
+    ]
+  },
+  {
+    "enum": "ManualExecutionStatus",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK currently declares only \"failed\"; spec's payin manual_execution_status also allows \"concluded\" and \"pending\". Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "concluded",
+      "pending"
+    ]
+  },
+  {
+    "field": "request_amount",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "POST /v1/instances/{instance_id}/payin-quotes/fx#requestBody",
+    "symbol": "GetFxRateInput.requestAmount"
+  },
+  {
+    "field": "blindpay_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "POST /v1/instances/{instance_id}/payin-quotes/fx#response.200",
+    "symbol": "GetFxRateResponse.blindpayQuotation"
+  },
+  {
+    "field": "commercial_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "POST /v1/instances/{instance_id}/payin-quotes/fx#response.200",
+    "symbol": "GetFxRateResponse.commercialQuotation"
+  },
+  {
+    "field": "instance_flat_fee",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "POST /v1/instances/{instance_id}/payin-quotes/fx#response.200",
+    "symbol": "GetFxRateResponse.instanceFlatFee"
+  },
+  {
+    "field": "request_amount",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "POST /v1/instances/{instance_id}/quotes/fx#requestBody",
+    "symbol": "GetFxRateInput.requestAmount"
+  },
+  {
+    "field": "blindpay_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "POST /v1/instances/{instance_id}/quotes/fx#response.200",
+    "symbol": "GetFxRateResponse.blindpayQuotation"
+  },
+  {
+    "field": "commercial_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "POST /v1/instances/{instance_id}/quotes/fx#response.200",
+    "symbol": "GetFxRateResponse.commercialQuotation"
+  },
+  {
+    "field": "instance_flat_fee",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "POST /v1/instances/{instance_id}/quotes/fx#response.200",
+    "symbol": "GetFxRateResponse.instanceFlatFee"
+  },
+  {
+    "field": "next_page",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "PaginationMetadata",
+    "symbol": "PaginationMetadata.nextPage"
+  },
+  {
+    "field": "prev_page",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "PaginationMetadata",
+    "symbol": "PaginationMetadata.prevPage"
+  },
+  {
+    "field": "billing_fee_amount",
+    "kind": "type-bug",
+    "owner": "eric@blindpay.com",
+    "reason": "LIKELY BUG, not a deliberate divergence: spec declares this field numeric, but the SDK declares it String. Unlike the Payin.billing_fee (wire key billing_fee) SDK-only field already covered in check-contract.swift's allow-list, this is a SEPARATE, distinct wire key (billing_fee_amount) that the spec types as a number and the SDK types as String -- decoding a real numeric billing_fee_amount value would fail today. Flagged here rather than silently fixed because changing the public property type is a breaking change that needs its own deliberate PR and a decision on the correct unit (cents vs dollars).",
+    "schema": "PayinOut",
+    "symbol": "Payin.billingFeeAmount"
+  },
+  {
+    "field": "status",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction.status"
+  },
+  {
+    "enum": "PaymentType",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "SEPA payout rail exists in the spec's PayoutOut.type enum (and in the BankAccount-side Rail enum already modeled) but no SEPA payout operation or fee options are modeled anywhere else in this SDK yet (see GetFeesOut.sepa in unmodeled.json). Deferred as a package with that broader SEPA-payout gap rather than added in isolation.",
+    "specValues": [
+      "sepa"
+    ]
+  },
+  {
+    "field": "receiver_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "PayoutOut",
+    "symbol": "Payout.receiverAmount"
+  },
+  {
+    "field": "sender_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "PayoutOut",
+    "symbol": "Payout.senderAmount"
+  },
+  {
+    "field": "request_amount",
+    "kind": "type-conversion",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
+    "schema": "QuoteIn",
+    "symbol": "CreateQuoteInput.requestAmount"
+  },
+  {
+    "field": "blindpay_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.blindpayQuotation"
+  },
+  {
+    "field": "commercial_quotation",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.commercialQuotation"
+  },
+  {
+    "field": "contract",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.contract"
+  },
+  {
+    "field": "customer_local_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.customerLocalAmount"
+  },
+  {
+    "field": "description",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.description"
+  },
+  {
+    "field": "expires_at",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.expiresAt"
+  },
+  {
+    "field": "flat_fee",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.flatFee"
+  },
+  {
+    "field": "partner_fee_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.partnerFeeAmount"
+  },
+  {
+    "field": "receiver_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.receiverAmount"
+  },
+  {
+    "field": "sender_amount",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse.senderAmount"
+  },
+  {
+    "enum": "SupportingDocumentType",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "Limit-increase supporting-document catalog was expanded from 6 to 15 document types. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "business_accounts_receivable",
+      "business_contract",
+      "business_merchant_processor_statement",
+      "business_shareholder_loan",
+      "individual_blockchain_wallet_statement",
+      "individual_crypto_exchange_statement",
+      "individual_employment_letter",
+      "individual_investment_statement",
+      "individual_pay_stub"
+    ]
+  },
+  {
+    "enum": "TrackingStep",
+    "kind": "deferred-addition",
+    "owner": "eric@blindpay.com",
+    "reason": "New payout tracking step. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
+    "specValues": [
+      "pending_review"
+    ]
+  },
+  {
+    "field": "banking_partner",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "VirtualAccountOut",
+    "symbol": "VirtualAccount.bankingPartner"
+  },
+  {
+    "field": "address",
+    "kind": "type-nullability",
+    "owner": "eric@blindpay.com",
+    "reason": "Spec allows null for this field but the SDK models it non-optional. Pre-existing across this SDK for fields the API practically always populates on a successful/terminal response (quote quotations, computed amounts, pagination cursors, tracking sub-object step). Changing the property to Optional is a breaking public type change for existing consumers, so it needs its own deliberate PR rather than a silent widening here.",
+    "schema": "WalletOut",
+    "symbol": "CustodialWallet.address"
+  }
+]

@@ -1,0 +1,653 @@
+[
+  {
+    "field": "requiredWhen",
+    "owner": "eric@blindpay.com",
+    "reason": "New conditional-requirement metadata on bank-detail field items; not yet modeled on BankDetailField.",
+    "schema": "AvailableBankDetails",
+    "symbol": "BankDetailField"
+  },
+  {
+    "field": "label",
+    "owner": "eric@blindpay.com",
+    "reason": "AvailableNaicsList's item shape gained label/value fields alongside code/title; not yet modeled on NaicsCode (possible duplicate of code/title, needs product confirmation).",
+    "schema": "AvailableNaicsList",
+    "symbol": "NaicsCode"
+  },
+  {
+    "field": "value",
+    "owner": "eric@blindpay.com",
+    "reason": "AvailableNaicsList's item shape gained label/value fields alongside code/title; not yet modeled on NaicsCode (possible duplicate of code/title, needs product confirmation).",
+    "schema": "AvailableNaicsList",
+    "symbol": "NaicsCode"
+  },
+  {
+    "field": "business_industry",
+    "owner": "eric@blindpay.com",
+    "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "date_of_birth",
+    "owner": "eric@blindpay.com",
+    "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "phone_number",
+    "owner": "eric@blindpay.com",
+    "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "recipient_relationship",
+    "owner": "eric@blindpay.com",
+    "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "status",
+    "owner": "eric@blindpay.com",
+    "reason": "New bank-account review status field; not yet modeled.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "swift_ifsc_branch_code",
+    "owner": "eric@blindpay.com",
+    "reason": "New SWIFT/IFSC field (India corridor); not yet modeled on either BankAccount or CreateBankAccountInput.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "swift_payment_code",
+    "owner": "eric@blindpay.com",
+    "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "tax_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
+    "schema": "BankAccountOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "checkbook_account_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider-internal passthrough field (Checkbook rail); no consumer-facing use identified yet.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
+  },
+  {
+    "field": "checkbook_user_key",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider-internal passthrough field (Checkbook rail); no consumer-facing use identified yet.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
+  },
+  {
+    "field": "force_cpf_cnpj",
+    "owner": "eric@blindpay.com",
+    "reason": "New override flag for Brazilian document validation; not yet modeled.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
+  },
+  {
+    "field": "onemoney_external_account_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider-internal passthrough field (1Money rail); no consumer-facing use identified yet.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
+  },
+  {
+    "field": "status",
+    "owner": "eric@blindpay.com",
+    "reason": "New bank-account review status field; not yet modeled.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
+  },
+  {
+    "field": "swift_ifsc_branch_code",
+    "owner": "eric@blindpay.com",
+    "reason": "New SWIFT/IFSC field (India corridor); not yet modeled on either BankAccount or CreateBankAccountInput.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
+  },
+  {
+    "field": "additional_info",
+    "owner": "eric@blindpay.com",
+    "reason": "New free-form partner metadata field on CreateCustomerInput; not yet requested by an SDK consumer.",
+    "schema": "CreateCustomerIn",
+    "symbol": "CreateCustomerInput"
+  },
+  {
+    "field": "latitude",
+    "owner": "eric@blindpay.com",
+    "reason": "New customer geolocation field; not yet modeled on any of the three Customer-derived structs.",
+    "schema": "CreateCustomerIn",
+    "symbol": "CreateCustomerInput"
+  },
+  {
+    "field": "longitude",
+    "owner": "eric@blindpay.com",
+    "reason": "New customer geolocation field; not yet modeled on any of the three Customer-derived structs.",
+    "schema": "CreateCustomerIn",
+    "symbol": "CreateCustomerInput"
+  },
+  {
+    "field": "billing_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New billing-fee breakdown field; not yet modeled on CreatePayinResponse.",
+    "schema": "CreatePayinOut",
+    "symbol": "CreatePayinResponse"
+  },
+  {
+    "field": "partner_fee",
+    "owner": "eric@blindpay.com",
+    "reason": "New nested partner-fee breakdown object; not yet modeled on CreatePayinResponse.",
+    "schema": "CreatePayinOut",
+    "symbol": "CreatePayinResponse"
+  },
+  {
+    "field": "transaction_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New fee breakdown field; not yet modeled on CreatePayinResponse.",
+    "schema": "CreatePayinOut",
+    "symbol": "CreatePayinResponse"
+  },
+  {
+    "field": "payer_rules",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on the PayinQuote response already; not yet accepted as a create-time input field.",
+    "schema": "CreatePayinQuoteIn",
+    "symbol": "CreatePayinQuoteInput"
+  },
+  {
+    "field": "billing_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New billing-fee breakdown field; not yet modeled on PayinQuote.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote"
+  },
+  {
+    "field": "is_otc",
+    "owner": "eric@blindpay.com",
+    "reason": "New OTC-flag field; not yet modeled on PayinQuote.",
+    "schema": "CreatePayinQuoteOut",
+    "symbol": "PayinQuote"
+  },
+  {
+    "field": "additional_info",
+    "owner": "eric@blindpay.com",
+    "reason": "New free-form partner metadata field on Customer; not yet requested by an SDK consumer.",
+    "schema": "CustomerOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "customer_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Legacy/internal alias for id on some customer responses; superseded by id, never wired to a second property.",
+    "schema": "CustomerOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "latitude",
+    "owner": "eric@blindpay.com",
+    "reason": "New customer geolocation field; not yet modeled on any of the three Customer-derived structs.",
+    "schema": "CustomerOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "longitude",
+    "owner": "eric@blindpay.com",
+    "reason": "New customer geolocation field; not yet modeled on any of the three Customer-derived structs.",
+    "schema": "CustomerOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "has_passkey",
+    "owner": "eric@blindpay.com",
+    "reason": "New member security-posture field; not yet modeled on InstanceMember.",
+    "schema": "GET /v1/instances/{id}/members#response.200[]",
+    "symbol": "InstanceMember"
+  },
+  {
+    "field": "approved_daily",
+    "owner": "eric@blindpay.com",
+    "reason": "Populated once a limit-increase request is approved; not yet modeled on LimitIncreaseRequest.",
+    "schema": "GetCustomerLimitIncreaseOut",
+    "symbol": "LimitIncreaseRequest"
+  },
+  {
+    "field": "approved_monthly",
+    "owner": "eric@blindpay.com",
+    "reason": "Populated once a limit-increase request is approved; not yet modeled on LimitIncreaseRequest.",
+    "schema": "GetCustomerLimitIncreaseOut",
+    "symbol": "LimitIncreaseRequest"
+  },
+  {
+    "field": "approved_per_transaction",
+    "owner": "eric@blindpay.com",
+    "reason": "Populated once a limit-increase request is approved; not yet modeled on LimitIncreaseRequest.",
+    "schema": "GetCustomerLimitIncreaseOut",
+    "symbol": "LimitIncreaseRequest"
+  },
+  {
+    "field": "sepa",
+    "owner": "eric@blindpay.com",
+    "reason": "New SEPA fee-options rail; not yet modeled on FeesResponse (consistent with SEPA payouts not yet being modeled anywhere in this SDK, see PaymentType known-divergence).",
+    "schema": "GetFeesOut",
+    "symbol": "FeesResponse"
+  },
+  {
+    "field": "circle_wallet_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider-internal passthrough field (Circle); no consumer-facing use identified yet.",
+    "schema": "OfframpWallet",
+    "symbol": "OfframpWallet"
+  },
+  {
+    "field": "manual_concluded_at",
+    "owner": "eric@blindpay.com",
+    "reason": "Manual-review timestamp field; not yet modeled on Payin.",
+    "schema": "PayinOut",
+    "symbol": "Payin"
+  },
+  {
+    "field": "manual_concluded_by",
+    "owner": "eric@blindpay.com",
+    "reason": "Manual-review actor field; not yet modeled on Payin.",
+    "schema": "PayinOut",
+    "symbol": "Payin"
+  },
+  {
+    "field": "partner_fee",
+    "owner": "eric@blindpay.com",
+    "reason": "New nested partner-fee breakdown object; not yet modeled on Payin.",
+    "schema": "PayinOut",
+    "symbol": "Payin"
+  },
+  {
+    "field": "payer_rules",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayinQuote already; not yet mirrored onto the Payin struct itself.",
+    "schema": "PayinOut",
+    "symbol": "Payin"
+  },
+  {
+    "field": "transaction_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New fee breakdown field; not yet modeled on Payin.",
+    "schema": "PayinOut",
+    "symbol": "Payin"
+  },
+  {
+    "field": "approved_risk_sources",
+    "owner": "eric@blindpay.com",
+    "reason": "Fraud/risk-review metadata added to the payin tracking_payment object; not yet modeled on PayinTrackingPayment.",
+    "schema": "PayinOut.tracking_payment",
+    "symbol": "PayinTrackingPayment"
+  },
+  {
+    "field": "review_context",
+    "owner": "eric@blindpay.com",
+    "reason": "Fraud/risk-review metadata added to the payin tracking_payment object; not yet modeled on PayinTrackingPayment.",
+    "schema": "PayinOut.tracking_payment",
+    "symbol": "PayinTrackingPayment"
+  },
+  {
+    "field": "review_source",
+    "owner": "eric@blindpay.com",
+    "reason": "Fraud/risk-review metadata added to the payin tracking_payment object; not yet modeled on PayinTrackingPayment.",
+    "schema": "PayinOut.tracking_payment",
+    "symbol": "PayinTrackingPayment"
+  },
+  {
+    "field": "end_to_end_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "provider_name",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "provider_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "pse_instruction",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "sender_bank_name",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "ted_instruction",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "transaction_hash",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "transfers_instruction",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "bank_account_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayoutOnEvmOut (evm/solana/stellar create responses) but not yet modeled on CreatePayoutResponse.",
+    "schema": "PayoutOnEvmOut",
+    "symbol": "CreatePayoutResponse"
+  },
+  {
+    "field": "billing_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New fee breakdown field; not yet modeled on CreatePayoutResponse.",
+    "schema": "PayoutOnEvmOut",
+    "symbol": "CreatePayoutResponse"
+  },
+  {
+    "field": "offramp_wallet_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayoutOnEvmOut (evm/solana/stellar create responses) but not yet modeled on CreatePayoutResponse.",
+    "schema": "PayoutOnEvmOut",
+    "symbol": "CreatePayoutResponse"
+  },
+  {
+    "field": "partner_fee",
+    "owner": "eric@blindpay.com",
+    "reason": "New nested partner-fee breakdown object; not yet modeled on CreatePayoutResponse.",
+    "schema": "PayoutOnEvmOut",
+    "symbol": "CreatePayoutResponse"
+  },
+  {
+    "field": "tracking_documents",
+    "owner": "eric@blindpay.com",
+    "reason": "New nested tracking sub-object for SWIFT document uploads; not yet modeled on CreatePayoutResponse.",
+    "schema": "PayoutOnEvmOut",
+    "symbol": "CreatePayoutResponse"
+  },
+  {
+    "field": "transaction_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New fee breakdown field; not yet modeled on CreatePayoutResponse.",
+    "schema": "PayoutOnEvmOut",
+    "symbol": "CreatePayoutResponse"
+  },
+  {
+    "field": "coelsa_id",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "end_to_end_id",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_clearing_system",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_error_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_imad",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_integration",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_reference",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_uetr",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "jpm_track_data",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider-internal (JPMorgan/Zenus) tracking payload; not modeled, no consumer-facing use identified.",
+    "schema": "PayoutOut",
+    "symbol": "Payout"
+  },
+  {
+    "field": "partner_fee",
+    "owner": "eric@blindpay.com",
+    "reason": "New nested partner-fee breakdown object; not yet modeled on Payout.",
+    "schema": "PayoutOut",
+    "symbol": "Payout"
+  },
+  {
+    "field": "sender_legal_name",
+    "owner": "eric@blindpay.com",
+    "reason": "New sender-identity field; not yet modeled on Payout (added in blindpay-v2 v3.2.0 per CHANGELOG, never wired here).",
+    "schema": "PayoutOut",
+    "symbol": "Payout"
+  },
+  {
+    "field": "tracking_documents",
+    "owner": "eric@blindpay.com",
+    "reason": "New nested tracking sub-object for SWIFT document uploads; not yet modeled on Payout.",
+    "schema": "PayoutOut",
+    "symbol": "Payout"
+  },
+  {
+    "field": "transaction_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New fee breakdown field; not yet modeled on Payout.",
+    "schema": "PayoutOut",
+    "symbol": "Payout"
+  },
+  {
+    "field": "provider_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayoutTrackingPayment already; not yet mirrored onto PayoutTrackingComplete.",
+    "schema": "PayoutOut.tracking_complete",
+    "symbol": "PayoutTrackingComplete"
+  },
+  {
+    "field": "refund_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "New refund-detail field; not yet modeled on PayoutTrackingComplete.",
+    "schema": "PayoutOut.tracking_complete",
+    "symbol": "PayoutTrackingComplete"
+  },
+  {
+    "field": "coelsa_id",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "end_to_end_id",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_clearing_system",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_error_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_imad",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_integration",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_reference",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_uetr",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "ledger_in_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Internal ledger cross-reference field; not modeled, no consumer-facing use identified.",
+    "schema": "PayoutOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "ledger_out_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Internal ledger cross-reference field; not modeled, no consumer-facing use identified.",
+    "schema": "PayoutOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "provider_error_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider error detail added to payout tracking_transaction; not yet modeled on PayoutTrackingTransaction.",
+    "schema": "PayoutOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "provider_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayoutTrackingPayment already; not yet mirrored onto PayoutTrackingTransaction.",
+    "schema": "PayoutOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "billing_fee_amount",
+    "owner": "eric@blindpay.com",
+    "reason": "New billing-fee breakdown field; not yet modeled on CreateQuoteResponse.",
+    "schema": "QuoteOut",
+    "symbol": "CreateQuoteResponse"
+  },
+  {
+    "field": "additional_info",
+    "owner": "eric@blindpay.com",
+    "reason": "New free-form partner metadata field on UpdateCustomerInput; not yet requested by an SDK consumer.",
+    "schema": "UpdateCustomerIn",
+    "symbol": "UpdateCustomerInput"
+  },
+  {
+    "field": "latitude",
+    "owner": "eric@blindpay.com",
+    "reason": "New customer geolocation field; not yet modeled on any of the three Customer-derived structs.",
+    "schema": "UpdateCustomerIn",
+    "symbol": "UpdateCustomerInput"
+  },
+  {
+    "field": "longitude",
+    "owner": "eric@blindpay.com",
+    "reason": "New customer geolocation field; not yet modeled on any of the three Customer-derived structs.",
+    "schema": "UpdateCustomerIn",
+    "symbol": "UpdateCustomerInput"
+  },
+  {
+    "field": "compliance_emails",
+    "owner": "eric@blindpay.com",
+    "reason": "New instance-level compliance notification setting; not yet modeled on UpdateInstanceInput.",
+    "schema": "UpdateInstanceIn",
+    "symbol": "UpdateInstanceInput"
+  },
+  {
+    "field": "customer_rfi_emails_enabled",
+    "owner": "eric@blindpay.com",
+    "reason": "New instance-level compliance notification setting; not yet modeled on UpdateInstanceInput.",
+    "schema": "UpdateInstanceIn",
+    "symbol": "UpdateInstanceInput"
+  },
+  {
+    "field": "file_url",
+    "owner": "eric@blindpay.com",
+    "reason": "Possible rename/duplicate of the already-modeled url field; needs product confirmation before modeling both.",
+    "schema": "UploadOut",
+    "symbol": "UploadResponse"
+  },
+  {
+    "field": "customer_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present in the spec's VirtualAccountOut but not mirrored onto the SDK's VirtualAccount struct (which already carries the customer via the enclosing resource path).",
+    "schema": "VirtualAccountOut",
+    "symbol": "VirtualAccount"
+  }
+]

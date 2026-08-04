@@ -1,0 +1,1507 @@
+{
+  "$schema_note": "Curated mapping from OpenAPI spec constructs to blindpay-swift SDK symbols. Bootstrapped by scoring struct CodingKeys wire-key sets against spec schema property sets, then hand-verified by reading source. See .api-sync/sync.swift for the reconciliation semantics.",
+  "enums": [
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/WebhookEndpoint.swift",
+        "symbol": "WebhookEvent"
+      },
+      "spec": {
+        "items": true,
+        "property": "events",
+        "schema": "WebhookEndpointIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Quote.swift",
+        "symbol": "CurrencyType"
+      },
+      "spec": {
+        "property": "currency_type",
+        "schema": "QuoteIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Quote.swift",
+        "symbol": "Network"
+      },
+      "spec": {
+        "property": "network",
+        "schema": "QuoteIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Quote.swift",
+        "symbol": "StablecoinToken"
+      },
+      "spec": {
+        "property": "token",
+        "schema": "QuoteIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Common.swift",
+        "symbol": "Country"
+      },
+      "spec": {
+        "property": "country",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Available.swift",
+        "symbol": "Rail"
+      },
+      "spec": {
+        "property": "type",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Available.swift",
+        "symbol": "AccountClass"
+      },
+      "spec": {
+        "property": "account_class",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Available.swift",
+        "symbol": "RecipientRelationship"
+      },
+      "spec": {
+        "property": "recipient_relationship",
+        "schema": "CreateBankAccountIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "AchCopDocumentType"
+      },
+      "spec": {
+        "property": "ach_cop_document_type",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "AccountType"
+      },
+      "spec": {
+        "property": "account_type",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec's raw value is \"saving\" (singular); SDK declares \"savings\". See known-divergences.json. Do not auto-fix in Phase A.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Available.swift",
+        "symbol": "BankAccountType"
+      },
+      "spec": {
+        "property": "account_type",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "SpeiProtocol"
+      },
+      "spec": {
+        "property": "spei_protocol",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "TransfersType"
+      },
+      "spec": {
+        "property": "transfers_type",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "KYCType"
+      },
+      "spec": {
+        "property": "kyc_type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "CustomerType"
+      },
+      "spec": {
+        "property": "type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payin.swift",
+        "symbol": "PayinType"
+      },
+      "spec": {
+        "property": "type",
+        "schema": "PayinOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "IDDocType"
+      },
+      "spec": {
+        "property": "id_doc_type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "ProofOfAddressDocType"
+      },
+      "spec": {
+        "property": "proof_of_address_doc_type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "SoleProprietorDocType"
+      },
+      "spec": {
+        "property": "sole_proprietor_doc_type",
+        "schema": "CreateVirtualAccountIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "SourceOfFundsDocType"
+      },
+      "spec": {
+        "property": "source_of_funds_doc_type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "PurposeOfTransactions"
+      },
+      "spec": {
+        "property": "purpose_of_transactions",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "AccountPurpose"
+      },
+      "spec": {
+        "property": "account_purpose",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "BusinessType"
+      },
+      "spec": {
+        "property": "business_type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has member \"446120\" not yet modeled. See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "BusinessIndustry"
+      },
+      "spec": {
+        "property": "business_industry",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec's top band is \"250000000_plus\"; SDK declares \"2500000000_plus\" (likely a decade-off typo). See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "EstimatedAnnualRevenue"
+      },
+      "spec": {
+        "property": "estimated_annual_revenue",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "SourceOfWealth"
+      },
+      "spec": {
+        "property": "source_of_wealth",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "AmlStatus"
+      },
+      "spec": {
+        "property": "aml_status",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "OwnerTaxType"
+      },
+      "spec": {
+        "property": "owners[].tax_type",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "OwnerRole"
+      },
+      "spec": {
+        "property": "owners[].role",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has member \"approved_rfi\" not yet modeled. See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "KYCStatus"
+      },
+      "spec": {
+        "property": "kyc_status",
+        "schema": "CustomerOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Instance.swift",
+        "symbol": "InstanceMemberRole"
+      },
+      "spec": {
+        "property": "user_role",
+        "schema": "UpdateInstanceMemberIn"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has 9 additional document-type members not yet modeled. See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+        "symbol": "SupportingDocumentType"
+      },
+      "spec": {
+        "property": "supporting_document_type",
+        "schema": "CustomerLimitIncreaseIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+        "symbol": "LimitIncreaseRequestStatus"
+      },
+      "spec": {
+        "property": "status",
+        "schema": "GetCustomerLimitIncreaseOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payin.swift",
+        "symbol": "PayinStatus"
+      },
+      "spec": {
+        "property": "status",
+        "schema": "PayinOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payin.swift",
+        "symbol": "PaymentMethod"
+      },
+      "spec": {
+        "property": "payment_method",
+        "schema": "PayinOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has members \"concluded\" and \"pending\" not yet modeled (SDK only declares \"failed\"). See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payin.swift",
+        "symbol": "ManualExecutionStatus"
+      },
+      "spec": {
+        "property": "manual_execution_status",
+        "schema": "PayinOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Transaction.swift",
+        "symbol": "TransactionStatus"
+      },
+      "spec": {
+        "property": "status",
+        "schema": "PayinOut",
+        "shared_with": "TransferOut.status"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "PayoutStatus"
+      },
+      "spec": {
+        "property": "status",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has member \"sepa\" not yet modeled. See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "PaymentType"
+      },
+      "spec": {
+        "property": "type",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has member \"pending_review\" not yet modeled. See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "TrackingStep"
+      },
+      "spec": {
+        "property": "tracking_payment.step",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "TrackingCompleteStatus"
+      },
+      "spec": {
+        "property": "tracking_complete.status",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "TrackingTransactionStatus"
+      },
+      "spec": {
+        "property": "tracking_transaction.status",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "PaymentProviderStatus"
+      },
+      "spec": {
+        "property": "tracking_payment.provider_status",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "ProviderStatus"
+      },
+      "spec": {
+        "property": "tracking_liquidity.provider_status",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has member \"5_30_min\" not yet modeled. See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Payout.swift",
+        "symbol": "EstimatedTimeOfArrival"
+      },
+      "spec": {
+        "property": "tracking_payment.estimated_time_of_arrival",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Quote.swift",
+        "symbol": "TransactionDocumentType"
+      },
+      "spec": {
+        "property": "transaction_document_type",
+        "schema": "PayoutOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+        "symbol": "VirtualAccountAccountType"
+      },
+      "spec": {
+        "property": "us.account_type",
+        "schema": "VirtualAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+        "symbol": "BankingPartner"
+      },
+      "spec": {
+        "property": "banking_partner",
+        "schema": "VirtualAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Upload.swift",
+        "symbol": "UploadBucket"
+      },
+      "spec": {
+        "property": "bucket",
+        "schema": "UploadIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Available.swift",
+        "symbol": "BankDetailKey"
+      },
+      "spec": {
+        "items": true,
+        "property": "key",
+        "schema": "AvailableBankDetails"
+      }
+    },
+    {
+      "note": "KNOWN DIVERGENCE: spec has member \"EUR\" not yet modeled. Inline spec body (no named schema). See known-divergences.json.",
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Quote.swift",
+        "symbol": "Currency"
+      },
+      "spec": {
+        "locator": "POST /v1/instances/{instance_id}/payin-quotes/fx#requestBody",
+        "property": "to"
+      }
+    }
+  ],
+  "ignore": {
+    "schemas": [
+      {
+        "reason": "RFI (request-for-information) compliance surface is not modeled by this SDK; adding it is a human resourcing decision (Phase C).",
+        "schema": "Rfi"
+      },
+      {
+        "reason": "Part of the unmodeled RFI family.",
+        "schema": "RfiField"
+      },
+      {
+        "reason": "Part of the unmodeled RFI family.",
+        "schema": "RfiSection"
+      },
+      {
+        "reason": "Part of the unmodeled RFI family.",
+        "schema": "CreateRfiBody"
+      },
+      {
+        "reason": "Part of the unmodeled RFI family.",
+        "schema": "CreateInstanceRfiBody"
+      },
+      {
+        "reason": "Part of the unmodeled RFI family (GET /v1/instances/{id}/rfi).",
+        "schema": "InstanceRfi"
+      },
+      {
+        "reason": "RFI/compliance decision surface, not modeled by this SDK.",
+        "schema": "KycDecisionBody"
+      },
+      {
+        "reason": "POST /v1/upload/analyze has no SDK coverage. UploadAnalyzeIn/Out models existed briefly in v3.2.0 and were deleted in v4.0.0; never wired to a service method.",
+        "schema": "UploadAnalyzeIn"
+      },
+      {
+        "reason": "See UploadAnalyzeIn.",
+        "schema": "UploadAnalyzeOut"
+      },
+      {
+        "reason": "Unreferenced by any public operation or webhook (zero $ref in the spec) -- an orphan schema. funding_end_to_end_id and payer_tax_id live only here; there is no SDK home for them.",
+        "schema": "LedgerOperation"
+      },
+      {
+        "reason": "API keys resource (ApiKey/ApiKeysService) was deleted wholesale from the SDK in v4.0.0 (see CHANGELOG); this is deliberate, not an oversight.",
+        "schema": "ApiKeyPublic"
+      },
+      {
+        "reason": "See ApiKeyPublic.",
+        "schema": "CreateApiKeyIn"
+      },
+      {
+        "reason": "See ApiKeyPublic.",
+        "schema": "CreateApiKeyOut"
+      },
+      {
+        "reason": "Backoffice/audit-log surface; not part of this customer-facing SDK's resource set.",
+        "schema": "AuditLog"
+      },
+      {
+        "reason": "See AuditLog.",
+        "schema": "AuditLogOut"
+      },
+      {
+        "reason": "See AuditLog.",
+        "schema": "AuditActor"
+      },
+      {
+        "reason": "Billing/invoicing dashboard surface; not modeled by this SDK.",
+        "schema": "BillingDetails"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "BillingSubscription"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "CollectInvoiceBody"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "CollectInvoiceSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "CreatePortalSessionSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "CreateRecurringItemSchemaIn"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "CurrentUsageSchema"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "GetInvoicePdfSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "GetInvoiceSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "GetInvoicesSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "InvoiceItemSchema"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "PayInvoiceSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "RecurringItem"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "UpdateRecurringItemSchemaIn"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "AddonItemSchema"
+      },
+      {
+        "reason": "See BillingDetails (saved payment method for invoice billing, not a BlindPay bank account).",
+        "schema": "PaymentMethodSchemaOut"
+      },
+      {
+        "reason": "See BillingDetails.",
+        "schema": "PaymentRoute"
+      },
+      {
+        "reason": "Dashboard complaint-intake surface; not modeled by this SDK.",
+        "schema": "CreateComplaintIn"
+      },
+      {
+        "reason": "Dashboard feedback surface; not modeled by this SDK.",
+        "schema": "CreateFeedbackIn"
+      },
+      {
+        "reason": "See CreateFeedbackIn.",
+        "schema": "FeedbackActor"
+      },
+      {
+        "reason": "See CreateFeedbackIn.",
+        "schema": "FeedbackOut"
+      },
+      {
+        "reason": "See CreateFeedbackIn.",
+        "schema": "FeedbackWithActorOut"
+      },
+      {
+        "reason": "Internal compliance-ops override surface; not modeled by this SDK.",
+        "schema": "ManualReviewSkip"
+      },
+      {
+        "reason": "Instance creation is an account/dashboard-level operation, not exposed to an API-key holder (there is no createInstance in InstancesService).",
+        "schema": "InstanceIn"
+      },
+      {
+        "reason": "No getInstance operation is implemented by this SDK (only getMembers, update, delete, member management).",
+        "schema": "InstanceOut"
+      },
+      {
+        "reason": "Dashboard-facing instance summary; not modeled by this SDK.",
+        "schema": "ExternalInstanceOut"
+      },
+      {
+        "reason": "Dashboard onboarding surface; not modeled by this SDK.",
+        "schema": "ExternalOnboardingInfo"
+      },
+      {
+        "reason": "Dashboard-only instance-management operation; no SDK method exists.",
+        "schema": "CopyInstanceMembersIn"
+      },
+      {
+        "reason": "See CopyInstanceMembersIn.",
+        "schema": "CopyInstanceMembersOut"
+      },
+      {
+        "reason": "Dashboard-only instance-management operation; no SDK method exists.",
+        "schema": "CreateInstanceOnboardingInviteIn"
+      },
+      {
+        "reason": "Dashboard-only instance-management operation; no SDK method exists.",
+        "schema": "CreateInviteIn"
+      },
+      {
+        "reason": "Internal OTC pricing configuration; not modeled by this SDK.",
+        "schema": "UpdateDynamicRateOtcIn"
+      },
+      {
+        "reason": "Internal wallet-monitoring surface; not modeled by this SDK.",
+        "schema": "MonitoredWallet"
+      },
+      {
+        "reason": "Internal usage/billing metric; not modeled by this SDK.",
+        "schema": "VirtualAccountsUsage"
+      },
+      {
+        "reason": "Webhook payload for wallet.inbound; see the *WebhookOut group reason.",
+        "schema": "WalletInboundSchemaOut"
+      },
+      {
+        "reason": "Internal wallet-token metadata; no corresponding SDK method returns this shape.",
+        "schema": "WalletTokenOut"
+      },
+      {
+        "reason": "Dashboard/portal session surface; not modeled by this SDK.",
+        "schema": "CreateExternalCustomerTokenIn"
+      },
+      {
+        "reason": "Generic error envelope; not a resource schema (handled by BlindPayError/APIError, which are already core, not mapped).",
+        "schema": "Error"
+      },
+      {
+        "reason": "Generic {success:true} envelope reused by many operations; modeled ad hoc per-operation as VoidResponse or an operation-specific *Response struct rather than one shared type.",
+        "schema": "Success"
+      },
+      {
+        "reason": "No corresponding SDK operation found (accept-tos is driven by the hosted TOS portal, not an API call this SDK wraps).",
+        "schema": "AcceptTosIn"
+      },
+      {
+        "reason": "See AcceptTosIn.",
+        "schema": "AcceptTosOut"
+      },
+      {
+        "reason": "Webhook payload; see the *WebhookOut group reason.",
+        "schema": "TosAcceptWebhookOut"
+      },
+      {
+        "reason": "Nested shape used only inside unmapped Billing/RFI schemas.",
+        "schema": "AdditionalInfoItem"
+      },
+      {
+        "reason": "Appears to be a legacy/duplicate of CreateTransferOut in the dashboard-facing surface; the SDK's CreateTransferResponse is verified against CreateTransferOut.",
+        "schema": "CreateTransferSchemaOut"
+      },
+      {
+        "reason": "Webhook payload schema; this SDK does not model incoming webhook payloads (WebhookEndpoint CRUD + WebhookEvent enum only).",
+        "schema": "BankAccountWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "BlockchainWalletWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "CircleTransactionWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "CustomerDeleteWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "CustomerNewWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "CustomerUpdateWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "LimitIncreaseNewWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "LimitIncreaseUpdateWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayinCompleteWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayinNewWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayinPartnerFeeWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayinUpdateWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayoutCompleteWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayoutNewWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayoutPartnerFeeWebhookOut"
+      },
+      {
+        "reason": "Webhook payload schema; see BankAccountWebhookOut.",
+        "schema": "PayoutUpdateWebhookOut"
+      },
+      {
+        "reason": "Array wrapper only (type: array). The item shape is mapped separately as spec schema SwiftCodeItem -> Available.swift:SwiftCodeResponse (confusing name collision: the SDK's SwiftCodeResponse struct is the item, not the array).",
+        "schema": "SwiftCodeResponse"
+      }
+    ]
+  },
+  "types": [
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Customer.swift",
+          "symbol": "Customer"
+        }
+      ],
+      "spec": "CustomerOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Customer.swift",
+          "symbol": "CreateCustomerInput"
+        }
+      ],
+      "spec": "CreateCustomerIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Customer.swift",
+          "symbol": "UpdateCustomerInput"
+        }
+      ],
+      "spec": "UpdateCustomerIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BankAccount.swift",
+          "symbol": "BankAccount"
+        }
+      ],
+      "spec": "BankAccountOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BankAccount.swift",
+          "symbol": "CreateBankAccountInput"
+        }
+      ],
+      "spec": "CreateBankAccountIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/OfframpWallet.swift",
+          "symbol": "OfframpWallet"
+        }
+      ],
+      "spec": "OfframpWallet"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BlockchainWallet.swift",
+          "symbol": "BlockchainWallet"
+        }
+      ],
+      "spec": "BlockchainWalletOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BlockchainWallet.swift",
+          "symbol": "CreateBlockchainWalletInput"
+        }
+      ],
+      "spec": "CreateBlockchainWalletIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BlockchainWallet.swift",
+          "symbol": "BlockchainWalletSignMessageResponse"
+        }
+      ],
+      "spec": "BlockchainWalletMessageOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+          "symbol": "RequestLimitIncreaseInput"
+        }
+      ],
+      "spec": "CustomerLimitIncreaseIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+          "symbol": "RequestLimitIncreaseResponse"
+        }
+      ],
+      "spec": "CustomerLimitIncreaseOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+          "symbol": "LimitIncreaseRequest"
+        }
+      ],
+      "spec": "GetCustomerLimitIncreaseOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+          "symbol": "CustomerLimitsResponse"
+        }
+      ],
+      "spec": "GetCustomerLimitsOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccount"
+        }
+      ],
+      "spec": "VirtualAccountOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "CreateVirtualAccountInput"
+        }
+      ],
+      "spec": "CreateVirtualAccountIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "UpdateVirtualAccountInput"
+        }
+      ],
+      "spec": "UpdateVirtualAccountIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustodialWallet.swift",
+          "symbol": "CreateCustodialWalletInput"
+        }
+      ],
+      "spec": "CreateWalletIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustodialWallet.swift",
+          "symbol": "CustodialWallet"
+        }
+      ],
+      "spec": "WalletOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustodialWallet.swift",
+          "symbol": "CustodialWalletBalanceResponse"
+        }
+      ],
+      "spec": "WalletBalanceOut"
+    },
+    {
+      "note": "CreateQuoteInput has a hand-rolled encode(to:) (cents conversion). refund_wallet_address applied here in Phase A.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Quote.swift",
+          "symbol": "CreateQuoteInput"
+        }
+      ],
+      "spec": "QuoteIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Quote.swift",
+          "symbol": "CreateQuoteResponse"
+        }
+      ],
+      "spec": "QuoteOut"
+    },
+    {
+      "note": "Inline spec body (no named schema). GetFxRateInput has a hand-rolled encode(to:) (cents conversion).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Quote.swift",
+          "symbol": "GetFxRateInput"
+        }
+      ],
+      "spec": "POST /v1/instances/{instance_id}/quotes/fx#requestBody"
+    },
+    {
+      "note": "Inline spec body (no named schema).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Quote.swift",
+          "symbol": "GetFxRateResponse"
+        }
+      ],
+      "spec": "POST /v1/instances/{instance_id}/quotes/fx#response.200"
+    },
+    {
+      "note": "Inline spec body (no named schema). Same SDK struct as quotes/fx; PayinQuotesService.getFxRate calls this endpoint.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Quote.swift",
+          "symbol": "GetFxRateInput"
+        }
+      ],
+      "spec": "POST /v1/instances/{instance_id}/payin-quotes/fx#requestBody"
+    },
+    {
+      "note": "Inline spec body (no named schema).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Quote.swift",
+          "symbol": "GetFxRateResponse"
+        }
+      ],
+      "spec": "POST /v1/instances/{instance_id}/payin-quotes/fx#response.200"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "CreatePayinInput"
+        }
+      ],
+      "spec": "CreatePayinIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "CreatePayinResponse"
+        }
+      ],
+      "spec": "CreatePayinOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "Payin"
+        }
+      ],
+      "spec": "PayinOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingPayment"
+        }
+      ],
+      "spec": "PayinOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingTransaction"
+        }
+      ],
+      "spec": "PayinOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingComplete"
+        }
+      ],
+      "spec": "PayinOut.tracking_complete"
+    },
+    {
+      "note": "CreatePayinQuoteInput has a hand-rolled encode(to:) (cents conversion).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "CreatePayinQuoteInput"
+        }
+      ],
+      "spec": "CreatePayinQuoteIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuote"
+        }
+      ],
+      "spec": "CreatePayinQuoteOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "SubmitPayoutDocumentsInput"
+        }
+      ],
+      "spec": "SubmitPayoutDocumentsIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "Payout"
+        }
+      ],
+      "spec": "PayoutOut"
+    },
+    {
+      "note": "8 spec properties currently unmodeled here: provider_integration, provider_error_reason, provider_uetr, provider_imad, provider_reference, provider_clearing_system, coelsa_id, end_to_end_id. See unmodeled.json (owner eric@blindpay.com).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingPayment"
+        }
+      ],
+      "spec": "PayoutOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingTransaction"
+        }
+      ],
+      "spec": "PayoutOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingLiquidity"
+        }
+      ],
+      "spec": "PayoutOut.tracking_liquidity"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingComplete"
+        }
+      ],
+      "spec": "PayoutOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "CreatePayoutEvmInput"
+        }
+      ],
+      "spec": "PayoutOnEvmIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "CreatePayoutSolanaInput"
+        }
+      ],
+      "spec": "PayoutOnSolanaIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "CreatePayoutStellarInput"
+        }
+      ],
+      "spec": "PayoutOnStellarIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "AuthorizeStellarInput"
+        }
+      ],
+      "spec": "PayoutOnStellarAuthorizeIn"
+    },
+    {
+      "note": "Response of createEvm/createStellar/createSolana (POST .../payouts/{evm,stellar,solana}). Shares PayoutTrackingPayment for its nested tracking_payment.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "CreatePayoutResponse"
+        }
+      ],
+      "spec": "PayoutOnEvmOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingPayment"
+        }
+      ],
+      "spec": "PayoutOnEvmOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "CreateTransferInput"
+        }
+      ],
+      "spec": "CreateTransferIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "Transfer"
+        }
+      ],
+      "spec": "CreateTransferOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "CreateTransferQuoteInput"
+        }
+      ],
+      "spec": "CreateTransferQuoteIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "CreateTransferQuoteResponse"
+        }
+      ],
+      "spec": "CreateTransferQuoteOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "Transfer"
+        }
+      ],
+      "spec": "TransferOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookEndpoint.swift",
+          "symbol": "CreateWebhookEndpointInput"
+        }
+      ],
+      "spec": "WebhookEndpointIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookEndpoint.swift",
+          "symbol": "CreateWebhookEndpointResponse"
+        }
+      ],
+      "spec": "WebhookEndpointOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookEndpoint.swift",
+          "symbol": "WebhookEndpoint"
+        }
+      ],
+      "spec": "WebhookEndpoint"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookEndpoint.swift",
+          "symbol": "WebhookPortalAccess"
+        }
+      ],
+      "spec": "PortalAccessOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/TermsOfService.swift",
+          "symbol": "InitiateTosInput"
+        }
+      ],
+      "spec": "InitiateTosIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/TermsOfService.swift",
+          "symbol": "InitiateTosResponse"
+        }
+      ],
+      "spec": "InitiateTosOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Upload.swift",
+          "symbol": "UploadInput"
+        }
+      ],
+      "spec": "UploadIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Upload.swift",
+          "symbol": "UploadResponse"
+        }
+      ],
+      "spec": "UploadOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Fee.swift",
+          "symbol": "FeesResponse"
+        }
+      ],
+      "spec": "GetFeesOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Fee.swift",
+          "symbol": "FeeOptions"
+        }
+      ],
+      "spec": "FeeOptions"
+    },
+    {
+      "note": "Spec schema is an array; SDK models the item shape. Patcher must unwrap .items when the resolved schema node has type=array and no properties key.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Available.swift",
+          "symbol": "RailResponse"
+        }
+      ],
+      "spec": "AvailableRails"
+    },
+    {
+      "note": "Spec schema is an array; SDK models the item shape.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Available.swift",
+          "symbol": "BankDetailField"
+        }
+      ],
+      "spec": "AvailableBankDetails"
+    },
+    {
+      "note": "Spec schema is an array; SDK models the item shape.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Available.swift",
+          "symbol": "NaicsCode"
+        }
+      ],
+      "spec": "AvailableNaicsList"
+    },
+    {
+      "note": "Naming collision: spec's own top-level SwiftCodeResponse schema is the array wrapper around SwiftCodeItem; the SDK reuses the name SwiftCodeResponse for the single-item shape. Do not confuse with spec's SwiftCodeResponse (array), which needs no separate SDK symbol.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Available.swift",
+          "symbol": "SwiftCodeResponse"
+        }
+      ],
+      "spec": "SwiftCodeItem"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Instance.swift",
+          "symbol": "UpdateInstanceInput"
+        }
+      ],
+      "spec": "UpdateInstanceIn"
+    },
+    {
+      "note": "UpdateMemberRoleInput.init(role:) assigns self.userRole; wire key user_role, label differs from property (pre-existing, see survey).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Instance.swift",
+          "symbol": "UpdateMemberRoleInput"
+        }
+      ],
+      "spec": "UpdateInstanceMemberIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Instance.swift",
+          "symbol": "MigrateInstanceOwnershipInput"
+        }
+      ],
+      "spec": "MigrateInstanceOwnershipIn"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Common.swift",
+          "symbol": "PaginationMetadata"
+        }
+      ],
+      "spec": "PaginationMetadata"
+    },
+    {
+      "note": "Inline spec body (no named schema). CreatePartnerFeeInput has a hand-rolled encode(to:).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PartnerFee.swift",
+          "symbol": "CreatePartnerFeeInput"
+        }
+      ],
+      "spec": "POST /v1/instances/{instance_id}/partner-fees#requestBody"
+    },
+    {
+      "note": "Inline spec body (no named schema).",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PartnerFee.swift",
+          "symbol": "CreatePartnerFeeResponse"
+        }
+      ],
+      "spec": "POST /v1/instances/{instance_id}/partner-fees#response.200"
+    },
+    {
+      "note": "Inline spec body (no named schema). evm_wallet_address/stellar_wallet_address are SDK-only fields, already covered by .api-sync/allow-list.json.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PartnerFee.swift",
+          "symbol": "PartnerFee"
+        }
+      ],
+      "spec": "GET /v1/instances/{instance_id}/partner-fees/{id}#response.200"
+    },
+    {
+      "note": "Inline spec body (no named schema); response is a bare array.",
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Instance.swift",
+          "symbol": "InstanceMember"
+        }
+      ],
+      "spec": "GET /v1/instances/{id}/members#response.200[]"
+    }
+  ]
+}
