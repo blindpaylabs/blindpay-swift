@@ -204,7 +204,7 @@ public struct BankAccount: Codable, Sendable, Equatable {
     public let offrampWallets: [OfframpWallet]?
     
     /// Timestamp when the bank account was created
-    public let createdAt: String
+    public let createdAt: String?
     
     public init(
         id: String,
@@ -271,7 +271,7 @@ public struct BankAccount: Codable, Sendable, Equatable {
         tedCpfCnpj: String? = nil,
         tronWalletHash: String? = nil,
         offrampWallets: [OfframpWallet]? = nil,
-        createdAt: String
+        createdAt: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -1034,4 +1034,3 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
     }
 }
-

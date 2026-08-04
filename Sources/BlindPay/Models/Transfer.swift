@@ -259,7 +259,7 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     public let requestAmount: Double
 
     /// Whether to cover fees
-    public let coverFees: Bool
+    public let coverFees: Bool?
 
     /// Amount reference (sender or receiver)
     public let amountReference: String
@@ -274,7 +274,7 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         customerToken: StablecoinToken,
         customerNetwork: Network,
         requestAmount: Double,
-        coverFees: Bool,
+        coverFees: Bool? = nil,
         amountReference: String,
         partnerFeeId: String? = nil
     ) {
@@ -308,7 +308,7 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
     public let id: String
 
     /// Expiration timestamp
-    public let expiresAt: Double
+    public let expiresAt: Double?
 
     /// Commercial quotation rate
     public let commercialQuotation: Double?
@@ -330,7 +330,7 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
 
     public init(
         id: String,
-        expiresAt: Double,
+        expiresAt: Double? = nil,
         commercialQuotation: Double? = nil,
         blindpayQuotation: Double? = nil,
         receiverAmount: Double,

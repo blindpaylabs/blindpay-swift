@@ -1056,10 +1056,10 @@ public struct Customer: Codable, Sendable, Equatable {
     public let aipriseValidationKey: String?
     
     /// Created at timestamp
-    public let createdAt: String
+    public let createdAt: String?
     
     /// Updated at timestamp
-    public let updatedAt: String
+    public let updatedAt: String?
     
     /// Transaction limits
     public let limit: CustomerLimits?
@@ -1144,8 +1144,8 @@ public struct Customer: Codable, Sendable, Equatable {
         instanceId: String,
         tosId: String? = nil,
         aipriseValidationKey: String? = nil,
-        createdAt: String,
-        updatedAt: String,
+        createdAt: String? = nil,
+        updatedAt: String? = nil,
         limit: CustomerLimits? = nil,
         isTosAccepted: Bool? = nil,
         accountPurpose: AccountPurpose? = nil,
@@ -1616,4 +1616,3 @@ public struct Pagination: Codable, Sendable, Equatable {
 
 /// Response type for listing customers — API returns a plain array
 public typealias ListCustomersResponse = [Customer]
-

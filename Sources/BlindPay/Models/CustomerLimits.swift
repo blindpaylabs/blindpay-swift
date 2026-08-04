@@ -154,10 +154,10 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     public let status: LimitIncreaseRequestStatus
     
     /// Created at timestamp
-    public let createdAt: String
+    public let createdAt: String?
     
     /// Updated at timestamp
-    public let updatedAt: String
+    public let updatedAt: String?
     
     /// Per transaction limit (optional)
     public let perTransaction: Int?
@@ -178,8 +178,8 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         id: String,
         customerId: String,
         status: LimitIncreaseRequestStatus,
-        createdAt: String,
-        updatedAt: String,
+        createdAt: String? = nil,
+        updatedAt: String? = nil,
         perTransaction: Int? = nil,
         daily: Int? = nil,
         monthly: Int? = nil,
@@ -211,4 +211,3 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         case supportingDocumentType = "supporting_document_type"
     }
 }
-

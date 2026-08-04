@@ -21,21 +21,21 @@ public struct CustodialWallet: Codable, Sendable, Equatable {
     public let externalId: String?
 
     /// Wallet address
-    public let address: String
+    public let address: String?
 
     /// Blockchain network
     public let network: Network
 
     /// Timestamp when the wallet was created
-    public let createdAt: String
+    public let createdAt: String?
 
     public init(
         id: String,
         name: String,
         externalId: String? = nil,
-        address: String,
+        address: String? = nil,
         network: Network,
-        createdAt: String
+        createdAt: String? = nil
     ) {
         self.id = id
         self.name = name

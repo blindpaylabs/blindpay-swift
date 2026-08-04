@@ -225,7 +225,7 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
     public let id: String
     
     /// Banking partner
-    public let bankingPartner: BankingPartner
+    public let bankingPartner: BankingPartner?
     
     /// KYC status (optional)
     public let kycStatus: KYCStatus?
@@ -244,7 +244,7 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
     
     public init(
         id: String,
-        bankingPartner: BankingPartner,
+        bankingPartner: BankingPartner? = nil,
         kycStatus: KYCStatus? = nil,
         us: VirtualAccountUS,
         token: StablecoinToken,
@@ -352,4 +352,3 @@ public struct UpdateVirtualAccountInput: Codable, Sendable {
         case token
     }
 }
-
