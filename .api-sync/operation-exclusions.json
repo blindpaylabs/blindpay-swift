@@ -1,0 +1,32 @@
+[
+  {
+    "method": "GET",
+    "path": "/v1/instances/{instance_id}/customers/{customer_id}/rfi",
+    "reason": "Pre-existing uncovered spec operation, predates operation-insert scaffolding. Deferred to a dedicated feature PR rather than auto-generated here, to keep this infra-only change scoped.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/instances/{instance_id}/customers/{customer_id}/rfi",
+    "reason": "Pre-existing uncovered spec operation, predates operation-insert scaffolding. Deferred to a dedicated feature PR rather than auto-generated here, to keep this infra-only change scoped.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/instances/{instance_id}/rfi",
+    "reason": "Pre-existing uncovered spec operation, predates operation-insert scaffolding. Deferred to a dedicated feature PR rather than auto-generated here, to keep this infra-only change scoped.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/instances/{instance_id}/rfi",
+    "reason": "Pre-existing uncovered spec operation, predates operation-insert scaffolding. Deferred to a dedicated feature PR rather than auto-generated here, to keep this infra-only change scoped.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/upload/analyze",
+    "reason": "multipart/form-data request body not supported by the generator; would be classified needs-human anyway, but recorded here so pre-existing drift does not surface as new noise the day operation-insert coverage scanning ships.",
+    "owner": "eric@blindpay.com"
+  }
+]
