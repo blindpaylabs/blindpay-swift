@@ -21,6 +21,53 @@ jobs:
           git fetch origin api-sync-data
           git show origin/api-sync-data:.api-sync/spec-current.json > .api-sync/spec-current.json
 
+      - name: Verify delivery manifest
+        env:
+          PAYLOAD_SOURCE_SHA: ${{ github.event.client_payload.source_sha }}
+          PAYLOAD_SPEC_SHA256: ${{ github.event.client_payload.spec_sha256 }}
+          PAYLOAD_GENERATED_AT: ${{ github.event.client_payload.generated_at }}
+        run: |
+          set -euo pipefail
+
+          if ! git show origin/api-sync-data:.api-sync/delivery.json > .api-sync/delivery.json 2>/dev/null; then
+            echo "::error::api-sync-data branch is missing .api-sync/delivery.json -- refusing to sync against an unverified spec"
+            exit 1
+          fi
+          if [ ! -s .api-sync/spec-current.json ]; then
+            echo "::error::api-sync-data branch is missing or has an empty .api-sync/spec-current.json"
+            exit 1
+          fi
+
+          echo "=== delivery manifest ==="
+          cat .api-sync/delivery.json
+
+          manifest_repo=$(jq -r '.source_repository // ""' .api-sync/delivery.json)
+          manifest_sha=$(jq -r '.source_sha // ""' .api-sync/delivery.json)
+          manifest_spec_sha256=$(jq -r '.spec_sha256 // ""' .api-sync/delivery.json)
+          manifest_generated_at=$(jq -r '.generated_at // ""' .api-sync/delivery.json)
+
+          if [ -z "$manifest_repo" ] || [ -z "$manifest_sha" ] || [ -z "$manifest_spec_sha256" ] || [ -z "$manifest_generated_at" ]; then
+            echo "::error::delivery.json is missing one or more required fields (source_repository, source_sha, spec_sha256, generated_at)"
+            exit 1
+          fi
+          if [ "$manifest_repo" != "blindpaylabs/blindpay-v2" ]; then
+            echo "::error::delivery.json source_repository is \"$manifest_repo\", expected \"blindpaylabs/blindpay-v2\""
+            exit 1
+          fi
+
+          actual_sha256=$(shasum -a 256 .api-sync/spec-current.json | cut -d' ' -f1)
+          if [ "$actual_sha256" != "$manifest_spec_sha256" ]; then
+            echo "::error::spec-current.json sha256 ($actual_sha256) does not match delivery.json's spec_sha256 ($manifest_spec_sha256) -- the fetched spec does not match what was recorded as delivered"
+            exit 1
+          fi
+
+          if [ -n "${PAYLOAD_SPEC_SHA256:-}" ] && [ "$PAYLOAD_SPEC_SHA256" != "$manifest_spec_sha256" ]; then
+            echo "::error::stale delivery: the repository_dispatch client_payload.spec_sha256 ($PAYLOAD_SPEC_SHA256) does not match the manifest currently on api-sync-data ($manifest_spec_sha256). A newer or older delivery has since overwritten the branch; re-trigger the dispatch instead of syncing against a mismatched spec."
+            exit 1
+          fi
+
+          echo "Delivery manifest verified: source_sha=$manifest_sha spec_sha256=$manifest_spec_sha256 generated_at=$manifest_generated_at"
+
       - name: Check for existing api-sync PR
         id: check-pr
         env:

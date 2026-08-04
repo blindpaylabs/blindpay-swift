@@ -1,0 +1,104 @@
+[
+  {
+    "schema": "CreateBankAccountIn",
+    "field": "business_industry",
+    "reason": "NAICS-code enum (hundreds of members, same set as CustomerOut.business_industry's BusinessIndustry). Modeled as a bare optional String on the create-input struct rather than duplicating/reusing the enum type; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "CreateBankAccountIn",
+    "field": "swift_payment_code",
+    "reason": "Large country-specific SWIFT payment-code enum. Modeled as a bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "CreateVirtualAccountIn",
+    "field": "sole_proprietor_doc_type",
+    "reason": "Modeled as a bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinOut",
+    "field": "pse_document_type",
+    "reason": "Modeled as a bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinOut.tracking_payment",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinOut.tracking_transaction",
+    "field": "status",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinOut.tracking_transaction",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinOut.tracking_complete",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayoutOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "CreateTransferQuoteIn",
+    "field": "amount_reference",
+    "reason": "Two-value (sender/receiver) enum modeled as a bare String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "TransferOut",
+    "field": "customer_network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String (see also known-divergences.json's Transfer.* nullability entries); pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "TransferOut",
+    "field": "customer_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "TransferOut",
+    "field": "network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "TransferOut",
+    "field": "sender_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "AvailableRails",
+    "field": "country",
+    "reason": "Country-code enum (same value set as the existing Country enum used elsewhere), but RailResponse.country is modeled as a bare String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "AvailableRails",
+    "field": "value",
+    "reason": "Payment-rail enum modeled as a bare String on RailResponse.value; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  }
+]
