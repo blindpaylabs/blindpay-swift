@@ -302,19 +302,19 @@ public struct PaginationParams: Codable, Sendable {
 public struct PaginationMetadata: Codable, Sendable, Equatable {
     /// Whether there are more pages available
     public let hasMore: Bool
-    
-    /// Next page number
-    public let nextPage: Int
-    
-    /// Previous page number
-    public let prevPage: Int
-    
-    public init(hasMore: Bool, nextPage: Int, prevPage: Int) {
+
+    /// Next page cursor
+    public let nextPage: String?
+
+    /// Previous page cursor
+    public let prevPage: String?
+
+    public init(hasMore: Bool, nextPage: String? = nil, prevPage: String? = nil) {
         self.hasMore = hasMore
         self.nextPage = nextPage
         self.prevPage = prevPage
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case hasMore = "has_more"
         case nextPage = "next_page"

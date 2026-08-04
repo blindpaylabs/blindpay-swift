@@ -27,7 +27,7 @@ public enum Rail: String, Codable, Sendable {
 /// Bank account type
 public enum BankAccountType: String, Codable, Sendable {
     case checking = "checking"
-    case savings = "savings"
+    case savings = "saving"
 }
 
 /// Account class type
