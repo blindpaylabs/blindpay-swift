@@ -1099,34 +1099,7 @@ public final class BlindPay: Sendable {
             body: data
         )
     }
-    
-    /// Authorizes a token on Solana wallet
-    ///
-    /// This method prepares a delegation transaction for a Solana wallet before creating a payout.
-    ///
-    /// - Parameter data: The input data containing the quote ID and sender wallet address
-    /// - Returns: An `APIResponse` containing the serialized transaction
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let input = AuthorizeSolanaInput(
-    ///     quoteId: "qu_123",
-    ///     senderWalletAddress: "0x123...890"
-    /// )
-    /// let response = try await blindPay.authorizeSolana(data: input)
-    /// if let result = response.data {
-    ///     print("Serialized transaction: \(result.serializedTransaction)")
-    /// }
-    /// ```
-    public func authorizeSolana(data: AuthorizeSolanaInput) async throws -> APIResponse<AuthorizeSolanaResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/solana/authorize",
-            method: .post,
-            body: data
-        )
-    }
-    
+
     // MARK: - Transfers Service Methods
 
     /// Creates a transfer quote

@@ -859,20 +859,6 @@ public struct AuthorizeStellarResponse: Codable, Sendable {
   }
 }
 
-/// Response for authorizing Solana token
-public struct AuthorizeSolanaResponse: Codable, Sendable {
-  /// Serialized transaction
-  public let serializedTransaction: String
-
-  public init(serializedTransaction: String) {
-    self.serializedTransaction = serializedTransaction
-  }
-
-  enum CodingKeys: String, CodingKey {
-    case serializedTransaction = "serialized_transaction"
-  }
-}
-
 // MARK: - Input Types
 
 /// Input parameters for listing payouts
@@ -1073,24 +1059,5 @@ public struct SubmitPayoutDocumentsResponse: Codable, Sendable {
     public init(success: Bool) {
         self.success = success
     }
-}
-
-/// Input for authorizing Solana token
-public struct AuthorizeSolanaInput: Codable, Sendable {
-  /// Quote ID
-  public let quoteId: String
-
-  /// Sender wallet address
-  public let senderWalletAddress: String
-
-  public init(quoteId: String, senderWalletAddress: String) {
-    self.quoteId = quoteId
-    self.senderWalletAddress = senderWalletAddress
-  }
-
-  enum CodingKeys: String, CodingKey {
-    case quoteId = "quote_id"
-    case senderWalletAddress = "sender_wallet_address"
-  }
 }
 

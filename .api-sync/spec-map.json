@@ -245,7 +245,6 @@
       }
     },
     {
-      "note": "KNOWN DIVERGENCE: spec's top band is \"250000000_plus\"; SDK declares \"2500000000_plus\" (likely a decade-off typo). See known-divergences.json.",
       "sdk": {
         "file": "Sources/BlindPay/Models/Customer.swift",
         "symbol": "EstimatedAnnualRevenue"
@@ -296,7 +295,6 @@
       }
     },
     {
-      "note": "KNOWN DIVERGENCE: spec has member \"approved_rfi\" not yet modeled. See known-divergences.json.",
       "sdk": {
         "file": "Sources/BlindPay/Models/Customer.swift",
         "symbol": "KYCStatus"

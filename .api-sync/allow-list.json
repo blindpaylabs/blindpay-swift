@@ -78,12 +78,6 @@
     "owner": "eric@blindpay.com"
   },
   {
-    "schema": "AuthorizeSolanaResponse",
-    "field": "serialized_transaction",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
-  },
-  {
     "schema": "Transfer",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
