@@ -299,7 +299,10 @@ public enum EstimatedAnnualRevenue: String, Codable, Sendable {
     case oneMillionTo9999999 = "1000000_9999999"
     case tenMillionTo49999999 = "10000000_49999999"
     case fiftyMillionTo249999999 = "50000000_249999999"
-    case twoAndAHalfBillionPlus = "2500000000_plus"
+    case twoHundredFiftyMillionPlus = "250000000_plus"
+
+    @available(*, deprecated, renamed: "twoHundredFiftyMillionPlus")
+    public static var twoAndAHalfBillionPlus: Self { .twoHundredFiftyMillionPlus }
 }
 
 // MARK: - Source of Wealth
@@ -831,11 +834,11 @@ public enum KYCStatus: String, Codable, Sendable {
     case verifying = "verifying"
     case approved = "approved"
     case rejected = "rejected"
-    case pending = "pending"
     case deprecated = "deprecated"
     case pendingReview = "pending_review"
     case awaitingContract = "awaiting_contract"
     case complianceRequest = "compliance_request"
+    case approvedRFI = "approved_rfi"
 }
 
 // MARK: - KYC Warning

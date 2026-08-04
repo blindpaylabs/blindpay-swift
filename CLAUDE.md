@@ -29,7 +29,7 @@ blindpay-swift/
       PartnerFee.swift                  # PartnerFee, CreatePartnerFeeInput, CreatePartnerFeeResponse.
       Payin.swift                       # PayinStatus, PaymentMethod, PayinType, PayinTrackingTransaction, Payin, CreatePayinInput, ListPayinsInput, response types.
       PayinQuote.swift                  # PayinQuotePayerRules, PayinQuote, CreatePayinQuoteInput, ListPayinQuotesInput, response types.
-      Payout.swift                      # PayoutStatus, TrackingStep, ProviderStatus, PaymentType, Payout, CreatePayoutEvmInput, CreatePayoutStellarInput, CreatePayoutSolanaInput, AuthorizeStellarInput/Response, AuthorizeSolanaInput/Response, ListPayoutsInput, response types.
+      Payout.swift                      # PayoutStatus, TrackingStep, ProviderStatus, PaymentType, Payout, CreatePayoutEvmInput, CreatePayoutStellarInput, CreatePayoutSolanaInput, AuthorizeStellarInput/Response, ListPayoutsInput, response types.
       Quote.swift                       # CurrencyType, Network, StablecoinToken, TransactionDocumentType, Currency, CreateQuoteInput, QuoteNetwork, QuoteContract, CreateQuoteResponse, GetFxRateInput, GetFxRateResponse, AnyCodable helper.
       CustomerLimits.swift              # SupportingDocumentType, LimitIncreaseRequestStatus, PayinLimits, PayoutLimits, CustomerLimitsResponse, RequestLimitIncreaseInput/Response, LimitIncreaseRequest.
       TermsOfService.swift              # InitiateTosInput, InitiateTosResponse.
