@@ -16,6 +16,7 @@ public enum BankingPartner: String, Codable, Sendable {
     case hsbc = "hsbc"
     case cfsb = "cfsb"
     case portage = "portage"
+    case ssb = "ssb"
 }
 
 // MARK: - Blockchain Wallet Reference
