@@ -45,6 +45,8 @@ var servicesPath = "Sources/BlindPay"
 var specMapPath = ".api-sync/spec-map.json"
 var unmodeledPath = ".api-sync/unmodeled.json"
 var knownDivergencesPath = ".api-sync/known-divergences.json"
+var enumExclusionsPath = ".api-sync/enum-exclusions.json"
+var nestedOmissionsPath = ".api-sync/nested-omissions.json"
 var reportPath: String? = nil
 
 do {
@@ -64,6 +66,8 @@ do {
         case "--spec-map": i += 1; if i < args.count { specMapPath = args[i] }
         case "--unmodeled": i += 1; if i < args.count { unmodeledPath = args[i] }
         case "--known-divergences": i += 1; if i < args.count { knownDivergencesPath = args[i] }
+        case "--enum-exclusions": i += 1; if i < args.count { enumExclusionsPath = args[i] }
+        case "--nested-omissions": i += 1; if i < args.count { nestedOmissionsPath = args[i] }
         case "--report": i += 1; if i < args.count { reportPath = args[i] }
         default: break
         }
@@ -595,6 +599,32 @@ func isKnownTypeDivergence(locator: String, field: String) -> Bool {
     typeDivergenceSet.contains("\(locator)\u{0}\(field)")
 }
 
+// enum-exclusions.json: honest ledger of enum-constrained spec properties on a
+// mapped schema that are deliberately not wired into spec-map.json's enums[]
+// (e.g. a legacy field the SDK intentionally treats as a bare String). Keyed
+// the same way as unmodeled.json (schema locator + field).
+let enumExclusionsRaw = (loadJSON(enumExclusionsPath) as? [[String: Any]]) ?? []
+let enumExclusionSet: Set<String> = Set(enumExclusionsRaw.compactMap { entry -> String? in
+    guard let schema = entry.str("schema"), let field = entry.str("field") else { return nil }
+    return "\(schema)\u{0}\(field)"
+})
+func isEnumCoverageExcluded(locator: String, field: String) -> Bool {
+    enumExclusionSet.contains("\(locator)\u{0}\(field)")
+}
+
+// nested-omissions.json: honest ledger of inline object/array-of-object
+// shapes on a mapped schema that are deliberately not given their own
+// spec-map.json types entry (e.g. a nested shape with no SDK representation
+// at all). Keyed the same way as unmodeled.json (schema locator + field).
+let nestedOmissionsRaw = (loadJSON(nestedOmissionsPath) as? [[String: Any]]) ?? []
+let nestedOmissionSet: Set<String> = Set(nestedOmissionsRaw.compactMap { entry -> String? in
+    guard let schema = entry.str("schema"), let field = entry.str("field") else { return nil }
+    return "\(schema)\u{0}\(field)"
+})
+func isNestedOmissionExcluded(locator: String, field: String) -> Bool {
+    nestedOmissionSet.contains("\(locator)\u{0}\(field)")
+}
+
 // Amount-shaped fields on the three cents-converting hand-rolled encoders:
 // adding one of these mechanically would silently guess at unit conversion,
 // so it is routed to NEEDS_HUMAN instead of auto-applied. Plain String/Bool/
@@ -864,6 +894,65 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
     return (applicable, needsHuman)
 }
 
+// MARK: - Reachability
+//
+// A component schema is only "in scope" for the new-schema needs-human gate
+// if something in the public surface can actually produce/consume it.
+// Schemas that exist in components/schemas but are never $ref'd from
+// anywhere reachable are orphans -- generator leftovers, drafts, or schemas
+// the spec author staged for a future endpoint -- and require no SDK work at
+// all. Seeding from every non-schema component section (not just paths)
+// matters because a schema can be reachable ONLY through a shared parameter
+// or response that several operations $ref, without appearing inline in any
+// single path's own body.
+
+/// Recursively collects every "#/components/schemas/Name" $ref found
+/// anywhere within `node` (properties, items, allOf/oneOf/anyOf,
+/// additionalProperties, or any other nesting) into `set`.
+func collectSchemaRefs(_ node: Any, into set: inout Set<String>) {
+    if let dict = node as? [String: Any] {
+        if let ref = dict["$ref"] as? String, ref.hasPrefix("#/components/schemas/") {
+            set.insert(String(ref.dropFirst("#/components/schemas/".count)))
+        }
+        for (_, v) in dict { collectSchemaRefs(v, into: &set) }
+    } else if let arr = node as? [Any] {
+        for v in arr { collectSchemaRefs(v, into: &set) }
+    }
+}
+
+/// Every component schema reachable, by transitive $ref, from: every path
+/// operation, the webhooks (or x-webhooks) section, and every non-schema
+/// component section (parameters, requestBodies, responses, headers,
+/// securitySchemes, etc.) -- since those are shared and can be the only
+/// place a schema is referenced from.
+func reachableSchemaNames(_ spec: [String: Any]) -> Set<String> {
+    var seeds: [Any] = [spec["paths"] ?? [:]]
+    if let wh = spec["webhooks"] { seeds.append(wh) }
+    if let wh = spec["x-webhooks"] { seeds.append(wh) }
+    if let components = spec["components"] as? [String: Any] {
+        for (key, value) in components where key != "schemas" {
+            seeds.append(value)
+        }
+    }
+
+    var frontier = Set<String>()
+    for seed in seeds { collectSchemaRefs(seed, into: &frontier) }
+
+    let allSchemas = schemas(of: spec)
+    var reachable = Set<String>()
+    while !frontier.subtracting(reachable).isEmpty {
+        let next = frontier.subtracting(reachable)
+        reachable.formUnion(next)
+        var newFrontier = Set<String>()
+        for name in next {
+            guard let schemaNode = allSchemas[name] else { continue }
+            collectSchemaRefs(schemaNode, into: &newFrontier)
+        }
+        frontier = newFrontier
+    }
+    return reachable
+}
+
 // MARK: - Removal / new-schema / new-operation / type-change detection (--apply only)
 
 func mappedSchemaBaseNames() -> Set<String> {
@@ -884,9 +973,14 @@ func detectStructuralChanges(old: [String: Any], new: [String: Any]) -> [Finding
     let oldSchemas = schemas(of: old)
     let newSchemas = schemas(of: new)
     let known = mappedSchemaBaseNames()
+    let reachable = reachableSchemaNames(new)
 
     for name in newSchemas.keys.sorted() where oldSchemas[name] == nil {
         if known.contains(name) { continue }
+        // Unreachable orphan schemas (not $ref'd from any path, webhook, or
+        // shared component section, even transitively) require no SDK work:
+        // nothing in the public surface can ever produce or accept one.
+        if !reachable.contains(name) { continue }
         findings.append(Finding(kind: .needsHuman, message: "new schema \"\(name)\" present in spec, not present in spec-map.json (types or ignore) -- needs mapping"))
     }
 
@@ -1313,6 +1407,115 @@ func printCoverageReport(spec: [String: Any], servicesPath: String) {
     }
 }
 
+// MARK: - Enum coverage (blocking, folded into --validate-map)
+//
+// reconcile()'s enum handling only diffs VALUES for enums already wired into
+// spec-map.json's enums[]. It has no way to notice a property that is
+// enum-constrained in the spec but was never wired in at all -- which
+// reconcile()'s Types loop would then treat as a plain unmapped field and
+// (if optional) mechanically add as a bare String, silently discarding the
+// enum constraint. This closes that gap: every enum-constrained property on
+// every mapped schema/locator must resolve to a spec-map enums[] anchor or a
+// recorded enum-exclusions.json entry.
+
+/// True if `node` (a property node) is directly enum-valued, array-of-enum
+/// (`items.enum`), or has an anyOf/oneOf branch that is.
+func isEnumConstrained(_ node: [String: Any]) -> Bool {
+    if node["enum"] != nil { return true }
+    if let items = node.dict("items"), items["enum"] != nil { return true }
+    let branches = (node["anyOf"] as? [Any]) ?? (node["oneOf"] as? [Any]) ?? []
+    for b in branches {
+        if let bd = b as? [String: Any], isEnumConstrained(bd) { return true }
+    }
+    return false
+}
+
+/// Checks every mapped schema's modeled SDK property type, not merely
+/// whether some spec-map.json enums[] entry happens to be anchored at this
+/// exact (locator, property) pair: the same enum symbol is deliberately
+/// anchored at only ONE canonical schema+property in enums[] (see
+/// `registeredEnumSymbols` above) even though dozens of other mapped
+/// schemas repeat the same spec enum on a same-named property. Requiring a
+/// literal per-locator anchor would demand a redundant enums[] entry for
+/// every one of those repeats; checking the SDK's actual declared type
+/// against the global registered-enum set gives credit for all of them.
+func enumCoverageErrors(spec: [String: Any], scanned: [String: ScannedType]) -> [String] {
+    var errors: [String] = []
+    for entry in specMapTypes {
+        guard let locator = entry.str("spec"), let sdkSites = entry["sdk"] as? [[String: Any]] else { continue }
+        guard let node = try? resolveLocator(locator, in: spec) else { continue }
+        let specProps = propertiesOf(node)
+        if specProps.isEmpty { continue }
+
+        for site in sdkSites {
+            guard let symbol = site.str("symbol"), let scannedType = scanned[symbol], scannedType.kind == "struct" else { continue }
+            var propertyByWireKey: [String: ScannedProperty] = [:]
+            for prop in scannedType.properties {
+                let wireKey = scannedType.codingKeysWireKeyOf[prop.name] ?? prop.name
+                propertyByWireKey[wireKey] = prop
+            }
+            for (propName, propNodeAny) in specProps.sorted(by: { $0.key < $1.key }) {
+                guard let propNode = propNodeAny as? [String: Any], isEnumConstrained(propNode) else { continue }
+                // An unmapped field is reconcile()'s (required/unmodeled) gate to
+                // catch, not this one -- avoid double-reporting the same gap.
+                guard let modeled = propertyByWireKey[propName] else { continue }
+                var base = swiftBaseType(modeled.typeText)
+                if base.hasPrefix("["), base.hasSuffix("]") { base = String(base.dropFirst().dropLast()) }
+                if registeredEnumSymbols.contains(base) { continue }
+                if isEnumCoverageExcluded(locator: locator, field: propName) { continue }
+                errors.append("enum coverage: property \"\(propName)\" on \(locator) (SDK: \(symbol).\(modeled.name): \(modeled.typeText)) is enum-constrained in the spec but the SDK type is not a registered spec-map enum, and no enum-exclusions.json entry exists")
+            }
+        }
+    }
+    return errors
+}
+
+// MARK: - Nested-object coverage (blocking, folded into --validate-map)
+//
+// spec-map.json's convention for a nested struct is a second, separate
+// types[] entry whose locator is the parent's dotted path (e.g.
+// "PayoutOut.tracking_payment", "CustomerOut.owners[]"). Nothing previously
+// verified that convention was actually followed for every inline
+// object/array-of-object shape under a mapped schema, so a newly-added
+// nested shape could silently go unmodeled forever. This walks every mapped
+// schema's own top-level properties (deeper nesting is covered because any
+// already-mapped nested locator is itself a types[] entry walked by this
+// same loop) and requires either a types[] entry at the nested dotted
+// locator or a recorded nested-omissions.json entry.
+
+/// True if `node` is an inline object schema (has "properties", not a $ref
+/// to a named component schema).
+func isInlineObjectNode(_ node: [String: Any]) -> Bool {
+    node["$ref"] == nil && node["properties"] != nil
+}
+
+func nestedShapeErrors(spec: [String: Any]) -> [String] {
+    var errors: [String] = []
+    let mappedLocators = Set(specMapTypes.compactMap { $0.str("spec") })
+    for entry in specMapTypes {
+        guard let locator = entry.str("spec") else { continue }
+        guard let node = try? resolveLocator(locator, in: spec) else { continue }
+        for (propName, propNodeAny) in propertiesOf(node).sorted(by: { $0.key < $1.key }) {
+            guard let propNode = propNodeAny as? [String: Any] else { continue }
+            // A property the SDK doesn't model at all is unmodeled.json's own
+            // gate; there's no nested shape to require a map entry FOR since
+            // nothing here represents it in the first place.
+            if unmodeledSet.contains("\(locator)\u{0}\(propName)") { continue }
+            var childLocator: String? = nil
+            if isInlineObjectNode(propNode) {
+                childLocator = "\(locator).\(propName)"
+            } else if let items = propNode.dict("items"), isInlineObjectNode(items) {
+                childLocator = "\(locator).\(propName)[]"
+            }
+            guard let cl = childLocator else { continue }
+            if mappedLocators.contains(cl) { continue }
+            if isNestedOmissionExcluded(locator: locator, field: propName) { continue }
+            errors.append("nested-object coverage: property \"\(propName)\" on \(locator) is an inline nested object shape (would be \(cl)) with no spec-map.json types[] entry and no nested-omissions.json entry")
+        }
+    }
+    return errors
+}
+
 // MARK: - Map validity
 
 func validateMap(spec: [String: Any], scanned: [String: ScannedType]) -> [String] {
@@ -1347,6 +1550,8 @@ func validateMap(spec: [String: Any], scanned: [String: ScannedType]) -> [String
             }
         }
     }
+    errors.append(contentsOf: enumCoverageErrors(spec: spec, scanned: scanned))
+    errors.append(contentsOf: nestedShapeErrors(spec: spec))
     return errors
 }
 

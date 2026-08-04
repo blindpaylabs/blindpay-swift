@@ -251,7 +251,8 @@ private func schema(_ properties: [String: Any], required: [String] = []) -> [St
 }
 
 /// Baseline spec: matches exactly what the fixture sources already model (no drift).
-private func baseSpec(extraSchemas: [String: Any] = [:], extraPaths: [String: Any] = [:]) -> [String: Any] {
+private func baseSpec(extraSchemas: [String: Any] = [:], extraPaths: [String: Any] = [:],
+                       extraComponents: [String: Any] = [:], extraTopLevel: [String: Any] = [:]) -> [String: Any] {
     var schemas: [String: Any] = [
         "ThingOut": schema(["id": ["type": "string"], "name": ["type": "string"],
                             "status": ["type": "string", "enum": ["active", "inactive"]]]),
@@ -269,7 +270,11 @@ private func baseSpec(extraSchemas: [String: Any] = [:], extraPaths: [String: An
         "/things": ["get": ["responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/ThingOut"]]]]]]]
     ]
     for (k, v) in extraPaths { paths[k] = v }
-    return ["openapi": "3.0.0", "info": ["title": "fixture", "version": "1.0"], "paths": paths, "components": ["schemas": schemas]]
+    var components: [String: Any] = ["schemas": schemas]
+    for (k, v) in extraComponents { components[k] = v }
+    var spec: [String: Any] = ["openapi": "3.0.0", "info": ["title": "fixture", "version": "1.0"], "paths": paths, "components": components]
+    for (k, v) in extraTopLevel { spec[k] = v }
+    return spec
 }
 
 private let baseSpecMap: [String: Any] = [
@@ -295,16 +300,20 @@ private func writeJSON(_ path: String, _ obj: Any) {
 }
 
 private func setupBaseline(_ dir: String, spec: [String: Any]? = nil, specMap: [String: Any]? = nil,
-                            unmodeled: [Any] = [], divergences: [Any] = []) {
+                            unmodeled: [Any] = [], divergences: [Any] = [],
+                            enumExclusions: [Any] = [], nestedOmissions: [Any] = []) {
     writeAllFixtureSources(dir)
     writeJSON(dir + "/spec-snapshot.json", spec ?? baseSpec())
     writeJSON(dir + "/spec-map.json", specMap ?? baseSpecMap)
     writeJSON(dir + "/unmodeled.json", unmodeled)
     writeJSON(dir + "/known-divergences.json", divergences)
+    writeJSON(dir + "/enum-exclusions.json", enumExclusions)
+    writeJSON(dir + "/nested-omissions.json", nestedOmissions)
 }
 
 private func commonArgs(_ dir: String) -> [String] {
-    ["--sources", "Models", "--spec-map", "spec-map.json", "--unmodeled", "unmodeled.json", "--known-divergences", "known-divergences.json"]
+    ["--sources", "Models", "--spec-map", "spec-map.json", "--unmodeled", "unmodeled.json", "--known-divergences", "known-divergences.json",
+     "--enum-exclusions", "enum-exclusions.json", "--nested-omissions", "nested-omissions.json"]
 }
 
 // MARK: - Clean baseline
@@ -561,14 +570,84 @@ private func commonArgs(_ dir: String) -> [String] {
 }
 
 @Test func newUnmappedSchemaIsNeedsHuman() {
+    // Reachable via a path response, so the new-schema gate still applies.
     let dir = makeFixtureDir()
-    let spec = baseSpec(extraSchemas: ["BrandNewOut": schema(["id": ["type": "string"]])])
+    let spec = baseSpec(
+        extraSchemas: ["BrandNewOut": schema(["id": ["type": "string"]])],
+        extraPaths: ["/brand-new": ["get": ["responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/BrandNewOut"]]]]]]]]
+    )
     setupBaseline(dir, spec: baseSpec())
     writeJSON(dir + "/spec-current.json", spec)
 
     let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
     #expect(apply.exitCode == 1)
     #expect(apply.stdout.contains("new schema \"BrandNewOut\""))
+}
+
+// MARK: - Reachability
+
+@Test func orphanUnreachableSchemaProducesNoFinding() {
+    // Not referenced from any path, webhook, or shared component section --
+    // an orphan schema requires no SDK work at all.
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraSchemas: ["OrphanOut": schema(["id": ["type": "string"]])])
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(!apply.stdout.contains("OrphanOut"))
+}
+
+@Test func webhookOnlyReachableSchemaIsNeedsHuman() {
+    // Reachable ONLY via the top-level "webhooks" section, never from a path.
+    let dir = makeFixtureDir()
+    let spec = baseSpec(
+        extraSchemas: ["WebhookOnlyOut": schema(["id": ["type": "string"]])],
+        extraTopLevel: ["webhooks": ["thing.new": ["post": ["requestBody": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/WebhookOnlyOut"]]]]]]]]
+    )
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("new schema \"WebhookOnlyOut\""))
+}
+
+@Test func parameterOnlyReachableSchemaIsNeedsHuman() {
+    // Reachable ONLY via a shared components/parameters entry, never inlined
+    // in any single path's own request/response body.
+    let dir = makeFixtureDir()
+    let spec = baseSpec(
+        extraSchemas: ["ParamOnlyOut": schema(["id": ["type": "string"]])],
+        extraComponents: ["parameters": ["FilterParam": ["name": "filter", "in": "query", "schema": ["$ref": "#/components/schemas/ParamOnlyOut"]]]]
+    )
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("new schema \"ParamOnlyOut\""))
+}
+
+@Test func transitivelyReachableSchemaIsNeedsHuman() {
+    // BrandNewOut is reachable from a path only through an intermediate
+    // schema ("WrapperOut") it is nested inside -- two $ref hops away.
+    let dir = makeFixtureDir()
+    let spec = baseSpec(
+        extraSchemas: [
+            "BrandNewOut": schema(["id": ["type": "string"]]),
+            "WrapperOut": schema(["inner": ["$ref": "#/components/schemas/BrandNewOut"]]),
+        ],
+        extraPaths: ["/wrapper": ["get": ["responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/WrapperOut"]]]]]]]]
+    )
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("new schema \"BrandNewOut\""))
+    #expect(apply.stdout.contains("new schema \"WrapperOut\""))
 }
 
 @Test func newOperationIsNeedsHuman() {
@@ -843,4 +922,72 @@ private func commonArgs(_ dir: String) -> [String] {
     setupBaseline(dir, spec: spec, divergences: [["enum": "FixtureStatus", "kind": "deferred-addition", "specValues": ["pending"], "reason": "deferred", "owner": "eric@blindpay.com"]])
     let check = runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
     #expect(check.exitCode == 0)
+}
+
+// MARK: - Enum coverage (blocking, folded into --validate-map)
+
+@Test func enumCoverageFlagsAnEnumConstrainedPropertyModeledAsABareType() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    // "id" is spec-enum-constrained but FixtureThing.id is a bare String,
+    // not a registered spec-map enum symbol.
+    schemas["ThingOut"] = schema(["id": ["type": "string", "enum": ["a", "b"]], "name": ["type": "string"],
+                                  "status": ["type": "string", "enum": ["active", "inactive"]]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: spec)
+    let result = runSync(in: dir, ["--validate-map", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(result.exitCode == 1)
+    #expect(result.stdout.contains("enum coverage"))
+    #expect(result.stdout.contains("\"id\" on ThingOut"))
+}
+
+@Test func enumExclusionEntrySuppressesEnumCoverageFinding() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["ThingOut"] = schema(["id": ["type": "string", "enum": ["a", "b"]], "name": ["type": "string"],
+                                  "status": ["type": "string", "enum": ["active", "inactive"]]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: spec, enumExclusions: [["schema": "ThingOut", "field": "id", "reason": "legacy bare id", "owner": "eric@blindpay.com"]])
+    let result = runSync(in: dir, ["--validate-map", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(result.exitCode == 0)
+}
+
+// MARK: - Nested-object coverage (blocking, folded into --validate-map)
+
+@Test func nestedObjectCoverageFlagsAnUnmappedInlineObjectShape() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["BareThingOut"] = schema(["status": ["type": "string"], "detail": schema(["note": ["type": "string"]])])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: spec)
+    let result = runSync(in: dir, ["--validate-map", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(result.exitCode == 1)
+    #expect(result.stdout.contains("nested-object coverage"))
+    #expect(result.stdout.contains("\"detail\" on BareThingOut"))
+}
+
+@Test func nestedOmissionEntrySuppressesNestedObjectCoverageFinding() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["BareThingOut"] = schema(["status": ["type": "string"], "detail": schema(["note": ["type": "string"]])])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+
+    setupBaseline(dir, spec: spec, nestedOmissions: [["schema": "BareThingOut", "field": "detail", "reason": "not modeled", "owner": "eric@blindpay.com"]])
+    let result = runSync(in: dir, ["--validate-map", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(result.exitCode == 0)
 }
