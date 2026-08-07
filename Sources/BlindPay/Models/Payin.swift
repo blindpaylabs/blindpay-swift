@@ -131,16 +131,24 @@ public struct PayinTrackingPayment: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
-  public init(step: String, providerName: String? = nil, completedAt: String? = nil) {
+  public let reviewContexts: [String: String]?
+
+  public let reviewSources: [String]?
+
+  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: String]? = nil, reviewSources: [String]? = nil) {
     self.step = step
     self.providerName = providerName
     self.completedAt = completedAt
+    self.reviewContexts = reviewContexts
+    self.reviewSources = reviewSources
   }
 
   enum CodingKeys: String, CodingKey {
     case step
     case providerName = "provider_name"
     case completedAt = "completed_at"
+    case reviewContexts = "review_contexts"
+    case reviewSources = "review_sources"
   }
 }
 
