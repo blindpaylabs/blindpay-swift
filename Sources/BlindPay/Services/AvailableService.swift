@@ -113,7 +113,7 @@ public final class AvailableService: Sendable {
     /// let response = try await blindPay.available.getNaicsCodes()
     /// if let codes = response.data {
     ///     for code in codes {
-    ///         print("\(code.code) - \(code.title)")
+    ///         print("\(code.value) - \(code.label)")
     ///     }
     /// }
     /// ```

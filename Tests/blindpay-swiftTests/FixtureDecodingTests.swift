@@ -58,6 +58,12 @@ struct FixtureDecodingTests {
         try expectDecodes(UploadResponse.self, "POST /v1/upload")
     }
 
+    // MARK: Available
+
+    @Test func naicsCodes() throws {
+        try expectDecodes(NaicsCode.self, "GET /v1/available/naics", isList: true)
+    }
+
     // MARK: Payins (PayinTrackingPayment.reviewContexts)
 
     @Test func payin() throws {

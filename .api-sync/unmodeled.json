@@ -7,20 +7,6 @@
     "symbol": "BankDetailField"
   },
   {
-    "field": "label",
-    "owner": "eric@blindpay.com",
-    "reason": "AvailableNaicsList's item shape gained label/value fields alongside code/title; not yet modeled on NaicsCode (possible duplicate of code/title, needs product confirmation).",
-    "schema": "AvailableNaicsList",
-    "symbol": "NaicsCode"
-  },
-  {
-    "field": "value",
-    "owner": "eric@blindpay.com",
-    "reason": "AvailableNaicsList's item shape gained label/value fields alongside code/title; not yet modeled on NaicsCode (possible duplicate of code/title, needs product confirmation).",
-    "schema": "AvailableNaicsList",
-    "symbol": "NaicsCode"
-  },
-  {
     "field": "business_industry",
     "owner": "eric@blindpay.com",
     "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",

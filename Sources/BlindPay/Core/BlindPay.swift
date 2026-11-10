@@ -1202,10 +1202,7 @@ public final class BlindPay: Sendable {
     /// - Returns: An `APIResponse` containing an array of NAICS codes
     /// - Throws: `BlindPayError` if the request fails
     public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
-        return try await apiClient.request(
-            endpoint: "/v1/available/naics",
-            method: .get
-        )
+        return try await available.getNaicsCodes()
     }
 
     // MARK: - Upload Service Methods
