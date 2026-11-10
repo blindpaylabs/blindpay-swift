@@ -61,4 +61,27 @@ struct PayinQuoteRequestTests {
         #expect(response.data?.id == "qu_000000000000")
         #expect(server.requests.first?.path == "/v1/instances/in_000000000000/payin-quotes")
     }
+
+    @Test func achPullQuoteSendsTheFundingBankAccount() async throws {
+        let server = MockServer(respondWith: .json(try Fixtures.response(operation, variant: "required_only")))
+        let input = CreatePayinQuoteInput(
+            walletId: "bl_000000000000",
+            currencyType: .sender,
+            requestAmount: 100,
+            paymentMethod: .achPull,
+            token: .usdc,
+            fundingBankAccountId: "ba_000000000000"
+        )
+        _ = try await server.client.instances.payins.quotes.create(data: input)
+
+        let body = try #require(server.requests.first).jsonBody()
+        #expect(body["payment_method"] as? String == "ach_pull")
+        #expect(body["funding_bank_account_id"] as? String == "ba_000000000000")
+        #expect(body["wallet_id"] as? String == "bl_000000000000")
+    }
+
+    @Test func paymentMethodDecodesAchPullAndCard() throws {
+        let decoded = try JSONDecoder().decode([PaymentMethod].self, from: Data(#"["ach_pull","card"]"#.utf8))
+        #expect(decoded == [.achPull, .card])
+    }
 }

@@ -28,8 +28,10 @@ public enum ManualExecutionStatus: String, Codable, Sendable {
 /// Payment method for payin
 public enum PaymentMethod: String, Codable, Sendable {
   case ach = "ach"
+  case achPull = "ach_pull"
   case wire = "wire"
   case pix = "pix"
+  case card = "card"
   case spei = "spei"
   case transfers = "transfers"
   case pse = "pse"
@@ -123,7 +125,9 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
 }
 
 /// Payment tracking information for payin
-public struct PayinTrackingPayment: Codable, Sendable, Equatable {
+///
+/// `@unchecked Sendable` because `reviewContexts` holds `AnyCodable`.
+public struct PayinTrackingPayment: Codable, Equatable, @unchecked Sendable {
   /// Step name
   public let step: String
 
