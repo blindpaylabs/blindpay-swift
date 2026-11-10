@@ -444,11 +444,11 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Transaction document ID
   public let transactionDocumentId: String?
 
-  /// Name
-  public let name: String
+  /// Name (null until known for some payment types)
+  public let name: String?
 
-  /// Payment type
-  public let type: PaymentType
+  /// Payment type (nullable in the API)
+  public let type: PaymentType?
 
   /// PIX key
   public let pixKey: String?
@@ -585,8 +585,8 @@ public struct Payout: Codable, Sendable, Equatable {
     transactionDocumentFile: String? = nil,
     transactionDocumentType: TransactionDocumentType? = nil,
     transactionDocumentId: String? = nil,
-    name: String,
-    type: PaymentType,
+    name: String? = nil,
+    type: PaymentType? = nil,
     pixKey: String? = nil,
     pixSafeBankCode: String? = nil,
     pixSafeBranchCode: String? = nil,

@@ -30,8 +30,8 @@ public struct PartnerFee: Codable, Sendable, Equatable {
     /// Payin flat fee
     public let payinFlatFee: Int
     
-    /// EVM wallet address
-    public let evmWalletAddress: String
+    /// EVM wallet address. Not in the API spec; usually absent.
+    public let evmWalletAddress: String?
     
     /// Stellar wallet address (optional)
     public let stellarWalletAddress: String?
@@ -53,7 +53,7 @@ public struct PartnerFee: Codable, Sendable, Equatable {
         payoutFlatFee: Int,
         payinPercentageFee: Int,
         payinFlatFee: Int,
-        evmWalletAddress: String,
+        evmWalletAddress: String? = nil,
         stellarWalletAddress: String? = nil,
         virtualAccountSet: Bool? = nil,
         createdAt: String? = nil,

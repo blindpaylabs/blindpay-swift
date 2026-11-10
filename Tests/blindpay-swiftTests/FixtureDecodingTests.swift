@@ -64,6 +64,56 @@ struct FixtureDecodingTests {
         try expectDecodes(NaicsCode.self, "GET /v1/available/naics", isList: true)
     }
 
+    @Test func swiftCode() throws {
+        try expectDecodes(SwiftCodeResponse.self, "GET /v1/available/swift/{swift}", isList: true)
+    }
+
+    // MARK: Payouts
+
+    @Test func payout() throws {
+        try expectDecodes(Payout.self, "GET /v1/instances/{instance_id}/payouts/{id}")
+    }
+
+    @Test func payoutTrack() throws {
+        try expectDecodes(Payout.self, "GET /v1/e/payouts/{id}")
+    }
+
+    @Test func payoutList() throws {
+        try expectDecodes(Payout.self, "GET /v1/instances/{instance_id}/payouts", isList: true)
+    }
+
+    // MARK: Virtual accounts
+
+    @Test func virtualAccount() throws {
+        try expectDecodes(VirtualAccount.self, "GET /v1/instances/{instance_id}/customers/{customer_id}/virtual-accounts/{id}")
+    }
+
+    @Test func virtualAccountList() throws {
+        try expectDecodes(VirtualAccount.self, "GET /v1/instances/{instance_id}/customers/{customer_id}/virtual-accounts", isList: true)
+    }
+
+    @Test func createVirtualAccountResponse() throws {
+        try expectDecodes(CreateVirtualAccountResponse.self, "POST /v1/instances/{instance_id}/customers/{customer_id}/virtual-accounts")
+    }
+
+    @Test func updateVirtualAccountResponse() throws {
+        try expectDecodes(UpdateVirtualAccountResponse.self, "PUT /v1/instances/{instance_id}/customers/{customer_id}/virtual-accounts/{id}")
+    }
+
+    // MARK: Partner fees
+
+    @Test func partnerFee() throws {
+        try expectDecodes(PartnerFee.self, "GET /v1/instances/{instance_id}/partner-fees/{id}")
+    }
+
+    @Test func partnerFeeList() throws {
+        try expectDecodes(PartnerFee.self, "GET /v1/instances/{instance_id}/partner-fees", isList: true)
+    }
+
+    @Test func createPartnerFeeResponse() throws {
+        try expectDecodes(CreatePartnerFeeResponse.self, "POST /v1/instances/{instance_id}/partner-fees")
+    }
+
     // MARK: Payins (PayinTrackingPayment.reviewContexts)
 
     @Test func payin() throws {
