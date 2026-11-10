@@ -21,6 +21,11 @@ struct AmountTests {
         (1234.56, 123456),
         (-19.99, -1999),
         (0.0, 0),
+        // Values whose description uses exponent notation ("5e-05", "1e+16").
+        (0.00005, 0),
+        (0.005, 1),
+        (1e16, 1_000_000_000_000_000_000),
+        (1.5e3, 150_000),
     ])
     func convertsMajorUnitsToRoundedCents(dollars: Double, cents: Int) throws {
         #expect(try Amount.cents(fromMajorUnits: dollars) == cents)
