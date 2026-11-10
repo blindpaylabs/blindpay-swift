@@ -128,7 +128,7 @@ If ALL properties match their JSON keys exactly (no snake_case conversion needed
 ### Custom encode(to:) Pattern
 
 Some Input types implement custom `encode(to:)` to:
-- Convert amounts from Double to Int (smallest unit: `Int(requestAmount * 100)`)
+- Convert amounts from Double dollars to Int cents with `Amount.cents(fromMajorUnits:codingPath:)` (Models/Amount.swift). Never write `Int(x * 100)`: it truncates, so 19.99 becomes 1998.
 - Skip nil optional fields with `encodeIfPresent`
 
 Only add custom encoding when the API expects a different type than the Swift property stores (e.g., amount conversion). Do not add it merely to skip nils -- Codable already skips nils with optional properties.
@@ -547,10 +547,10 @@ Non-paginated list endpoints use `typealias {Resource}sResponse = [{Resource}]`.
 
 ### Amount fields
 
-The API uses integer amounts in smallest currency unit (e.g., 100 = $1.00). Some Input types accept `Double` in Swift and convert to `Int` in custom `encode(to:)`:
+The API uses integer amounts in smallest currency unit (e.g., 100 = $1.00). Some Input types accept `Double` in Swift and convert to `Int` in custom `encode(to:)` through the shared rounding helper (19.99 -> 1999):
 
 ```swift
-try container.encode(Int(requestAmount * 100), forKey: .requestAmount)
+try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
 ```
 
 ### HTTP methods

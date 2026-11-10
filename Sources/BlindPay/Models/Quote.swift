@@ -149,8 +149,8 @@ public struct CreateQuoteInput: Codable, Sendable {
         try container.encode(bankAccountId, forKey: .bankAccountId)
         try container.encode(currencyType, forKey: .currencyType)
         try container.encodeIfPresent(network, forKey: .network)
-        // Convert to integer smallest unit (100 = 1.00)
-        try container.encode(Int(requestAmount * 100), forKey: .requestAmount)
+        // Convert dollars to integer cents, rounded (19.99 -> 1999)
+        try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
         try container.encodeIfPresent(token, forKey: .token)
         try container.encodeIfPresent(coverFees, forKey: .coverFees)
         try container.encodeIfPresent(description, forKey: .description)
@@ -343,8 +343,8 @@ public struct GetFxRateInput: Codable, Sendable {
         try container.encode(currencyType, forKey: .currencyType)
         try container.encode(from, forKey: .from)
         try container.encode(to, forKey: .to)
-        // Convert to integer smallest unit (100 = 1.00)
-        try container.encode(Int(requestAmount * 100), forKey: .requestAmount)
+        // Convert dollars to integer cents, rounded (19.99 -> 1999)
+        try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
     }
 }
 
