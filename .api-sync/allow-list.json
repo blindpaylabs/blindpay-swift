@@ -88,5 +88,41 @@
     "field": "aiprise_validation_key",
     "reason": "Absent from the public spec snapshot; only appeared alongside internal-only surface in the unfiltered spec. Pre-existing SDK field, unrelated to the customers rename; needs its own investigation.",
     "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "CreatePayinQuoteInput",
+    "field": "funding_bank_account_id",
+    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
+    "owner": "sdk-parity"
+  },
+  {
+    "schema": "CreatePayinQuoteResponse",
+    "field": "card_instruction",
+    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
+    "owner": "sdk-parity"
+  },
+  {
+    "schema": "PayinQuoteCardInstruction",
+    "field": "tokenization_key",
+    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
+    "owner": "sdk-parity"
+  },
+  {
+    "schema": "PayinQuoteCardInstruction",
+    "field": "checkout_public_key",
+    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
+    "owner": "sdk-parity"
+  },
+  {
+    "schema": "PayinQuoteCardInstruction",
+    "field": "checkout_token",
+    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
+    "owner": "sdk-parity"
+  },
+  {
+    "schema": "PayinQuoteCardInstruction",
+    "field": "checkout_url",
+    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
+    "owner": "sdk-parity"
   }
 ]

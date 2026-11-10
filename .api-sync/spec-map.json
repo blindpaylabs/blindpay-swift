@@ -937,10 +937,19 @@
       "sdk": [
         {
           "file": "Sources/BlindPay/Models/PayinQuote.swift",
-          "symbol": "PayinQuote"
+          "symbol": "CreatePayinQuoteResponse"
         }
       ],
       "spec": "CreatePayinQuoteOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuotePayerRules"
+        }
+      ],
+      "spec": "CreatePayinQuoteIn.payer_rules"
     },
     {
       "sdk": [

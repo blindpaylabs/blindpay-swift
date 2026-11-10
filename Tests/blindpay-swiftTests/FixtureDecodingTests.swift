@@ -46,6 +46,12 @@ private func expectDecodes<Item: Decodable>(_ type: Item.Type, _ operation: Stri
 }
 
 struct FixtureDecodingTests {
+    // MARK: Payin quotes
+
+    @Test func createPayinQuoteResponse() throws {
+        try expectDecodes(CreatePayinQuoteResponse.self, "POST /v1/instances/{instance_id}/payin-quotes")
+    }
+
     // MARK: Payins (PayinTrackingPayment.reviewContexts)
 
     @Test func payin() throws {

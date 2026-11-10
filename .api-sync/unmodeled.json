@@ -161,27 +161,6 @@
     "symbol": "CreatePayinResponse"
   },
   {
-    "field": "payer_rules",
-    "owner": "eric@blindpay.com",
-    "reason": "Present on the PayinQuote response already; not yet accepted as a create-time input field.",
-    "schema": "CreatePayinQuoteIn",
-    "symbol": "CreatePayinQuoteInput"
-  },
-  {
-    "field": "billing_fee_amount",
-    "owner": "eric@blindpay.com",
-    "reason": "New billing-fee breakdown field; not yet modeled on PayinQuote.",
-    "schema": "CreatePayinQuoteOut",
-    "symbol": "PayinQuote"
-  },
-  {
-    "field": "is_otc",
-    "owner": "eric@blindpay.com",
-    "reason": "New OTC-flag field; not yet modeled on PayinQuote.",
-    "schema": "CreatePayinQuoteOut",
-    "symbol": "PayinQuote"
-  },
-  {
     "field": "additional_info",
     "owner": "eric@blindpay.com",
     "reason": "New free-form partner metadata field on Customer; not yet requested by an SDK consumer.",
