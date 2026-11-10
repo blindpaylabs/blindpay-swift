@@ -12,6 +12,7 @@ blindpay-swift/
     Core/
       BlindPay.swift                    # Main client class. Facade that duplicates every service method as a flat convenience method AND exposes service objects.
       Configuration.swift               # Configuration struct (baseURL only).
+      Amount.swift                      # Internal Amount.cents(fromMajorUnits:) and KeyedEncodingContainer.encodeCents(_:forKey:): dollars -> rounded integer cents.
     API/
       APIClient.swift                   # Internal HTTP client. Generic request<T: Codable>() (JSON) and requestMultipart<T>() (multipart/form-data) methods. Handles APIResponse<T> envelope and error decoding. Internal `protocolClasses` init parameter is a test-only seam.
       MultipartFormData.swift           # Internal multipart/form-data body builder used by uploads.
@@ -19,7 +20,6 @@ blindpay-swift/
     Models/
       APIResponse.swift                 # APIResponse<T> and APIError. Generic response envelope.
       Common.swift                      # Country enum (ISO 3166-1 alpha-2), PaginationParams, PaginationMetadata.
-      Amount.swift                      # Internal Amount.cents(fromMajorUnits:) helper: dollars -> rounded integer cents.
       Upload.swift                      # UploadBucket, UploadInput (file bytes + name + content type; multipart, not Codable), UploadResponse (file_url).
       Available.swift                   # Rail, BankAccountType, AccountClass, RecipientRelationship, NaicsCode, RailResponse, BankDetailKey, BankDetailItem, BankDetailField, SwiftCodeResponse.
       Instance.swift                    # InstanceMemberRole, InstanceMember, UpdateInstanceInput, UpdateMemberRoleInput, VoidResponse.
@@ -139,7 +139,7 @@ If ALL properties match their JSON keys exactly (no snake_case conversion needed
 ### Custom encode(to:) Pattern
 
 Some Input types implement custom `encode(to:)` to:
-- Convert amounts from Double dollars to Int cents with `Amount.cents(fromMajorUnits:codingPath:)` (Models/Amount.swift). Never write `Int(x * 100)`: it truncates, so 19.99 becomes 1998.
+- Convert amounts from Double dollars to Int cents with `container.encodeCents(_:forKey:)` (Core/Amount.swift). Never write `Int(x * 100)`: it truncates, so 19.99 becomes 1998.
 - Skip nil optional fields with `encodeIfPresent`
 
 Only add custom encoding when the API expects a different type than the Swift property stores (e.g., amount conversion). Do not add it merely to skip nils -- Codable already skips nils with optional properties.
@@ -282,7 +282,13 @@ In `InstancesService.swift`:
 
 ### Step 4: Add convenience methods to BlindPay.swift
 
-In `BlindPay.swift`, add flat convenience methods that delegate to the service. Follow the existing pattern -- each method should have full doc comments with examples, matching the service method signature but with a descriptive verb name (e.g., `listInvoices`, `getInvoice`, `createInvoice`, `deleteInvoice`).
+In `BlindPay.swift`, add flat convenience methods that delegate to the service. Each method has full doc comments with examples, matches the service method signature, and uses a descriptive verb name (e.g., `listInvoices`, `getInvoice`, `createInvoice`, `deleteInvoice`). Never repeat the endpoint literal in the facade:
+
+```swift
+public func createInvoice(data: CreateInvoiceInput) async throws -> APIResponse<CreateInvoiceResponse> {
+    return try await instances.invoices.create(data: data)
+}
+```
 
 ### Step 5: No Package.swift changes needed
 
@@ -311,14 +317,10 @@ public func update(id: String, data: UpdatePartnerFeeInput) async throws -> APIR
 }
 ```
 
-In `BlindPay.swift`, add:
+In `BlindPay.swift`, add a method that delegates to the service:
 ```swift
 public func updatePartnerFee(id: String, data: UpdatePartnerFeeInput) async throws -> APIResponse<UpdatePartnerFeeResponse> {
-    return try await apiClient.request(
-        endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-        method: .put,
-        body: data
-    )
+    return try await instances.partnerFees.update(id: id, data: data)
 }
 ```
 
@@ -572,7 +574,7 @@ Non-paginated list endpoints use `typealias {Resource}sResponse = [{Resource}]`.
 The API uses integer amounts in smallest currency unit (e.g., 100 = $1.00). Some Input types accept `Double` in Swift and convert to `Int` in custom `encode(to:)` through the shared rounding helper (19.99 -> 1999):
 
 ```swift
-try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
+try container.encodeCents(requestAmount, forKey: .requestAmount)
 ```
 
 ### HTTP methods
