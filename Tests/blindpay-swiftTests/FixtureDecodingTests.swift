@@ -128,6 +128,10 @@ struct FixtureDecodingTests {
         try expectDecodes(Payin.self, "GET /v1/instances/{instance_id}/payins", isList: true)
     }
 
+    @Test func createPayinResponse() throws {
+        try expectDecodes(CreatePayinResponse.self, "POST /v1/instances/{instance_id}/payins/evm")
+    }
+
     @Test func payinReviewContextsAcceptsNestedJSON() throws {
         // review_contexts is a free-form object per risk source; real values are
         // nested objects, which the old [String: String] type rejected.

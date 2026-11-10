@@ -265,15 +265,15 @@ public struct RTPDetails: Codable, Sendable, Equatable {
 /// Beneficiary information
 public struct BeneficiaryInfo: Codable, Sendable, Equatable {
   /// Beneficiary name
-  public let name: String
+  public let name: String?
 
   /// Address line 1
-  public let addressLine1: String
+  public let addressLine1: String?
 
   /// Address line 2
-  public let addressLine2: String
+  public let addressLine2: String?
 
-  public init(name: String, addressLine1: String, addressLine2: String) {
+  public init(name: String? = nil, addressLine1: String? = nil, addressLine2: String? = nil) {
     self.name = name
     self.addressLine1 = addressLine1
     self.addressLine2 = addressLine2
@@ -289,15 +289,15 @@ public struct BeneficiaryInfo: Codable, Sendable, Equatable {
 /// Receiving bank information
 public struct ReceivingBankInfo: Codable, Sendable, Equatable {
   /// Bank name
-  public let name: String
+  public let name: String?
 
   /// Address line 1
-  public let addressLine1: String
+  public let addressLine1: String?
 
   /// Address line 2
-  public let addressLine2: String
+  public let addressLine2: String?
 
-  public init(name: String, addressLine1: String, addressLine2: String) {
+  public init(name: String? = nil, addressLine1: String? = nil, addressLine2: String? = nil) {
     self.name = name
     self.addressLine1 = addressLine1
     self.addressLine2 = addressLine2
@@ -313,16 +313,16 @@ public struct ReceivingBankInfo: Codable, Sendable, Equatable {
 /// BlindPay bank details
 public struct BlindPayBankDetails: Codable, Sendable, Equatable {
   /// Routing number
-  public let routingNumber: String
+  public let routingNumber: String?
 
   /// Account number
-  public let accountNumber: String
+  public let accountNumber: String?
 
   /// Account type
-  public let accountType: String
+  public let accountType: String?
 
   /// SWIFT BIC code
-  public let swiftBicCode: String
+  public let swiftBicCode: String?
 
   /// ACH payment details
   public let ach: ACHDetails?
@@ -340,10 +340,10 @@ public struct BlindPayBankDetails: Codable, Sendable, Equatable {
   public let receivingBank: ReceivingBankInfo?
 
   public init(
-    routingNumber: String,
-    accountNumber: String,
-    accountType: String,
-    swiftBicCode: String,
+    routingNumber: String? = nil,
+    accountNumber: String? = nil,
+    accountType: String? = nil,
+    swiftBicCode: String? = nil,
     ach: ACHDetails? = nil,
     wire: WireDetails? = nil,
     rtp: RTPDetails? = nil,
