@@ -34,3 +34,10 @@ enum Amount {
         return Int(scaled)
     }
 }
+
+extension KeyedEncodingContainer {
+    /// Encodes a major-unit amount as rounded integer cents.
+    mutating func encodeCents(_ majorUnits: Double, forKey key: Key) throws {
+        try encode(Amount.cents(fromMajorUnits: majorUnits, codingPath: codingPath + [key]), forKey: key)
+    }
+}

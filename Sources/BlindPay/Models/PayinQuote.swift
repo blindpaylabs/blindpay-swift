@@ -259,8 +259,9 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
     /// Whether the sender covers the fees
     public let coverFees: Bool?
 
-    /// Request amount in dollars (major units). Sent as integer cents, rounded
-    /// (19.99 -> 1999). The API's minimum is 500 cents.
+    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
+    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
+    /// enforces a per-currency minimum and returns 400 below it.
     public let requestAmount: Double
 
     /// Payment method
@@ -329,7 +330,7 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         try container.encode(currencyType, forKey: .currencyType)
         try container.encodeIfPresent(coverFees, forKey: .coverFees)
         // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
+        try container.encodeCents(requestAmount, forKey: .requestAmount)
         try container.encode(paymentMethod, forKey: .paymentMethod)
         try container.encode(token, forKey: .token)
         try container.encodeIfPresent(partnerFeeId, forKey: .partnerFeeId)

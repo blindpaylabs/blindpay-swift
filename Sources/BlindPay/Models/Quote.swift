@@ -75,7 +75,9 @@ public struct CreateQuoteInput: Codable, Sendable {
     /// Network (optional)
     public let network: Network?
     
-    /// Request amount
+    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
+    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
+    /// enforces a per-currency minimum and returns 400 below it.
     public let requestAmount: Double
     
     /// Token (optional)
@@ -150,7 +152,7 @@ public struct CreateQuoteInput: Codable, Sendable {
         try container.encode(currencyType, forKey: .currencyType)
         try container.encodeIfPresent(network, forKey: .network)
         // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
+        try container.encodeCents(requestAmount, forKey: .requestAmount)
         try container.encodeIfPresent(token, forKey: .token)
         try container.encodeIfPresent(coverFees, forKey: .coverFees)
         try container.encodeIfPresent(description, forKey: .description)
@@ -316,7 +318,9 @@ public struct GetFxRateInput: Codable, Sendable {
     /// To currency
     public let to: Currency
     
-    /// Request amount
+    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
+    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
+    /// enforces a per-currency minimum and returns 400 below it.
     public let requestAmount: Double
     
     public init(
@@ -344,7 +348,7 @@ public struct GetFxRateInput: Codable, Sendable {
         try container.encode(from, forKey: .from)
         try container.encode(to, forKey: .to)
         // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encode(Amount.cents(fromMajorUnits: requestAmount, codingPath: container.codingPath + [CodingKeys.requestAmount]), forKey: .requestAmount)
+        try container.encodeCents(requestAmount, forKey: .requestAmount)
     }
 }
 

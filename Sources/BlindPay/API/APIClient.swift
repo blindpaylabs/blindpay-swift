@@ -57,7 +57,7 @@ internal final class APIClient: Sendable {
     /// Sends a `multipart/form-data` request (used by file uploads).
     func requestMultipart<T: Codable>(
         endpoint: String,
-        method: HTTPMethod = .post,
+        method: HTTPMethod,
         form: MultipartFormData,
         queryParameters: [String: String]? = nil
     ) async throws -> APIResponse<T> {
