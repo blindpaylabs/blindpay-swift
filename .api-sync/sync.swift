@@ -534,6 +534,8 @@ func swiftType(for node: [String: Any]) -> String {
     if let arr = t as? [Any] {
         t = arr.first(where: { ($0 as? String) != "null" })
     }
+    // A `format: binary` string is a file part of a multipart body.
+    if t as? String == "string", node["format"] as? String == "binary" { return "Data?" }
     switch t as? String {
     case "integer": return "Int?"
     case "number": return "Double?"
@@ -809,6 +811,9 @@ func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText
         // corresponds to it.
         return nil
     case "string":
+        // `format: binary` is raw file content (a multipart file part), which
+        // the SDK carries as Data.
+        if swiftBase == "Data", propNode["format"] as? String == "binary" { return nil }
         return swiftBase == "String" ? nil : "spec type \"string\" vs SDK type \(swiftBase)"
     case "integer":
         return swiftBase == "Int" ? nil : "spec type \"integer\" vs SDK type \(swiftBase)"

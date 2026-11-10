@@ -489,6 +489,52 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(check.stdout.contains("spec type \"object\" vs SDK type [String: String]"))
 }
 
+// A multipart file part is `type: string, format: binary`; the SDK models it
+// as Data. Without this the reference spec flagged UploadInput.file.
+@Test func binaryStringPropertyMatchesDataAndOtherStringsDoNot() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["BareThingOut"] = schema(["status": ["type": "string", "format": "binary"]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+    setupBaseline(dir, spec: spec)
+    let bare = readSource(dir, "Models/Bare.swift").replacingOccurrences(of: "status: String", with: "status: Data")
+    write(dir + "/Models/Bare.swift", bare)
+
+    let check = runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(check.exitCode == 0)
+    #expect(!check.stdout.contains("needs-human"))
+
+    // Without format: binary, Data is still a mismatch.
+    schemas["BareThingOut"] = schema(["status": ["type": "string"]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+    writeJSON(dir + "/spec-snapshot.json", spec)
+    let mismatch = runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(mismatch.exitCode == 1)
+    #expect(mismatch.stdout.contains("spec type \"string\" vs SDK type Data"))
+}
+
+@Test func binaryFieldInsertionUsesData() {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["BareThingOut"] = schema(["status": ["type": "string"], "attachment": ["type": "string", "format": "binary"]])
+    comps["schemas"] = schemas
+    spec["components"] = comps
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(readSource(dir, "Models/Bare.swift").contains("public let attachment: Data?"))
+    let check = runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir))
+    #expect(check.exitCode == 0)
+}
+
 @Test func fieldInsertionWithoutCodingKeys() {
     let dir = makeFixtureDir()
     var spec = baseSpec()
