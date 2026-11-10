@@ -75,16 +75,6 @@
     "symbol": "FeeOptions.payoutPercentage"
   },
   {
-    "enum": "ManualExecutionStatus",
-    "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
-    "reason": "SDK currently declares only \"failed\"; spec's payin manual_execution_status also allows \"concluded\" and \"pending\". Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
-    "specValues": [
-      "concluded",
-      "pending"
-    ]
-  },
-  {
     "field": "request_amount",
     "kind": "type-conversion",
     "owner": "eric@blindpay.com",

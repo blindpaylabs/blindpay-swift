@@ -451,7 +451,14 @@ public struct AnyCodable: Codable, Equatable, @unchecked Sendable {
     }
     
     public static func == (lhs: AnyCodable, rhs: AnyCodable) -> Bool {
-        switch (lhs.value, rhs.value) {
+        return AnyCodable.isEqual(lhs.value, rhs.value)
+    }
+
+    /// Structural equality over decoded JSON values. Decoding stores nested
+    /// arrays and objects as `[Any]` / `[String: Any]` (not `[AnyCodable]`),
+    /// so those are compared element by element.
+    private static func isEqual(_ lhs: Any, _ rhs: Any) -> Bool {
+        switch (lhs, rhs) {
         case is (NSNull, NSNull):
             return true
         case let (lhs as Bool, rhs as Bool):
@@ -462,10 +469,16 @@ public struct AnyCodable: Codable, Equatable, @unchecked Sendable {
             return lhs == rhs
         case let (lhs as String, rhs as String):
             return lhs == rhs
-        case let (lhs as [AnyCodable], rhs as [AnyCodable]):
-            return lhs == rhs
-        case let (lhs as [String: AnyCodable], rhs as [String: AnyCodable]):
-            return lhs == rhs
+        case let (lhs as AnyCodable, rhs):
+            return isEqual(lhs.value, rhs)
+        case let (lhs, rhs as AnyCodable):
+            return isEqual(lhs, rhs.value)
+        case let (lhs as [Any], rhs as [Any]):
+            return lhs.count == rhs.count && zip(lhs, rhs).allSatisfy { isEqual($0, $1) }
+        case let (lhs as [String: Any], rhs as [String: Any]):
+            return lhs.count == rhs.count && lhs.allSatisfy { key, value in
+                rhs[key].map { isEqual(value, $0) } ?? false
+            }
         default:
             return false
         }

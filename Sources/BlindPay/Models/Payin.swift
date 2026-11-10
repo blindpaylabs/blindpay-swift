@@ -20,6 +20,8 @@ public enum PayinStatus: String, Codable, Sendable {
 
 /// Manual execution status for payin
 public enum ManualExecutionStatus: String, Codable, Sendable {
+  case pending = "pending"
+  case concluded = "concluded"
   case failed = "failed"
 }
 
@@ -131,11 +133,12 @@ public struct PayinTrackingPayment: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
-  public let reviewContexts: [String: String]?
+  /// Structured risk context per flagging source (free-form JSON object)
+  public let reviewContexts: [String: AnyCodable]?
 
   public let reviewSources: [String]?
 
-  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: String]? = nil, reviewSources: [String]? = nil) {
+  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: AnyCodable]? = nil, reviewSources: [String]? = nil) {
     self.step = step
     self.providerName = providerName
     self.completedAt = completedAt

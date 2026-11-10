@@ -356,7 +356,6 @@
       }
     },
     {
-      "note": "KNOWN DIVERGENCE: spec has members \"concluded\" and \"pending\" not yet modeled (SDK only declares \"failed\"). See known-divergences.json.",
       "sdk": {
         "file": "Sources/BlindPay/Models/Payin.swift",
         "symbol": "ManualExecutionStatus"

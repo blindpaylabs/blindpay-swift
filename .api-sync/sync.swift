@@ -539,7 +539,10 @@ func swiftType(for node: [String: Any]) -> String {
     case "number": return "Double?"
     case "boolean": return "Bool?"
     case "array": return "[String]?"
-    case "object": return "[String: String]?"
+    // An unmodeled object can hold any JSON value (nested objects, numbers,
+    // arrays), so a [String: String] dictionary would fail to decode real
+    // payloads. AnyCodable accepts every JSON value.
+    case "object": return "[String: AnyCodable]?"
     default: return "String?"
     }
 }
@@ -819,6 +822,9 @@ func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText
     case "array":
         return swiftBase.hasPrefix("[") ? nil : "spec type \"array\" vs SDK type \(swiftBase)"
     case "object":
+        // A free-form JSON object (e.g. `additionalProperties: {}`) is modeled
+        // as [String: AnyCodable]; any other dictionary or array is too narrow.
+        if swiftBase.replacingOccurrences(of: " ", with: "") == "[String:AnyCodable]" { return nil }
         return (primitiveTypes.contains(swiftBase) || swiftBase.hasPrefix("["))
             ? "spec type \"object\" vs SDK type \(swiftBase)" : nil
     default:
