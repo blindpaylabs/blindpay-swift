@@ -46,8 +46,8 @@ struct PayinQuoteRequestTests {
         #expect((body["payer_rules"] as? [String: Any])?["pix_allowed_tax_ids"] as? [String] == ["123.456.789-09"])
     }
 
-    @Test func createDecodesTheRequiredOnlyAndNullResponses() async throws {
-        for variant in ["required_only", "nullables_null"] {
+    @Test func createDecodesEveryDecodeSafetyVariant() async throws {
+        for variant in try Fixtures.variantNames(operation) {
             let server = MockServer(respondWith: .json(try Fixtures.response(operation, variant: variant)))
             let response = try await server.client.instances.payins.quotes.create(data: input())
             #expect(response.data?.id == "qu_000000000000", "variant \(variant)")
