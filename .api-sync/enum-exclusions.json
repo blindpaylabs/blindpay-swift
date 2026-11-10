@@ -105,6 +105,6 @@
     "schema": "CreatePayinQuoteIn.payer_rules",
     "field": "pse_document_type",
     "reason": "Two-value request enum (CC, NIT, or null). Modeled as an optional String so a new document type never needs an SDK release; documented on the property.",
-    "owner": "sdk-parity"
+    "owner": "sdk-maintainers"
   }
 ]

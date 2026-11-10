@@ -92,37 +92,37 @@
   {
     "schema": "CreatePayinQuoteInput",
     "field": "funding_bank_account_id",
-    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
-    "owner": "sdk-parity"
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayinQuoteResponse",
     "field": "card_instruction",
-    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
-    "owner": "sdk-parity"
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinQuoteCardInstruction",
     "field": "tokenization_key",
-    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
-    "owner": "sdk-parity"
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinQuoteCardInstruction",
     "field": "checkout_public_key",
-    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
-    "owner": "sdk-parity"
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinQuoteCardInstruction",
     "field": "checkout_token",
-    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
-    "owner": "sdk-parity"
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinQuoteCardInstruction",
     "field": "checkout_url",
-    "reason": "In the public spec at blindpay-v2@66144f3b2 (CreatePayinQuoteIn / CreatePayinQuoteOut.card_instruction) but not in this stale snapshot. Remove when the snapshot is refreshed to the reference spec.",
-    "owner": "sdk-parity"
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   }
 ]
