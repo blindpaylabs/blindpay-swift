@@ -10,132 +10,256 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// API client for making network requests
+/// API client for making network requests.
+///
+/// Each call serialises its body once, then runs up to
+/// `configuration.maxRetries + 1` attempts through the transport, each bounded
+/// by a total timeout. Retry decisions follow ``RetryPolicy``.
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 internal final class APIClient: Sendable {
     private let apiKey: String
     private let instanceId: String
     private let configuration: Configuration
-    private let session: URLSession
-    
-    /// - Parameter protocolClasses: Internal test seam. When set, these
-    ///   `URLProtocol` subclasses intercept every request (tests only).
-    init(apiKey: String, instanceId: String, configuration: Configuration, protocolClasses: [AnyClass]? = nil) {
+    private let userAgent: String
+
+    init(apiKey: String, instanceId: String, configuration: Configuration) {
         self.apiKey = apiKey
         self.instanceId = instanceId
         self.configuration = configuration
-        
-        let sessionConfiguration = URLSessionConfiguration.default
-        if let protocolClasses = protocolClasses {
-            sessionConfiguration.protocolClasses = protocolClasses
-        }
-        sessionConfiguration.httpAdditionalHeaders = [
-            "Content-Type": "application/json",
-            "User-Agent": "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
-            "Authorization": "Bearer \(apiKey)",
-        ]
-        
-        self.session = URLSession(configuration: sessionConfiguration)
-    }
-    
-    func request<T: Codable>(
-        endpoint: String,
-        method: HTTPMethod = .get,
-        body: (any Codable)? = nil,
-        queryParameters: [String: String]? = nil
-    ) async throws -> APIResponse<T> {
-        var request = URLRequest(url: try makeURL(endpoint: endpoint, queryParameters: queryParameters))
-        request.httpMethod = method.rawValue
-        
-        if let body = body {
-            request.httpBody = try JSONEncoder().encode(body)
-        }
-        
-        return try await send(request)
+        self.userAgent = "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")"
     }
 
-    /// Sends a `multipart/form-data` request (used by file uploads).
-    func requestMultipart<T: Codable>(
+    /// Sends a JSON request (or a body-less one).
+    func request<T: Decodable & Sendable>(
+        endpoint: String,
+        method: HTTPMethod = .get,
+        body: (any Encodable)? = nil,
+        queryParameters: QueryParameters? = nil,
+        options: RequestOptions? = nil
+    ) async throws -> APIResponse<T> {
+        var bodyData: Data?
+        if let body = body {
+            do {
+                bodyData = try JSONEncoder().encode(body)
+            } catch {
+                throw BlindPayError.encodingError(error)
+            }
+        }
+        let idempotencyKey = try resolveIdempotencyKey(method: method, options: options)
+        let request = try makeRequest(
+            endpoint: endpoint,
+            method: method,
+            queryParameters: queryParameters,
+            body: bodyData,
+            contentType: bodyData == nil ? nil : "application/json",
+            idempotencyKey: idempotencyKey,
+            options: options
+        )
+        return try await send(request, method: method, isMultipart: false, idempotencyKey: idempotencyKey, options: options)
+    }
+
+    /// Sends a `multipart/form-data` request (used by file uploads). Never
+    /// carries an idempotency key (the API skips multipart) and is never
+    /// retried.
+    func requestMultipart<T: Decodable & Sendable>(
         endpoint: String,
         method: HTTPMethod,
         form: MultipartFormData,
-        queryParameters: [String: String]? = nil
+        queryParameters: QueryParameters? = nil,
+        options: RequestOptions? = nil
     ) async throws -> APIResponse<T> {
-        var request = URLRequest(url: try makeURL(endpoint: endpoint, queryParameters: queryParameters))
-        request.httpMethod = method.rawValue
-        // Overrides the session's default JSON Content-Type.
-        request.setValue(form.contentType, forHTTPHeaderField: "Content-Type")
-        request.httpBody = form.encoded()
-        return try await send(request)
+        let request = try makeRequest(
+            endpoint: endpoint,
+            method: method,
+            queryParameters: queryParameters,
+            body: form.encoded(),
+            contentType: form.contentType,
+            idempotencyKey: nil,
+            options: options
+        )
+        return try await send(request, method: method, isMultipart: true, idempotencyKey: nil, options: options)
     }
 
-    private func makeURL(endpoint: String, queryParameters: [String: String]?) throws -> URL {
-        var urlString = "\(configuration.baseURL)\(endpoint)"
-        
-        if let queryParameters = queryParameters, !queryParameters.isEmpty {
-            var components = URLComponents(string: urlString)
-            components?.queryItems = queryParameters.map { key, value in
-                URLQueryItem(name: key, value: value)
+    // MARK: - Request building
+
+    /// Validates a caller key, or generates one before the first attempt for
+    /// a JSON mutation when retries are on.
+    private func resolveIdempotencyKey(method: HTTPMethod, options: RequestOptions?) throws -> String? {
+        guard method != .get else { return nil }
+        if let key = options?.idempotencyKey {
+            guard !key.isEmpty else {
+                throw BlindPayError.invalidRequest("idempotencyKey must not be empty")
             }
-            urlString = components?.url?.absoluteString ?? urlString
+            guard key.count <= 255 else {
+                throw BlindPayError.invalidRequest("idempotencyKey must be at most 255 characters")
+            }
+            return key
         }
-        
-        guard let url = URL(string: urlString) else {
+        return configuration.maxRetries > 0 ? UUID().uuidString.lowercased() : nil
+    }
+
+    private func makeRequest(
+        endpoint: String,
+        method: HTTPMethod,
+        queryParameters: QueryParameters?,
+        body: Data?,
+        contentType: String?,
+        idempotencyKey: String?,
+        options: RequestOptions?
+    ) throws -> URLRequest {
+        var request = URLRequest(url: try makeURL(endpoint: endpoint, queryParameters: queryParameters))
+        request.httpMethod = method.rawValue
+        request.httpBody = body
+        // Backstop only: the total per-attempt timeout is enforced in attempt().
+        request.timeoutInterval = options?.timeout ?? configuration.timeout
+        for (name, value) in options?.headers ?? [:] {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        request.setValue(idempotencyKey, forHTTPHeaderField: "Idempotency-Key")
+        return request
+    }
+
+    private func makeURL(endpoint: String, queryParameters: QueryParameters?) throws -> URL {
+        guard var components = URLComponents(string: "\(configuration.baseURL)\(endpoint)") else {
+            throw BlindPayError.invalidURL
+        }
+        if let queryParameters = queryParameters, !queryParameters.isEmpty {
+            components.queryItems = queryParameters.queryItems
+            // URLComponents leaves "+" alone, which servers read as a space.
+            components.percentEncodedQuery = components.percentEncodedQuery?
+                .replacingOccurrences(of: "+", with: "%2B")
+        }
+        guard let url = components.url else {
             throw BlindPayError.invalidURL
         }
         return url
     }
 
-    private func send<T: Codable>(_ request: URLRequest) async throws -> APIResponse<T> {
-        let (data, response) = try await session.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw BlindPayError.invalidResponse
+    // MARK: - Sending
+
+    private struct AttemptTimeout: Error {}
+
+    private func send<T: Decodable & Sendable>(
+        _ request: URLRequest,
+        method: HTTPMethod,
+        isMultipart: Bool,
+        idempotencyKey: String?,
+        options: RequestOptions?
+    ) async throws -> APIResponse<T> {
+        let timeout = options?.timeout ?? configuration.timeout
+        var attempt = 0
+        while true {
+            try Task.checkCancellation()
+            let canRetry = attempt < configuration.maxRetries
+            do {
+                let (data, response) = try await self.attempt(request, timeout: timeout)
+                if (200..<300).contains(response.statusCode) {
+                    return try decodeSuccess(data)
+                }
+                let error = makeAPIError(data: data, response: response, idempotencyKey: idempotencyKey)
+                let outcome = RetryPolicy.Outcome.response(status: error.status, code: error.code, message: error.message)
+                if canRetry, RetryPolicy.shouldRetry(method: method, isMultipart: isMultipart, hasIdempotencyKey: idempotencyKey != nil, outcome: outcome) {
+                    try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: error.headers.value(for: "Retry-After"), jitter: configuration.jitter()))
+                    attempt += 1
+                    continue
+                }
+                return APIResponse(data: nil, error: error)
+            } catch {
+                if error is CancellationError || Task.isCancelled { throw CancellationError() }
+                let failure: BlindPayError
+                switch error {
+                case is AttemptTimeout:
+                    failure = .timeout(idempotencyKey: idempotencyKey)
+                case let urlError as URLError where urlError.code == .timedOut:
+                    failure = .timeout(idempotencyKey: idempotencyKey)
+                case let urlError as URLError:
+                    failure = .networkError(urlError, idempotencyKey: idempotencyKey)
+                case let blindPayError as BlindPayError:
+                    throw blindPayError
+                default:
+                    failure = .networkError(error, idempotencyKey: idempotencyKey)
+                }
+                if canRetry, RetryPolicy.shouldRetry(method: method, isMultipart: isMultipart, hasIdempotencyKey: idempotencyKey != nil, outcome: .noResponse) {
+                    try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: nil, jitter: configuration.jitter()))
+                    attempt += 1
+                    continue
+                }
+                throw failure
+            }
         }
-        
+    }
+
+    /// One attempt, bounded by a total timeout. `URLRequest.timeoutInterval`
+    /// is only an idle timeout, so the transport races a timer task.
+    private func attempt(_ request: URLRequest, timeout: TimeInterval) async throws -> (Data, HTTPURLResponse) {
+        let transport = configuration.transport
+        return try await withThrowingTaskGroup(of: (Data, HTTPURLResponse).self) { group in
+            group.addTask { try await transport.send(request) }
+            group.addTask {
+                try await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1_000_000_000))
+                throw AttemptTimeout()
+            }
+            defer { group.cancelAll() }
+            guard let result = try await group.next() else { throw AttemptTimeout() }
+            return result
+        }
+    }
+
+    // MARK: - Decoding
+
+    private struct Envelope<T: Decodable>: Decodable {
+        let data: T
+    }
+
+    private func decodeSuccess<T: Decodable & Sendable>(_ data: Data) throws -> APIResponse<T> {
+        // 204 / empty body / literal null: success with no data.
+        let trimmed = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty || trimmed == "null" {
+            return APIResponse(data: nil, error: nil)
+        }
         let decoder = JSONDecoder()
-        
-        if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-            // Check if response is null (either as NSNull or as the string "null")
-            if data.count == 4, let dataString = String(data: data, encoding: .utf8), dataString == "null" {
-                return APIResponse<T>(data: nil, error: nil)
+        do {
+            return APIResponse(data: try decoder.decode(T.self, from: data), error: nil)
+        } catch let directError {
+            // Some legacy responses wrap the payload in { "data": ... }.
+            if let envelope = try? decoder.decode(Envelope<T>.self, from: data) {
+                return APIResponse(data: envelope.data, error: nil)
             }
-            if let jsonObject = try? JSONSerialization.jsonObject(with: data), jsonObject is NSNull {
-                return APIResponse<T>(data: nil, error: nil)
-            }
-            
-            do {
-                let apiResponse = try decoder.decode(APIResponse<T>.self, from: data)
-                // If APIResponse decoded but both data and error are nil,
-                // the response was likely direct data, so try direct decode
-                if apiResponse.data == nil && apiResponse.error == nil {
-                    let directData = try decoder.decode(T.self, from: data)
-                    return APIResponse<T>(data: directData, error: nil)
-                }
-                return apiResponse
-            } catch {
-                do {
-                    let directData = try decoder.decode(T.self, from: data)
-                    return APIResponse<T>(data: directData, error: nil)
-                } catch {
-                    throw BlindPayError.decodingError(error)
-                }
-            }
-        } else {
-            do {
-                let errorResponse = try decoder.decode(APIResponse<EmptyResponse>.self, from: data)
-                if let error = errorResponse.error {
-                    return APIResponse<T>(data: nil, error: error)
-                }
-            } catch {
-                throw BlindPayError.decodingError(error)
-            }
-            if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let message = errorDict["message"] as? String {
-                return APIResponse<T>(data: nil, error: APIError(message: message))
-            }
-            throw BlindPayError.httpError(statusCode: httpResponse.statusCode)
+            throw BlindPayError.decodingError(directError)
         }
+    }
+
+    private func makeAPIError(data: Data, response: HTTPURLResponse, idempotencyKey: String?) -> APIError {
+        var headers: [String: String] = [:]
+        for (name, value) in response.allHeaderFields {
+            headers[String(describing: name)] = String(describing: value)
+        }
+        // Non-JSON bodies (e.g. a proxy's HTML 502) still produce an APIError.
+        let body = try? JSONDecoder().decode(APIErrorBody.self, from: data)
+        let message = body?.message ?? HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
+        return APIError(
+            status: response.statusCode,
+            code: body?.code,
+            message: message,
+            description: body?.description,
+            errors: body?.errors ?? [],
+            traceId: body?.traceId,
+            requestId: headers.value(for: "X-Request-Id"),
+            idempotencyKey: idempotencyKey,
+            retryable: RetryPolicy.isRetryable(status: response.statusCode, code: body?.code, message: body?.message),
+            headers: headers
+        )
+    }
+}
+
+extension Dictionary where Key == String, Value == String {
+    /// Case-insensitive header lookup.
+    func value(for header: String) -> String? {
+        first { $0.key.caseInsensitiveCompare(header) == .orderedSame }?.value
     }
 }
 
@@ -147,7 +271,3 @@ internal enum HTTPMethod: String, Sendable {
     case patch = "PATCH"
     case delete = "DELETE"
 }
-
-/// Empty codable type for error-only responses
-private struct EmptyResponse: Codable, Sendable {}
-

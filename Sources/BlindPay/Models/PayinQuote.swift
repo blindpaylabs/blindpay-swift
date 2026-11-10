@@ -499,8 +499,8 @@ public struct ListPayinQuotesInput: Codable, Sendable {
     }
 
     /// Converts to query parameters dictionary
-    func toQueryParameters() -> [String: String] {
-        var params: [String: String] = [:]
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
         if let limit = limit {
             params["limit"] = limit
         }

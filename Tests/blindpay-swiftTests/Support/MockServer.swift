@@ -57,6 +57,12 @@ final class MockServer: @unchecked Sendable {
         MockRegistry.shared.register(self, for: host)
     }
 
+    /// Answers attempt `n` with `responses[n]` (the last one repeats).
+    convenience init(sequence responses: [MockResponse]) {
+        let counter = Counter()
+        self.init { _ in responses[min(counter.next(), responses.count - 1)] }
+    }
+
     /// Always answers with the same response.
     convenience init(respondWith response: MockResponse) {
         self.init { _ in response }
@@ -66,13 +72,43 @@ final class MockServer: @unchecked Sendable {
         MockRegistry.shared.unregister(host)
     }
 
-    var client: BlindPay {
-        BlindPay(
-            apiKey: "test_key",
-            instanceId: instanceId,
-            configuration: Configuration(baseURL: "https://\(host)"),
-            protocolClasses: [MockURLProtocol.self]
+    /// A client wired to this mock. Retries are on (as in production) but
+    /// never really sleep; recorded sleeps are in ``sleeps``.
+    var client: BlindPay { client() }
+
+    func client(maxRetries: Int = 2, timeout: TimeInterval = 60) -> BlindPay {
+        BlindPay(apiKey: "test_key", instanceId: instanceId, configuration: configuration(maxRetries: maxRetries, timeout: timeout))
+    }
+
+    func configuration(maxRetries: Int = 2, timeout: TimeInterval = 60) -> Configuration {
+        Configuration(
+            baseURL: "https://\(host)",
+            timeout: timeout,
+            maxRetries: maxRetries,
+            transport: MockServer.transport,
+            sleep: { [weak self] seconds in self?.recordSleep(seconds) },
+            jitter: { 1.0 }
         )
+    }
+
+    /// A URLSession transport whose requests go to MockURLProtocol.
+    static let transport: URLSessionTransport = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        return URLSessionTransport(session: URLSession(configuration: configuration))
+    }()
+
+    private var recordedSleeps: [TimeInterval] = []
+
+    /// Every backoff the client asked for, in order.
+    var sleeps: [TimeInterval] {
+        lock.lock(); defer { lock.unlock() }
+        return recordedSleeps
+    }
+
+    private func recordSleep(_ seconds: TimeInterval) {
+        lock.lock(); defer { lock.unlock() }
+        recordedSleeps.append(seconds)
     }
 
     var requests: [RecordedRequest] {
@@ -85,6 +121,16 @@ final class MockServer: @unchecked Sendable {
         recorded.append(request)
         lock.unlock()
         return responder(request)
+    }
+}
+
+final class Counter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = 0
+    func next() -> Int {
+        lock.lock(); defer { lock.unlock() }
+        defer { value += 1 }
+        return value
     }
 }
 

@@ -45,7 +45,7 @@ public final class PayinsService: Sendable {
     /// }
     /// ```
     public func list(params: ListPayinsInput? = nil) async throws -> APIResponse<ListPayinsResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins",
             method: .get,

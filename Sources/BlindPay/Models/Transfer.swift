@@ -403,8 +403,8 @@ public struct ListTransfersInput: Sendable {
         self.endingBefore = endingBefore
     }
 
-    func toQueryParameters() -> [String: String] {
-        var params: [String: String] = [:]
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
         if let limit = limit { params["limit"] = limit }
         if let offset = offset { params["offset"] = offset }
         if let startingAfter = startingAfter { params["starting_after"] = startingAfter }

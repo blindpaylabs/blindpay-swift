@@ -27,15 +27,9 @@ public final class BlindPay: Sendable {
     ///   - apiKey: Your BlindPay API key
     ///   - instanceId: Your BlindPay instance ID
     ///   - configuration: Optional configuration for custom base URL and other settings
-    public convenience init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
-        self.init(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: nil)
-    }
-
-    /// Internal test seam: routes every request through the given
-    /// `URLProtocol` subclasses instead of the network.
-    init(apiKey: String, instanceId: String, configuration: Configuration, protocolClasses: [AnyClass]?) {
+    public init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
         self.instanceId = instanceId
-        self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: protocolClasses)
+        self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration)
         self.available = AvailableService(apiClient: apiClient)
         self.upload = UploadService(apiClient: apiClient, instanceId: instanceId)
         self.instances = InstancesService(apiClient: apiClient, instanceId: instanceId)
@@ -704,7 +698,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func listPayins(params: ListPayinsInput? = nil) async throws -> APIResponse<ListPayinsResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins",
             method: .get,
@@ -869,7 +863,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func listPayinQuotes(params: ListPayinQuotesInput? = nil) async throws -> APIResponse<PayinQuotesResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes",
             method: .get,
@@ -929,7 +923,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func listPayouts(params: ListPayoutsInput? = nil) async throws -> APIResponse<ListPayoutsResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts",
             method: .get,
@@ -1133,7 +1127,7 @@ public final class BlindPay: Sendable {
     /// - Returns: An `APIResponse` containing a list of transfers with pagination
     /// - Throws: `BlindPayError` if the request fails
     public func listTransfers(params: ListTransfersInput? = nil) async throws -> APIResponse<ListTransfersResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/transfers",
             method: .get,
@@ -1350,7 +1344,7 @@ public final class BlindPay: Sendable {
         bankAccountId: String? = nil,
         country: String? = nil
     ) async throws -> APIResponse<ListCustomersResponse> {
-        var queryParameters: [String: String] = [:]
+        var queryParameters = QueryParameters()
         if let limit = limit {
             queryParameters["limit"] = limit
         }

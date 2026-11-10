@@ -15,11 +15,11 @@ struct BlindPayErrorTests {
         #expect(error.errorDescription == "Invalid URL")
     }
     
-    @Test func httpErrorDescription() {
-        let statusCode = 404
-        let error = BlindPayError.httpError(statusCode: statusCode)
-        
-        #expect(error.errorDescription == "HTTP error with status code: 404")
+    @Test func timeoutCarriesTheIdempotencyKey() {
+        let error = BlindPayError.timeout(idempotencyKey: "key_1")
+
+        #expect(error.errorDescription == "The request timed out")
+        #expect(error.idempotencyKey == "key_1")
     }
     
     @Test func invalidResponseErrorDescription() {
