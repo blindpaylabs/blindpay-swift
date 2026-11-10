@@ -1,0 +1,151 @@
+//
+//  MockServer.swift
+//  blindpay-swift
+//
+//  In-process HTTP mock built on URLProtocol. Each MockServer owns a unique
+//  host, so tests running in parallel never see each other's requests.
+//
+
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+@testable import BlindPay
+
+/// A request as the mock transport received it.
+struct RecordedRequest: Sendable {
+    let method: String
+    let url: URL
+    let headers: [String: String]
+    let body: Data
+
+    var path: String { url.path }
+
+    /// Query items in wire order.
+    var queryItems: [URLQueryItem] {
+        URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+    }
+
+    func header(_ name: String) -> String? {
+        headers.first { $0.key.caseInsensitiveCompare(name) == .orderedSame }?.value
+    }
+
+    func jsonBody() throws -> [String: Any] {
+        try JSONSerialization.jsonObject(with: body) as? [String: Any] ?? [:]
+    }
+}
+
+struct MockResponse: Sendable {
+    var status: Int = 200
+    var headers: [String: String] = ["Content-Type": "application/json"]
+    var body: Data = Data()
+
+    static func json(_ data: Data, status: Int = 200) -> MockResponse {
+        MockResponse(status: status, body: data)
+    }
+}
+
+final class MockServer: @unchecked Sendable {
+    let host = "mock-\(UUID().uuidString.lowercased()).test"
+    let instanceId = "in_000000000000"
+    private let lock = NSLock()
+    private var recorded: [RecordedRequest] = []
+    private let responder: @Sendable (RecordedRequest) -> MockResponse
+
+    init(responder: @escaping @Sendable (RecordedRequest) -> MockResponse) {
+        self.responder = responder
+        MockRegistry.shared.register(self, for: host)
+    }
+
+    /// Always answers with the same response.
+    convenience init(respondWith response: MockResponse) {
+        self.init { _ in response }
+    }
+
+    deinit {
+        MockRegistry.shared.unregister(host)
+    }
+
+    var client: BlindPay {
+        BlindPay(
+            apiKey: "test_key",
+            instanceId: instanceId,
+            configuration: Configuration(baseURL: "https://\(host)"),
+            protocolClasses: [MockURLProtocol.self]
+        )
+    }
+
+    var requests: [RecordedRequest] {
+        lock.lock(); defer { lock.unlock() }
+        return recorded
+    }
+
+    fileprivate func handle(_ request: RecordedRequest) -> MockResponse {
+        lock.lock()
+        recorded.append(request)
+        lock.unlock()
+        return responder(request)
+    }
+}
+
+private final class MockRegistry: @unchecked Sendable {
+    static let shared = MockRegistry()
+    private let lock = NSLock()
+    private var servers: [String: MockServer] = [:]
+
+    func register(_ server: MockServer, for host: String) {
+        lock.lock(); defer { lock.unlock() }
+        servers[host] = server
+    }
+
+    func unregister(_ host: String) {
+        lock.lock(); defer { lock.unlock() }
+        servers[host] = nil
+    }
+
+    func server(for host: String) -> MockServer? {
+        lock.lock(); defer { lock.unlock() }
+        return servers[host]
+    }
+}
+
+final class MockURLProtocol: URLProtocol, @unchecked Sendable {
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let url = request.url, let host = url.host,
+              let server = MockRegistry.shared.server(for: host) else {
+            client?.urlProtocol(self, didFailWithError: URLError(.cannotConnectToHost))
+            return
+        }
+        let recorded = RecordedRequest(
+            method: request.httpMethod ?? "GET",
+            url: url,
+            headers: request.allHTTPHeaderFields ?? [:],
+            // Inside a URLProtocol the body arrives as a stream, not httpBody.
+            body: request.httpBody ?? Self.readAll(request.httpBodyStream)
+        )
+        let response = server.handle(recorded)
+        let http = HTTPURLResponse(url: url, statusCode: response.status, httpVersion: "HTTP/1.1", headerFields: response.headers)!
+        client?.urlProtocol(self, didReceive: http, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: response.body)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+
+    private static func readAll(_ stream: InputStream?) -> Data {
+        guard let stream = stream else { return Data() }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        while stream.hasBytesAvailable {
+            let count = stream.read(&buffer, maxLength: buffer.count)
+            if count <= 0 { break }
+            data.append(buffer, count: count)
+        }
+        return data
+    }
+}

@@ -27,9 +27,15 @@ public final class BlindPay: Sendable {
     ///   - apiKey: Your BlindPay API key
     ///   - instanceId: Your BlindPay instance ID
     ///   - configuration: Optional configuration for custom base URL and other settings
-    public init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
+    public convenience init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
+        self.init(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: nil)
+    }
+
+    /// Internal test seam: routes every request through the given
+    /// `URLProtocol` subclasses instead of the network.
+    init(apiKey: String, instanceId: String, configuration: Configuration, protocolClasses: [AnyClass]?) {
         self.instanceId = instanceId
-        self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration)
+        self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: protocolClasses)
         self.available = AvailableService(apiClient: apiClient)
         self.upload = UploadService(apiClient: apiClient)
         self.instances = InstancesService(apiClient: apiClient, instanceId: instanceId)

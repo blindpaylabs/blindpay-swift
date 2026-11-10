@@ -18,12 +18,17 @@ internal final class APIClient: Sendable {
     private let configuration: Configuration
     private let session: URLSession
     
-    init(apiKey: String, instanceId: String, configuration: Configuration) {
+    /// - Parameter protocolClasses: Internal test seam. When set, these
+    ///   `URLProtocol` subclasses intercept every request (tests only).
+    init(apiKey: String, instanceId: String, configuration: Configuration, protocolClasses: [AnyClass]? = nil) {
         self.apiKey = apiKey
         self.instanceId = instanceId
         self.configuration = configuration
         
         let sessionConfiguration = URLSessionConfiguration.default
+        if let protocolClasses = protocolClasses {
+            sessionConfiguration.protocolClasses = protocolClasses
+        }
         sessionConfiguration.httpAdditionalHeaders = [
             "Content-Type": "application/json",
             "User-Agent": "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
