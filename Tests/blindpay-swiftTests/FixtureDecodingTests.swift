@@ -52,6 +52,12 @@ struct FixtureDecodingTests {
         try expectDecodes(CreatePayinQuoteResponse.self, "POST /v1/instances/{instance_id}/payin-quotes")
     }
 
+    // MARK: Upload
+
+    @Test func uploadResponse() throws {
+        try expectDecodes(UploadResponse.self, "POST /v1/upload")
+    }
+
     // MARK: Payins (PayinTrackingPayment.reviewContexts)
 
     @Test func payin() throws {

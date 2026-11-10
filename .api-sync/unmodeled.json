@@ -616,13 +616,6 @@
     "symbol": "UpdateInstanceInput"
   },
   {
-    "field": "file_url",
-    "owner": "eric@blindpay.com",
-    "reason": "Possible rename/duplicate of the already-modeled url field; needs product confirmation before modeling both.",
-    "schema": "UploadOut",
-    "symbol": "UploadResponse"
-  },
-  {
     "field": "customer_id",
     "owner": "eric@blindpay.com",
     "reason": "Present in the spec's VirtualAccountOut but not mirrored onto the SDK's VirtualAccount struct (which already carries the customer via the enclosing resource path).",

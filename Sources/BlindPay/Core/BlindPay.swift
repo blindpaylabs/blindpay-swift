@@ -37,7 +37,7 @@ public final class BlindPay: Sendable {
         self.instanceId = instanceId
         self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: protocolClasses)
         self.available = AvailableService(apiClient: apiClient)
-        self.upload = UploadService(apiClient: apiClient)
+        self.upload = UploadService(apiClient: apiClient, instanceId: instanceId)
         self.instances = InstancesService(apiClient: apiClient, instanceId: instanceId)
     }
     
@@ -1212,26 +1212,24 @@ public final class BlindPay: Sendable {
 
     /// Uploads a file to the specified bucket
     ///
-    /// This method uploads a file and returns the URL of the uploaded file.
+    /// Sends the file as `multipart/form-data` to `POST /v1/upload` with your
+    /// instance id. Same as `upload.create(data:)`.
     ///
-    /// - Parameter data: The input data containing the bucket and file
-    /// - Returns: An `APIResponse` containing the upload URL
+    /// - Parameter data: The file bytes, file name, content type and bucket
+    /// - Returns: An `APIResponse` containing the uploaded file's URL
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let input = UploadInput(bucket: .onboarding, file: "base64encodedfile...")
+    /// let pdf = try Data(contentsOf: URL(fileURLWithPath: "passport.pdf"))
+    /// let input = UploadInput(file: pdf, fileName: "passport.pdf", contentType: "application/pdf", bucket: .onboarding)
     /// let response = try await blindPay.createUpload(data: input)
     /// if let result = response.data {
-    ///     print("Uploaded file URL: \(result.url)")
+    ///     print("Uploaded file URL: \(result.fileUrl)")
     /// }
     /// ```
     public func createUpload(data: UploadInput) async throws -> APIResponse<UploadResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/upload",
-            method: .post,
-            body: data
-        )
+        return try await upload.create(data: data)
     }
 
     // MARK: - Terms of Service Service Methods
