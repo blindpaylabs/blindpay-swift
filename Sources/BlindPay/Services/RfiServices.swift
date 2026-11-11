@@ -1,5 +1,5 @@
 //
-//  RfiService.swift
+//  RfiServices.swift
 //  blindpay-swift
 //
 
@@ -29,7 +29,7 @@ public final class InstanceRfiService: Sendable {
 
     /// Submits answers to the open RFI. `response` is sent as the whole JSON
     /// body, keyed by field key.
-    public func submit(response: RfiResponse, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
+    public func submit(response: RfiSubmission, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/rfi",
             method: .post,
@@ -70,7 +70,7 @@ public final class CustomerRfiService: Sendable {
     ///     "proof_of_income": ["https://..."],
     /// ])
     /// ```
-    public func submit(response: RfiResponse, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
+    public func submit(response: RfiSubmission, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/rfi",
             method: .post,

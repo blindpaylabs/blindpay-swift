@@ -45,7 +45,7 @@ public enum RfiValue: Codable, Sendable, Equatable, ExpressibleByStringLiteral, 
 
 /// RFI answers keyed by field key (``RfiField/key``). Submitted as the whole
 /// JSON body.
-public typealias RfiResponse = [String: RfiValue]
+public typealias RfiSubmission = [String: RfiValue]
 
 /// Result of submitting an RFI. `success` is false (with `reason`) when no
 /// RFI is pending.
@@ -140,7 +140,7 @@ public struct Rfi: Codable, Sendable, Equatable {
     public let instanceId: String
     public let status: RfiStatus
     public let request: [RfiSection]
-    public let response: RfiResponse
+    public let response: RfiSubmission
     public let expiresAt: String
     public let submittedAt: String?
     public let createdAt: String
@@ -157,7 +157,7 @@ public struct Rfi: Codable, Sendable, Equatable {
         instanceId: String,
         status: RfiStatus,
         request: [RfiSection],
-        response: RfiResponse,
+        response: RfiSubmission,
         expiresAt: String,
         submittedAt: String? = nil,
         createdAt: String,
@@ -204,7 +204,7 @@ public struct InstanceRfi: Codable, Sendable, Equatable {
     public let instanceId: String
     public let status: RfiStatus
     public let request: [RfiSection]
-    public let response: RfiResponse
+    public let response: RfiSubmission
     public let expiresAt: String
     public let submittedAt: String?
     public let createdAt: String
@@ -214,7 +214,7 @@ public struct InstanceRfi: Codable, Sendable, Equatable {
         instanceId: String,
         status: RfiStatus,
         request: [RfiSection],
-        response: RfiResponse,
+        response: RfiSubmission,
         expiresAt: String,
         submittedAt: String? = nil,
         createdAt: String

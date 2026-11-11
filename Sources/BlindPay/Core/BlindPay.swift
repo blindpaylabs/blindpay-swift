@@ -1269,7 +1269,7 @@ public final class BlindPay: Sendable {
     }
 
     /// See ``InstanceRfiService/submit(response:options:)``.
-    public func submitInstanceRfi(response: RfiResponse, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
+    public func submitInstanceRfi(response: RfiSubmission, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
         return try await instances.rfi.submit(response: response, options: options)
     }
 
@@ -1279,7 +1279,7 @@ public final class BlindPay: Sendable {
     }
 
     /// See ``CustomerRfiService/submit(response:options:)``.
-    public func submitCustomerRfi(customerId: String, response: RfiResponse, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
+    public func submitCustomerRfi(customerId: String, response: RfiSubmission, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
         return try await customers(customerId: customerId).rfi.submit(response: response, options: options)
     }
 
