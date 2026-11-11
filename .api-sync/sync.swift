@@ -581,6 +581,28 @@ func swiftType(for node: [String: Any]) -> String {
     }
 }
 
+/// The Swift type for a new optional field. A `$ref` to a mapped schema
+/// reuses the mapped SDK type; other objects decode as AnyCodable; arrays keep
+/// their element type instead of defaulting to strings.
+func fieldSwiftType(_ nodeIn: [String: Any], spec: [String: Any]) -> String {
+    guard let node = effectiveSchemaNode(inlineEnumRef(nodeIn, spec: spec)) else { return "AnyCodable?" }
+    if let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/") {
+        let name = String(ref.dropFirst("#/components/schemas/".count))
+        if let mapped = specMapTypes.first(where: { $0.str("spec") == name }),
+           let symbol = (mapped["sdk"] as? [[String: Any]])?.first?.str("symbol") {
+            return symbol + "?"
+        }
+        guard let target = schemas(of: spec)[name] as? [String: Any] else { return "AnyCodable?" }
+        return fieldSwiftType(target, spec: spec)
+    }
+    if (node["type"] as? String) == "array", let items = node.dict("items") {
+        let element = fieldSwiftType(items, spec: spec)
+        return "[\(element.hasSuffix("?") ? String(element.dropLast()) : element)]?"
+    }
+    if node["properties"] != nil && node["type"] == nil { return "[String: AnyCodable]?" }
+    return swiftType(for: node)
+}
+
 // MARK: - Findings
 
 enum FindingKind: String { case applicableEnumCase = "applicable-enum-case", applicableField = "applicable-field", operationInsert = "operation-insert", needsHuman = "needs-human" }
@@ -805,6 +827,18 @@ func swiftBaseType(_ typeText: String) -> String {
 ///     reported, for full visibility into where the SDK's current type
 ///     surface disagrees with the spec at all, regardless of which side is
 ///     "stricter".
+/// A property that is just `{"$ref": X}` to a named scalar enum schema (e.g.
+/// `YieldStatus`) is that enum, not an object: inline it so type checks see
+/// the enum.
+func inlineEnumRef(_ node: [String: Any], spec: [String: Any]) -> [String: Any] {
+    guard let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/"),
+          let target = schemas(of: spec)[String(ref.dropFirst("#/components/schemas/".count))] as? [String: Any],
+          target["enum"] != nil, target["properties"] == nil else { return node }
+    var merged = target
+    for (key, value) in node where key != "$ref" { merged[key] = value }
+    return merged
+}
+
 func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText: String, strictNullability: Bool) -> String? {
     let (specBase, specNullable) = specTypeInfo(propNode)
     let swiftOptional = isSwiftOptional(swiftTypeText)
@@ -892,6 +926,8 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
             let missing = specVals.subtracting(sdkVals)
             for value in missing.sorted() {
                 if isKnownDivergence(enumName: symbol, value: value) { continue }
+                // An enum mapped at several locators is inserted into once.
+                if applicable.contains(where: { $0.enumSymbol == symbol && $0.enumValue == value }) { continue }
                 applicable.append(Finding(kind: .applicableEnumCase,
                                            message: "enum \(symbol) is missing member \"\(value)\" (spec: \(locator))",
                                            enumSymbol: symbol, enumValue: value))
@@ -930,7 +966,7 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
                 if let modeled = propertyByWireKey[propName] {
                     guard let propNodeDict = propNode as? [String: Any] else { continue }
                     if isKnownTypeDivergence(locator: locator, field: propName) { continue }
-                    if let reason = typeMismatchReason(propName: propName, propNode: propNodeDict, swiftTypeText: modeled.typeText, strictNullability: false) {
+                    if let reason = typeMismatchReason(propName: propName, propNode: inlineEnumRef(propNodeDict, spec: spec), swiftTypeText: modeled.typeText, strictNullability: false) {
                         needsHuman.append(Finding(kind: .needsHuman,
                             message: "\(symbol).\(modeled.name) (spec property \"\(propName)\" on \(locator)) type mismatch: \(reason)"))
                     }
@@ -943,7 +979,16 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
                     continue
                 }
                 let camelName = deriveCamelName(from: propName)
-                let typeText = swiftType(for: propNode as? [String: Any] ?? [:])
+                let typeText = fieldSwiftType(propNode as? [String: Any] ?? [:], spec: spec)
+                // A struct mapped at several locators gets each field once.
+                if applicable.contains(where: { $0.fieldSymbol == symbol && $0.fieldWireKey == propName }) { continue }
+                // Without CodingKeys the property name is the wire key, so a
+                // snake_case key can't be added mechanically.
+                if !scannedType.hasCodingKeys && camelName != propName {
+                    needsHuman.append(Finding(kind: .needsHuman,
+                        message: "\(symbol) is missing optional spec property \"\(propName)\" (spec: \(locator)), but it has no CodingKeys to map the snake_case key -- add a CodingKeys block first"))
+                    continue
+                }
                 if amountConvertingEncoders.contains(symbol) && looksAmountShaped(name: camelName, typeText: typeText) {
                     needsHuman.append(Finding(kind: .needsHuman,
                         message: "\(symbol).\(camelName) (spec property \"\(propName)\") looks amount-shaped on a cents-converting hand-rolled encoder; needs a human decision on unit conversion, not a mechanical add"))
@@ -2165,7 +2210,7 @@ func auditTypes(spec: [String: Any], scanned: [String: ScannedType]) -> [TypeAud
             }
             for (propName, propNode) in specProps.sorted(by: { $0.key < $1.key }) {
                 guard let modeled = propertyByWireKey[propName], let propNodeDict = propNode as? [String: Any] else { continue }
-                if let reason = typeMismatchReason(propName: propName, propNode: propNodeDict, swiftTypeText: modeled.typeText, strictNullability: true) {
+                if let reason = typeMismatchReason(propName: propName, propNode: inlineEnumRef(propNodeDict, spec: spec), swiftTypeText: modeled.typeText, strictNullability: true) {
                     findings.append(TypeAuditFinding(locator: locator, symbol: symbol, field: propName, propertyName: modeled.name, reason: reason))
                 }
             }

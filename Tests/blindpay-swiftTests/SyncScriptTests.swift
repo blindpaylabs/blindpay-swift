@@ -493,6 +493,59 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains(expected))
 }
 
+/// A struct mapped at two locators gets a new field once, not twice.
+@Test func aStructMappedTwiceGetsANewFieldOnce() {
+    let dir = makeFixtureDir()
+    let fields: [String: Any] = ["id": ["type": "string"], "name": ["type": "string"],
+                                 "status": ["type": "string", "enum": ["active", "inactive"]], "note_text": ["type": "string"]]
+    let spec = baseSpec(extraSchemas: ["ThingOut": schema(fields), "ThingWebhookOut": schema(fields)])
+    var map = baseSpecMap
+    var types = map["types"] as! [[String: Any]]
+    types.append(["spec": "ThingWebhookOut", "sdk": [["file": "Models/Thing.swift", "symbol": "FixtureThing"]]])
+    map["types"] = types
+    setupBaseline(dir, spec: spec, specMap: map)
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    let source = readSource(dir, "Models/Thing.swift")
+    #expect(source.components(separatedBy: "public let noteText").count == 2)
+    #expect(source.components(separatedBy: "case noteText = \"note_text\"").count == 2)
+}
+
+/// Without CodingKeys a snake_case key can't be added (the property name
+/// would be the wire key), so it is handed to a human.
+@Test func aSnakeCaseFieldOnAStructWithoutCodingKeysIsNeedsHuman() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraSchemas: ["BareThingOut": schema(["status": ["type": "string"], "error_message": ["type": "string"]])])
+    setupBaseline(dir, spec: spec)
+    writeJSON(dir + "/spec-current.json", spec)
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("no CodingKeys"))
+    #expect(!readSource(dir, "Models/Bare.swift").contains("errorMessage"))
+}
+
+/// A new `$ref` field reuses the mapped SDK type; arrays keep their element
+/// type; a `$ref` to a named string enum is that enum, not an object.
+@Test func newFieldTypesFollowRefsAndArrayItems() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraSchemas: [
+        "StatusEnum": ["type": "string", "enum": ["active", "inactive"]],
+        "NumericOut": schema(["count": ["type": "number"], "thing": ["$ref": "#/components/schemas/ThingOut"],
+                              "counts": ["type": "array", "items": ["type": "integer"]]]),
+        "ThingOut": schema(["id": ["type": "string"], "name": ["type": "string"], "status": ["$ref": "#/components/schemas/StatusEnum"]]),
+    ])
+    setupBaseline(dir, spec: spec)
+    writeJSON(dir + "/spec-current.json", spec)
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0, "\(apply.stdout)")
+    let source = readSource(dir, "Models/Numeric.swift")
+    #expect(source.contains("public let thing: FixtureThing?"))
+    #expect(source.contains("public let counts: [Int]?"))
+    #expect(!apply.stdout.contains("no longer enum-valued"))
+}
+
 // MARK: - Applicable: field insertion, with and without CodingKeys
 
 @Test func fieldInsertionWithCodingKeys() {
