@@ -420,6 +420,57 @@ public typealias BankAccountResponse = BankAccount
 /// Response type for creating a bank account
 public typealias CreateBankAccountResponse = BankAccount
 
+
+/// Review status of a bank account.
+public enum BankAccountStatus: String, Codable, Sendable {
+    case verifying = "verifying"
+    case approved = "approved"
+    case rejected = "rejected"
+    case deprecated = "deprecated"
+}
+
+/// Filters for listing a customer's bank accounts. Every value is optional; unset ones are not sent.
+public struct ListBankAccountsInput: Sendable {
+    /// Only this status.
+    public var status: BankAccountStatus?
+
+    /// Only this rail.
+    public var type: Rail?
+
+    /// Name contains this text.
+    public var name: String?
+
+    /// Only this bank account.
+    public var bankAccountId: String?
+
+    /// Only this country.
+    public var country: Country?
+
+    public init(
+        status: BankAccountStatus? = nil,
+        type: Rail? = nil,
+        name: String? = nil,
+        bankAccountId: String? = nil,
+        country: Country? = nil
+    ) {
+        self.status = status
+        self.type = type
+        self.name = name
+        self.bankAccountId = bankAccountId
+        self.country = country
+    }
+
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
+        params["status"] = status?.rawValue
+        params["type"] = type?.rawValue
+        params["name"] = name
+        params["bank_account_id"] = bankAccountId
+        params["country"] = country?.rawValue
+        return params
+    }
+}
+
 // MARK: - Input Types
 
 /// Input for creating a bank account

@@ -211,25 +211,16 @@ internal final class APIClient: Sendable {
 
     // MARK: - Decoding
 
-    private struct Envelope<T: Decodable>: Decodable {
-        let data: T
-    }
-
     private func decodeSuccess<T: Decodable & Sendable>(_ data: Data) throws -> APIResponse<T> {
         // 204 / empty body / literal null: success with no data.
         let trimmed = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty || trimmed == "null" {
             return APIResponse(data: nil, error: nil)
         }
-        let decoder = JSONDecoder()
         do {
-            return APIResponse(data: try decoder.decode(T.self, from: data), error: nil)
-        } catch let directError {
-            // Some legacy responses wrap the payload in { "data": ... }.
-            if let envelope = try? decoder.decode(Envelope<T>.self, from: data) {
-                return APIResponse(data: envelope.data, error: nil)
-            }
-            throw BlindPayError.decodingError(directError)
+            return APIResponse(data: try JSONDecoder().decode(T.self, from: data), error: nil)
+        } catch {
+            throw BlindPayError.decodingError(error)
         }
     }
 

@@ -24,20 +24,19 @@ public final class PayoutsService: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse` with payouts and pagination metadata
+    /// Without `limit` or a cursor the API returns every payout in one array
+    /// (`pagination` is `nil`); with one it returns a page (default size 10).
+    ///
+    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse`
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayoutsInput(
-    ///     limit: "50",
-    ///     status: .processing,
-    ///     customerId: "re_123"
-    /// )
+    /// let params = ListPayoutsInput(limit: 50, customerId: "cu_123", status: .processing)
     /// let response = try await blindPay.instances.payouts.list(params: params)
     /// if let result = response.data {
     ///     print("Found \(result.data.count) payouts")
-    ///     print("Has more: \(result.pagination.hasMore)")
+    ///     print("Has more: \(result.pagination?.hasMore ?? false)")
     /// }
     /// ```
     public func list(params: ListPayoutsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayoutsResponse> {
@@ -48,6 +47,18 @@ public final class PayoutsService: Sendable {
             queryParameters: queryParams.isEmpty ? nil : queryParams,
             options: options
         )
+    }
+
+    /// Iterates every payout matching `params`, fetching pages of 100 (or
+    /// `params.limit`) on demand. `endingBefore` is not supported.
+    ///
+    /// ```swift
+    /// for try await payout in blindPay.instances.payouts.listAutoPaging(params: ListPayoutsInput(status: .completed)) {
+    ///     print(payout.id)
+    /// }
+    /// ```
+    public func listAutoPaging(params: ListPayoutsInput = ListPayoutsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payout, Error> {
+        AutoPager.stream(params: params) { [self] page in try await self.list(params: page, options: options) }
     }
     
     /// Retrieves a specific payout by ID
@@ -81,6 +92,9 @@ public final class PayoutsService: Sendable {
     /// - Parameter payoutId: The unique identifier of the payout
     /// - Returns: An `APIResponse` containing the `Payout` object with tracking information
     /// - Throws: `BlindPayError` if the request fails
+    ///
+    /// Public tracking endpoint for BlindPay's web and iOS apps; server-side
+    /// calls get 401 in production. Use ``get(payoutId:options:)`` instead.
     ///
     /// Example:
     /// ```swift

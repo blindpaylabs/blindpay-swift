@@ -886,9 +886,9 @@ public struct FraudWarning: Codable, Sendable, Equatable {
     public let operation: String
     
     /// Score
-    public let score: Int
+    public let score: Double
     
-    public init(id: String, name: String, operation: String, score: Int) {
+    public init(id: String, name: String, operation: String, score: Double) {
         self.id = id
         self.name = name
         self.operation = operation
@@ -901,15 +901,15 @@ public struct FraudWarning: Codable, Sendable, Equatable {
 /// Customer transaction limits
 public struct CustomerLimits: Codable, Sendable, Equatable {
     /// Per transaction limit
-    public let perTransaction: Int
+    public let perTransaction: Int?
     
     /// Daily limit
-    public let daily: Int
+    public let daily: Int?
     
     /// Monthly limit
-    public let monthly: Int
+    public let monthly: Int?
     
-    public init(perTransaction: Int, daily: Int, monthly: Int) {
+    public init(perTransaction: Int?, daily: Int?, monthly: Int?) {
         self.perTransaction = perTransaction
         self.daily = daily
         self.monthly = monthly
@@ -1590,29 +1590,80 @@ public struct DeleteCustomerResponse: Codable, Sendable, Equatable {
     }
 }
 
-/// Pagination information
-public struct Pagination: Codable, Sendable, Equatable {
-    /// Whether there are more items
-    public let hasMore: Bool
-    
-    /// Next page cursor
-    public let nextPage: String?
-    
-    /// Previous page cursor
-    public let prevPage: String?
-    
-    public init(hasMore: Bool, nextPage: String? = nil, prevPage: String? = nil) {
-        self.hasMore = hasMore
-        self.nextPage = nextPage
-        self.prevPage = prevPage
+/// Response type for listing customers — API returns a plain array
+public typealias ListCustomersResponse = ListResult<Customer>
+
+/// Filters and cursors for listing customers. Every value is optional; unset ones are not sent.
+public struct ListCustomersInput: CursorPaginatedInput {
+    /// Page size (10, 50, 100, 200, 500 or 1000).
+    public var limit: Int?
+
+    /// Return items after this id (the previous page's `pagination.nextPage`).
+    public var startingAfter: String?
+
+    /// Return items before this id.
+    public var endingBefore: String?
+
+    /// Full name contains this text.
+    public var fullName: String?
+
+    /// Customer name contains this text.
+    public var customerName: String?
+
+    /// Only this KYC status.
+    public var status: KYCStatus?
+
+    /// Only this customer.
+    public var customerId: String?
+
+    /// Only customers with this bank account.
+    public var bankAccountId: String?
+
+    /// Only this country.
+    public var country: Country?
+
+    /// Deprecated: the API ignores `offset`. Use `startingAfter`.
+    @available(*, deprecated, message: "Ignored by the API; use startingAfter.")
+    public var offset: Int? {
+        get { legacyOffset }
+        set { legacyOffset = newValue }
     }
-    
-    enum CodingKeys: String, CodingKey {
-        case hasMore = "has_more"
-        case nextPage = "next_page"
-        case prevPage = "prev_page"
+    private var legacyOffset: Int?
+
+    public init(
+        limit: Int? = nil,
+        startingAfter: String? = nil,
+        endingBefore: String? = nil,
+        fullName: String? = nil,
+        customerName: String? = nil,
+        status: KYCStatus? = nil,
+        customerId: String? = nil,
+        bankAccountId: String? = nil,
+        country: Country? = nil
+    ) {
+        self.limit = limit
+        self.startingAfter = startingAfter
+        self.endingBefore = endingBefore
+        self.fullName = fullName
+        self.customerName = customerName
+        self.status = status
+        self.customerId = customerId
+        self.bankAccountId = bankAccountId
+        self.country = country
+    }
+
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
+        params["limit"] = limit.map(String.init)
+        params["offset"] = legacyOffset.map(String.init)
+        params["starting_after"] = startingAfter
+        params["ending_before"] = endingBefore
+        params["full_name"] = fullName
+        params["customer_name"] = customerName
+        params["status"] = status?.rawValue
+        params["customer_id"] = customerId
+        params["bank_account_id"] = bankAccountId
+        params["country"] = country?.rawValue
+        return params
     }
 }
-
-/// Response type for listing customers — API returns a plain array
-public typealias ListCustomersResponse = [Customer]

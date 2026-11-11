@@ -264,39 +264,54 @@ public enum Country: String, Codable, Sendable {
 
 // MARK: - Pagination
 
-/// Pagination parameters for API requests
-public struct PaginationParams: Codable, Sendable {
-    /// Number of items per page
-    public let limit: String?
-    
-    /// Offset for pagination
-    public let offset: String?
-    
-    /// Cursor for pagination (starting after this ID)
-    public let startingAfter: String?
-    
-    /// Cursor for pagination (ending before this ID)
-    public let endingBefore: String?
-    
-    public init(
-        limit: String? = nil,
-        offset: String? = nil,
-        startingAfter: String? = nil,
-        endingBefore: String? = nil
-    ) {
-        self.limit = limit
-        self.offset = offset
-        self.startingAfter = startingAfter
-        self.endingBefore = endingBefore
+/// One page of a list call.
+///
+/// List endpoints answer with a bare array when no `limit`, `startingAfter`
+/// or `endingBefore` is sent, and with `{data, pagination}` when one is.
+/// Both decode into `ListResult`: `pagination` is `nil` for the bare array.
+/// An unpaginated call returns every row, so prefer the `listAutoPaging`
+/// methods for large lists.
+public struct ListResult<Element: Sendable>: Sendable {
+    /// The items on this page.
+    public let data: [Element]
+
+    /// Cursor metadata; `nil` when the API returned a bare array.
+    public let pagination: PaginationMetadata?
+
+    public init(data: [Element], pagination: PaginationMetadata? = nil) {
+        self.data = data
+        self.pagination = pagination
     }
-    
+
     enum CodingKeys: String, CodingKey {
-        case limit
-        case offset
-        case startingAfter = "starting_after"
-        case endingBefore = "ending_before"
+        case data
+        case pagination
     }
 }
+
+extension ListResult: Decodable where Element: Decodable {
+    public init(from decoder: Decoder) throws {
+        // An object is the envelope; anything else must be the bare array.
+        // Element decoding errors propagate in both cases.
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            data = try container.decode([Element].self, forKey: .data)
+            pagination = try container.decodeIfPresent(PaginationMetadata.self, forKey: .pagination)
+        } else {
+            data = try decoder.singleValueContainer().decode([Element].self)
+            pagination = nil
+        }
+    }
+}
+
+extension ListResult: Encodable where Element: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(data, forKey: .data)
+        try container.encodeIfPresent(pagination, forKey: .pagination)
+    }
+}
+
+extension ListResult: Equatable where Element: Equatable {}
 
 /// Pagination metadata returned in API responses
 public struct PaginationMetadata: Codable, Sendable, Equatable {

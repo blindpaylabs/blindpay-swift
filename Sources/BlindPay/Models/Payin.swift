@@ -636,85 +636,99 @@ public struct Payin: Codable, Sendable, Equatable {
   }
 }
 
-// MARK: - Pagination Response
-
-/// Pagination metadata for payin list responses
 // MARK: - Response Types
 
-/// Response type for listing payins (plain array)
-public typealias ListPayinsResponse = [Payin]
+/// One page of payins (see ``ListResult``).
+public typealias ListPayinsResponse = ListResult<Payin>
 
 /// Response type for single payin
 public typealias PayinResponse = Payin
 
 // MARK: - Input Types
 
-/// Input parameters for listing payins
-public struct ListPayinsInput: Codable, Sendable {
-  /// Number of items to return
-  public let limit: String?
+/// Filters and cursors for listing payins. Every value is optional; unset ones are not sent.
+public struct ListPayinsInput: CursorPaginatedInput {
+  /// Page size (10, 50, 100, 200, 500 or 1000).
+  public var limit: Int?
 
-  /// Number of items to skip
-  public let offset: String?
+  /// Return items after this id (the previous page's `pagination.nextPage`).
+  public var startingAfter: String?
 
-  /// Cursor for pagination (starting after this ID)
-  public let startingAfter: String?
+  /// Return items before this id.
+  public var endingBefore: String?
 
-  /// Cursor for pagination (ending before this ID)
-  public let endingBefore: String?
+  /// Only this customer.
+  public var customerId: String?
 
-  /// Filter by customer ID
-  public let customerId: String?
+  /// Only this status.
+  public var status: PayinStatus?
 
-  /// Filter by status
-  public let status: PayinStatus?
+  /// Customer name contains this text.
+  public var customerName: String?
+
+  /// Only this bank account.
+  public var bankAccountId: String?
+
+  /// Only this country.
+  public var country: Country?
+
+  /// Only this payment method.
+  public var paymentMethod: PaymentMethod?
+
+  /// Only this network.
+  public var network: Network?
+
+  /// Only this token.
+  public var token: StablecoinToken?
+
+  /// Deprecated: the API ignores `offset`. Use `startingAfter`.
+  @available(*, deprecated, message: "Ignored by the API; use startingAfter.")
+  public var offset: Int? {
+    get { legacyOffset }
+    set { legacyOffset = newValue }
+  }
+  private var legacyOffset: Int?
 
   public init(
-    limit: String? = nil,
-    offset: String? = nil,
+    limit: Int? = nil,
     startingAfter: String? = nil,
     endingBefore: String? = nil,
     customerId: String? = nil,
-    status: PayinStatus? = nil
+    status: PayinStatus? = nil,
+    customerName: String? = nil,
+    bankAccountId: String? = nil,
+    country: Country? = nil,
+    paymentMethod: PaymentMethod? = nil,
+    network: Network? = nil,
+    token: StablecoinToken? = nil
   ) {
     self.limit = limit
-    self.offset = offset
     self.startingAfter = startingAfter
     self.endingBefore = endingBefore
     self.customerId = customerId
     self.status = status
+    self.customerName = customerName
+    self.bankAccountId = bankAccountId
+    self.country = country
+    self.paymentMethod = paymentMethod
+    self.network = network
+    self.token = token
   }
 
-  enum CodingKeys: String, CodingKey {
-    case limit
-    case offset
-    case startingAfter = "starting_after"
-    case endingBefore = "ending_before"
-    case customerId = "customer_id"
-    case status
-  }
-
-  /// Converts to query parameters dictionary
   func toQueryParameters() -> QueryParameters {
     var params = QueryParameters()
-    if let limit = limit {
-      params["limit"] = limit
-    }
-    if let offset = offset {
-      params["offset"] = offset
-    }
-    if let startingAfter = startingAfter {
-      params["starting_after"] = startingAfter
-    }
-    if let endingBefore = endingBefore {
-      params["ending_before"] = endingBefore
-    }
-    if let customerId = customerId {
-      params["customer_id"] = customerId
-    }
-    if let status = status {
-      params["status"] = status.rawValue
-    }
+    params["limit"] = limit.map(String.init)
+    params["offset"] = legacyOffset.map(String.init)
+    params["starting_after"] = startingAfter
+    params["ending_before"] = endingBefore
+    params["customer_id"] = customerId
+    params["status"] = status?.rawValue
+    params["customer_name"] = customerName
+    params["bank_account_id"] = bankAccountId
+    params["country"] = country?.rawValue
+    params["payment_method"] = paymentMethod?.rawValue
+    params["network"] = network?.rawValue
+    params["token"] = token?.rawValue
     return params
   }
 }

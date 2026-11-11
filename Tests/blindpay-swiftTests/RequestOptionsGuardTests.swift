@@ -30,7 +30,7 @@ struct RequestOptionsGuardTests {
         let files = try FileManager.default.contentsOfDirectory(atPath: sourcesRoot.appendingPathComponent("Services").path)
             .filter { $0.hasSuffix(".swift") }
             .map { "Services/\($0)" } + ["Core/BlindPay.swift"]
-        let signature = try NSRegularExpression(pattern: #"public func (\w+)\(([^()]*)\)\s*async throws -> APIResponse<"#)
+        let signature = try NSRegularExpression(pattern: #"public func (\w+)\(([^()]*(?:\(\)[^()]*)*)\)\s*(?:async throws -> APIResponse<|-> AsyncThrowingStream<)"#)
         var methods: [Method] = []
         for file in files {
             let text = try String(contentsOf: sourcesRoot.appendingPathComponent(file), encoding: .utf8)

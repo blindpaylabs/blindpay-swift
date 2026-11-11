@@ -92,7 +92,7 @@ struct RequestHeaderTests {
 
     @Test func queryParametersAreOrderedAndUnsetOnesOmitted() async throws {
         let server = MockServer(respondWith: .json(Data("[]".utf8)))
-        _ = try await server.client.instances.payouts.list(params: ListPayoutsInput(limit: "10", startingAfter: "po_000000000000"))
+        _ = try await server.client.instances.payouts.list(params: ListPayoutsInput(limit: 10, startingAfter: "po_000000000000"))
         let request = try #require(server.requests.first)
         #expect(request.queryItems.map(\.name) == ["limit", "starting_after"])
         #expect(request.url.query?.contains("offset") == false)

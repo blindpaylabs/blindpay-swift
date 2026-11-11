@@ -709,25 +709,24 @@ public final class BlindPay: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayinsResponse` (plain array of payins)
+    /// - Returns: An `APIResponse` containing a `ListPayinsResponse` (see ``ListResult``)
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayinsInput(limit: "50", status: .processing)
+    /// let params = ListPayinsInput(limit: 50, status: .processing)
     /// let response = try await blindPay.listPayins(params: params)
     /// if let payins = response.data {
     ///     print("Found \(payins.count) payins")
     /// }
     /// ```
     public func listPayins(params: ListPayinsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayinsResponse> {
-        let queryParams = params?.toQueryParameters() ?? QueryParameters()
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payins",
-            method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams,
-            options: options
-        )
+        return try await instances.payins.list(params: params, options: options)
+    }
+
+    /// Iterates every matching payin. See ``PayinsService/listAutoPaging(params:options:)``.
+    public func listPayinsAutoPaging(params: ListPayinsInput = ListPayinsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payin, Error> {
+        return instances.payins.listAutoPaging(params: params, options: options)
     }
     
     /// Retrieves a specific payin by ID
@@ -770,12 +769,8 @@ public final class BlindPay: Sendable {
     ///     print("Tracking payment step: \(payin.trackingPayment?.step ?? "N/A")")
     /// }
     /// ```
-    public func getPayinTrack(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/e/payins/\(payinId)",
-            method: .get,
-            options: options
-        )
+    public func getPayinTrack(payinId: String, checkoutToken: String? = nil, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
+        return try await instances.payins.getTrack(payinId: payinId, checkoutToken: checkoutToken, options: options)
     }
     
     /// Creates a new payin on EVM chains
@@ -941,25 +936,24 @@ public final class BlindPay: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse` (plain array of payouts)
+    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse` (see ``ListResult``)
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayoutsInput(limit: "50", status: .processing)
+    /// let params = ListPayoutsInput(limit: 50, status: .processing)
     /// let response = try await blindPay.listPayouts(params: params)
     /// if let payouts = response.data {
     ///     print("Found \(payouts.count) payouts")
     /// }
     /// ```
     public func listPayouts(params: ListPayoutsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayoutsResponse> {
-        let queryParams = params?.toQueryParameters() ?? QueryParameters()
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts",
-            method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams,
-            options: options
-        )
+        return try await instances.payouts.list(params: params, options: options)
+    }
+
+    /// Iterates every matching payout. See ``PayoutsService/listAutoPaging(params:options:)``.
+    public func listPayoutsAutoPaging(params: ListPayoutsInput = ListPayoutsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payout, Error> {
+        return instances.payouts.listAutoPaging(params: params, options: options)
     }
     
     /// Retrieves a specific payout by ID
@@ -1132,73 +1126,35 @@ public final class BlindPay: Sendable {
 
     // MARK: - Transfers Service Methods
 
-    /// Creates a transfer quote
-    ///
-    /// - Parameter data: The input data containing transfer quote configuration
-    /// - Returns: An `APIResponse` containing the created transfer quote
-    /// - Throws: `BlindPayError` if the request fails
+    /// Creates a transfer quote. See ``TransferQuotesService/create(data:options:)``.
     public func createTransferQuote(data: CreateTransferQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateTransferQuoteResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/transfer-quotes",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.transferQuotes.create(data: data, options: options)
     }
 
-    /// Creates a transfer from a previously created transfer quote
-    ///
-    /// - Parameter data: The input data containing the transfer quote ID
-    /// - Returns: An `APIResponse` containing the created transfer
-    /// - Throws: `BlindPayError` if the request fails
+    /// Executes a transfer from a transfer quote. See ``TransfersService/create(data:options:)``.
     public func createTransfer(data: CreateTransferInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateTransferResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/transfers",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.transfers.create(data: data, options: options)
     }
 
-    /// Lists all transfers for the instance
-    ///
-    /// - Parameter params: Optional parameters for pagination
-    /// - Returns: An `APIResponse` containing a list of transfers with pagination
-    /// - Throws: `BlindPayError` if the request fails
+    /// Lists one page of transfers. See ``TransfersService/list(params:options:)``.
     public func listTransfers(params: ListTransfersInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListTransfersResponse> {
-        let queryParams = params?.toQueryParameters() ?? QueryParameters()
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/transfers",
-            method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams,
-            options: options
-        )
+        return try await instances.transfers.list(params: params, options: options)
     }
 
-    /// Retrieves a specific transfer by ID
-    ///
-    /// - Parameter transferId: The unique identifier of the transfer
-    /// - Returns: An `APIResponse` containing the transfer details
-    /// - Throws: `BlindPayError` if the request fails
+    /// Iterates every matching transfer. See ``TransfersService/listAutoPaging(params:options:)``.
+    public func listTransfersAutoPaging(params: ListTransfersInput = ListTransfersInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Transfer, Error> {
+        return instances.transfers.listAutoPaging(params: params, options: options)
+    }
+
+    /// Retrieves a transfer. See ``TransfersService/get(transferId:options:)``.
     public func getTransfer(transferId: String, options: RequestOptions? = nil) async throws -> APIResponse<TransferResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/transfers/\(transferId)",
-            method: .get,
-            options: options
-        )
+        return try await instances.transfers.get(transferId: transferId, options: options)
     }
 
-    /// Retrieves transfer tracking information using the public endpoint
-    ///
-    /// - Parameter transferId: The unique identifier of the transfer
-    /// - Returns: An `APIResponse` containing the transfer with tracking info
-    /// - Throws: `BlindPayError` if the request fails
+    /// Public tracking endpoint; server-side calls get 401 in production.
+    /// See ``TransfersService/getTrack(transferId:options:)``.
     public func getTransferTrack(transferId: String, options: RequestOptions? = nil) async throws -> APIResponse<TransferResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/e/transfers/\(transferId)",
-            method: .get,
-            options: options
-        )
+        return try await instances.transfers.getTrack(transferId: transferId, options: options)
     }
 
     // MARK: - Fees Service Methods
@@ -1345,90 +1301,27 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createCustomer(data: CreateCustomerInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateCustomerResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.customers.create(data: data, options: options)
     }
     
     /// Lists all customers for the instance
     ///
-    /// This method retrieves a paginated list of customers with optional filtering and pagination parameters.
-    ///
-    /// - Parameters:
-    ///   - limit: Number of items to return (optional, enum: 10, 50, 100, 200, 500, 1000)
-    ///   - offset: Number of items to skip (optional, enum: 0, 10, 50, 100, 200, 500, 1000)
-    ///   - startingAfter: A cursor for pagination - object ID that defines your place in the list (optional)
-    ///   - endingBefore: A cursor for pagination - object ID that defines your place in the list (optional)
-    ///   - fullName: Filter by full name (optional)
-    ///   - customerName: Filter by customer name (optional)
-    ///   - status: Filter by status (optional, enum: verifying, approved, rejected, deprecated, pending_review)
-    ///   - customerId: Filter by customer ID (optional)
-    ///   - bankAccountId: Filter by bank account ID (optional)
-    ///   - country: Filter by country (optional)
-    /// - Returns: An `APIResponse` containing a list of customers with pagination information
-    /// - Throws: `BlindPayError` if the request fails
+    /// Without `limit` or a cursor the API returns every customer in one array
+    /// (`pagination` is `nil`); with one it returns a page (default size 100).
+    /// See ``InstanceCustomersService/list(params:options:)``.
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.listCustomers(limit: "50", offset: "0")
-    /// if let customers = response.data {
-    ///     print("Found \(customers.count) customers")
-    /// }
+    /// let page = try await blindPay.listCustomers(params: ListCustomersInput(limit: 50, status: .approved)).get()
+    /// print(page?.data.count ?? 0)
     /// ```
-    public func listCustomers(
-        limit: String? = nil,
-        offset: String? = nil,
-        startingAfter: String? = nil,
-        endingBefore: String? = nil,
-        fullName: String? = nil,
-        customerName: String? = nil,
-        status: String? = nil,
-        customerId: String? = nil,
-        bankAccountId: String? = nil,
-        country: String? = nil,
-        options: RequestOptions? = nil
-    ) async throws -> APIResponse<ListCustomersResponse> {
-        var queryParameters = QueryParameters()
-        if let limit = limit {
-            queryParameters["limit"] = limit
-        }
-        if let offset = offset {
-            queryParameters["offset"] = offset
-        }
-        if let startingAfter = startingAfter {
-            queryParameters["starting_after"] = startingAfter
-        }
-        if let endingBefore = endingBefore {
-            queryParameters["ending_before"] = endingBefore
-        }
-        if let fullName = fullName {
-            queryParameters["full_name"] = fullName
-        }
-        if let customerName = customerName {
-            queryParameters["customer_name"] = customerName
-        }
-        if let status = status {
-            queryParameters["status"] = status
-        }
-        if let customerId = customerId {
-            queryParameters["customer_id"] = customerId
-        }
-        if let bankAccountId = bankAccountId {
-            queryParameters["bank_account_id"] = bankAccountId
-        }
-        if let country = country {
-            queryParameters["country"] = country
-        }
+    public func listCustomers(params: ListCustomersInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListCustomersResponse> {
+        return try await instances.customers.list(params: params, options: options)
+    }
 
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers",
-            method: .get,
-            queryParameters: queryParameters.isEmpty ? nil : queryParameters,
-            options: options
-        )
+    /// Iterates every matching customer. See ``InstanceCustomersService/listAutoPaging(params:options:)``.
+    public func listCustomersAutoPaging(params: ListCustomersInput = ListCustomersInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Customer, Error> {
+        return instances.customers.listAutoPaging(params: params, options: options)
     }
     
     /// Retrieves a specific customer by ID

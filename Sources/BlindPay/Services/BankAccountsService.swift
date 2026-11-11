@@ -43,10 +43,12 @@ public final class BankAccountsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list(options: RequestOptions? = nil) async throws -> APIResponse<BankAccountsResponse> {
+    public func list(params: ListBankAccountsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<BankAccountsResponse> {
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts",
             method: .get,
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
             options: options
         )
     }
