@@ -836,64 +836,7 @@ public final class BlindPay: Sendable {
         return try await instances.payins.quotes.create(data: data, options: options)
     }
     
-    /// Retrieves a specific payin quote by ID
-    ///
-    /// This method fetches the details of a specific payin quote.
-    ///
-    /// - Parameter id: The unique identifier of the payin quote
-    /// - Returns: An `APIResponse` containing the `PayinQuote` object
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.getPayinQuote(id: "pq_123")
-    /// if let quote = response.data {
-    ///     print("Quote ID: \(quote.id)")
-    ///     print("Expires at: \(quote.expiresAt)")
-    ///     print("Sender amount: \(quote.senderAmount)")
-    ///     print("Receiver amount: \(quote.receiverAmount)")
-    /// }
-    /// ```
-    public func getPayinQuote(id: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinQuoteResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payin-quotes/\(id)",
-            method: .get,
-            options: options
-        )
-    }
     
-    /// Lists all payin quotes for the instance
-    ///
-    /// This method fetches a list of all payin quotes associated with the instance,
-    /// with optional filtering and pagination support.
-    ///
-    /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing an array of `PayinQuote` objects
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let params = ListPayinQuotesInput(
-    ///     limit: "50",
-    ///     customerId: "re_123"
-    /// )
-    /// let response = try await blindPay.listPayinQuotes(params: params)
-    /// if let quotes = response.data {
-    ///     print("Found \(quotes.count) payin quotes")
-    ///     for quote in quotes {
-    ///         print("Quote ID: \(quote.id)")
-    ///     }
-    /// }
-    /// ```
-    public func listPayinQuotes(params: ListPayinQuotesInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<PayinQuotesResponse> {
-        let queryParams = params?.toQueryParameters() ?? QueryParameters()
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payin-quotes",
-            method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams,
-            options: options
-        )
-    }
     
     /// Gets the foreign exchange rate between two currencies for payin quotes
     ///

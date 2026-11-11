@@ -60,12 +60,6 @@
     "owner": "eric@blindpay.com"
   },
   {
-    "schema": "PayinQuote",
-    "field": "billing_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
-  },
-  {
     "schema": "Payout",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
