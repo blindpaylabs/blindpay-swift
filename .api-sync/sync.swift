@@ -49,6 +49,7 @@ var enumExclusionsPath = ".api-sync/enum-exclusions.json"
 var nestedOmissionsPath = ".api-sync/nested-omissions.json"
 var operationExclusionsPath = ".api-sync/operation-exclusions.json"
 var reportPath: String? = nil
+var versionFilePath = "Sources/BlindPay/Core/Version.swift"
 
 do {
     let args = CommandLine.arguments
@@ -71,6 +72,7 @@ do {
         case "--nested-omissions": i += 1; if i < args.count { nestedOmissionsPath = args[i] }
         case "--operation-exclusions": i += 1; if i < args.count { operationExclusionsPath = args[i] }
         case "--report": i += 1; if i < args.count { reportPath = args[i] }
+        case "--version-file": i += 1; if i < args.count { versionFilePath = args[i] }
         default: break
         }
         i += 1
@@ -1838,6 +1840,27 @@ func detectStructuralChanges(old: [String: Any], new: [String: Any]) -> [Finding
 
 enum Bump: String { case none, patch, minor }
 
+/// Applies `bump` to the SDK version constant (`BlindPaySDK.version` in
+/// `versionFilePath`), the single source of the release version: release.yml
+/// tags `v<version>` once the sync PR merges. Returns the new version, or nil
+/// when there is nothing to bump or no version file (test fixtures).
+func bumpSDKVersion(_ bump: Bump) -> String? {
+    guard bump != .none, let source = try? String(contentsOfFile: versionFilePath, encoding: .utf8) else { return nil }
+    let regex = try! NSRegularExpression(pattern: #"public static let version = "(\d+)\.(\d+)\.(\d+)""#)
+    let range = NSRange(source.startIndex..<source.endIndex, in: source)
+    guard let match = regex.firstMatch(in: source, range: range),
+          let all = Range(match.range, in: source),
+          let major = Int(source[Range(match.range(at: 1), in: source)!]),
+          let minor = Int(source[Range(match.range(at: 2), in: source)!]),
+          let patch = Int(source[Range(match.range(at: 3), in: source)!]) else {
+        fail("could not find `public static let version = \"X.Y.Z\"` in \(versionFilePath)")
+    }
+    let next = bump == .minor ? "\(major).\(minor + 1).0" : "\(major).\(minor).\(patch + 1)"
+    let updated = source.replacingCharacters(in: all, with: "public static let version = \"\(next)\"")
+    try! updated.write(toFile: versionFilePath, atomically: true, encoding: .utf8)
+    return next
+}
+
 func classifyBump(old: [String: Any], new: [String: Any]) -> Bump {
     if old.count == new.count, NSDictionary(dictionary: old).isEqual(to: new) { return .none }
 
@@ -2446,6 +2469,10 @@ case .apply:
         report["applied"] = applicable.map { $0.message }
         report["needsHuman"] = []
         report["bump"] = bump.rawValue
+        if let version = bumpSDKVersion(bump) {
+            report["version"] = version
+            print("  version bump: \(bump.rawValue) -> \(version)")
+        }
     }
 
     // Refresh the snapshot by copying the source spec file's bytes verbatim

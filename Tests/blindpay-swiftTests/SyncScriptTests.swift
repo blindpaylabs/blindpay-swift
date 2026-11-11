@@ -460,6 +460,39 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(again.stdout.contains("no changes"))
 }
 
+/// --apply bumps BlindPaySDK.version by the computed bump and reports the new
+/// version, which the api-sync workflow puts in the PR; release.yml tags it.
+@Test func applyBumpsTheSDKVersionConstant() throws {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var schemas = spec["components"] as! [String: Any]
+    var thingOut = (schemas["schemas"] as! [String: Any])["ThingOut"] as! [String: Any]
+    var props = thingOut["properties"] as! [String: Any]
+    props["status"] = ["type": "string", "enum": ["active", "inactive", "pending"]]
+    thingOut["properties"] = props
+    var innerSchemas = schemas["schemas"] as! [String: Any]
+    innerSchemas["ThingOut"] = thingOut
+    schemas["schemas"] = innerSchemas
+    spec["components"] = schemas
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+    try "public enum BlindPaySDK {\n    public static let version = \"5.0.9\"\n}\n".write(toFile: dir + "/Version.swift", atomically: true, encoding: .utf8)
+
+    let args = ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json", "--version-file", "Version.swift"] + commonArgs(dir)
+    let apply = runSync(in: dir, args)
+    #expect(apply.exitCode == 0)
+    let bump = try #require(readReportBump(dir))
+    let expected = bump == "minor" ? "5.1.0" : "5.0.10"
+    let report = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: dir + "/report.json"))) as? [String: Any]
+    #expect(report?["version"] as? String == expected)
+    #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains("public static let version = \"\(expected)\""))
+
+    // Nothing left to apply: no further bump.
+    let again = runSync(in: dir, args)
+    #expect(again.stdout.contains("no changes"))
+    #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains(expected))
+}
+
 // MARK: - Applicable: field insertion, with and without CodingKeys
 
 @Test func fieldInsertionWithCodingKeys() {
