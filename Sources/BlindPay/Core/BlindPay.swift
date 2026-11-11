@@ -1331,3 +1331,15 @@ public final class BlindPay: Sendable {
         return CustomersService(apiClient: apiClient, instanceId: instanceId, customerId: customerId)
     }
 }
+
+/// The client never reveals its API key in `dump`, `Mirror` or descriptions.
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+extension BlindPay: CustomReflectable, CustomStringConvertible, CustomDebugStringConvertible {
+    public var customMirror: Mirror {
+        Mirror(self, children: ["instanceId": instanceId, "apiKey": "<redacted>"], displayStyle: .class)
+    }
+
+    public var description: String { "BlindPay(instanceId: \(instanceId), apiKey: <redacted>)" }
+
+    public var debugDescription: String { description }
+}

@@ -301,3 +301,15 @@ internal enum HTTPMethod: String, Sendable {
     case patch = "PATCH"
     case delete = "DELETE"
 }
+
+/// Never expose the API key through `dump`, `Mirror` or string descriptions.
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+extension APIClient: CustomReflectable, CustomStringConvertible, CustomDebugStringConvertible {
+    var customMirror: Mirror {
+        Mirror(self, children: ["apiKey": "<redacted>", "baseURL": configuration.baseURL], displayStyle: .class)
+    }
+
+    var description: String { "APIClient(baseURL: \(configuration.baseURL), apiKey: <redacted>)" }
+
+    var debugDescription: String { description }
+}
