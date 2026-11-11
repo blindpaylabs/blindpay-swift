@@ -44,6 +44,8 @@ struct MockResponse: Sendable {
     var status: Int = 200
     var headers: [String: String] = ["Content-Type": "application/json"]
     var body: Data = Data()
+    /// Send the status line and headers, then fail while "reading" the body.
+    var failsAfterHeaders: Bool = false
 
     static func json(_ data: Data, status: Int = 200) -> MockResponse {
         MockResponse(status: status, body: data)
@@ -100,7 +102,7 @@ final class MockServer: @unchecked Sendable {
     static let transport: URLSessionTransport = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
-        return URLSessionTransport(session: URLSession(configuration: configuration))
+        return URLSessionTransport(configuration: configuration)
     }()
 
     private var recordedSleeps: [TimeInterval] = []
@@ -180,6 +182,10 @@ final class MockURLProtocol: URLProtocol, @unchecked Sendable {
         let response = server.handle(recorded)
         let http = HTTPURLResponse(url: url, statusCode: response.status, httpVersion: "HTTP/1.1", headerFields: response.headers)!
         client?.urlProtocol(self, didReceive: http, cacheStoragePolicy: .notAllowed)
+        if response.failsAfterHeaders {
+            client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
+            return
+        }
         client?.urlProtocol(self, didLoad: response.body)
         client?.urlProtocolDidFinishLoading(self)
     }

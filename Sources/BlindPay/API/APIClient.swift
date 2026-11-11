@@ -85,10 +85,16 @@ internal final class APIClient: Sendable {
     /// Validates a caller key, or generates one before the first attempt for
     /// a JSON mutation when retries are on.
     private func resolveIdempotencyKey(method: HTTPMethod, options: RequestOptions?) throws -> String? {
+        if options?.headers.keys.contains(where: { $0.caseInsensitiveCompare("Idempotency-Key") == .orderedSame }) == true {
+            throw BlindPayError.invalidRequest("pass the idempotency key as RequestOptions.idempotencyKey, not as a header")
+        }
         guard method != .get else { return nil }
         if let key = options?.idempotencyKey {
-            guard !key.isEmpty else {
-                throw BlindPayError.invalidRequest("idempotencyKey must not be empty")
+            // The server ignores an empty key, so it would look protected
+            // without being so; padding would make retries look like
+            // different keys.
+            guard !key.isEmpty, key.trimmingCharacters(in: .whitespacesAndNewlines) == key else {
+                throw BlindPayError.invalidRequest("idempotencyKey must not be empty or padded with whitespace")
             }
             guard key.count <= 255 else {
                 throw BlindPayError.invalidRequest("idempotencyKey must be at most 255 characters")
@@ -168,6 +174,19 @@ internal final class APIClient: Sendable {
                     continue
                 }
                 return APIResponse(data: nil, error: error)
+            } catch HTTPTransportError.incompleteResponse(let response, let underlying) {
+                if Task.isCancelled { throw CancellationError() }
+                // The server answered. A mutation is never resent: on a 5xx
+                // the server has released the key and would run it again.
+                if method == .get, canRetry, !isMultipart {
+                    try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: nil, jitter: configuration.jitter()))
+                    attempt += 1
+                    continue
+                }
+                if response.statusCode >= 400 {
+                    return APIResponse(data: nil, error: makeAPIError(data: Data(), response: response, idempotencyKey: idempotencyKey))
+                }
+                throw BlindPayError.networkError(underlying, idempotencyKey: idempotencyKey)
             } catch {
                 if error is CancellationError || Task.isCancelled { throw CancellationError() }
                 let failure: BlindPayError
@@ -194,19 +213,39 @@ internal final class APIClient: Sendable {
     }
 
     /// One attempt, bounded by a total timeout. `URLRequest.timeoutInterval`
-    /// is only an idle timeout, so the transport races a timer task.
+    /// is only an idle timeout, so a timer cancels the transport. The
+    /// transport's own outcome is still awaited, so a timeout that hits while
+    /// the body is being read surfaces as an incomplete response (the server
+    /// answered), not as "no response".
     private func attempt(_ request: URLRequest, timeout: TimeInterval) async throws -> (Data, HTTPURLResponse) {
         let transport = configuration.transport
-        return try await withThrowingTaskGroup(of: (Data, HTTPURLResponse).self) { group in
-            group.addTask { try await transport.send(request) }
-            group.addTask {
-                try await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1_000_000_000))
-                throw AttemptTimeout()
-            }
-            defer { group.cancelAll() }
-            guard let result = try await group.next() else { throw AttemptTimeout() }
-            return result
+        let timedOut = Flag()
+        let send = Task { try await transport.send(request) }
+        let timer = Task {
+            try await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1_000_000_000))
+            timedOut.set()
+            send.cancel()
         }
+        defer { timer.cancel() }
+        do {
+            return try await withTaskCancellationHandler {
+                try await send.value
+            } onCancel: {
+                send.cancel()
+            }
+        } catch let error as HTTPTransportError {
+            throw error
+        } catch {
+            if timedOut.isSet { throw AttemptTimeout() }
+            throw error
+        }
+    }
+
+    private final class Flag: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value = false
+        func set() { lock.lock(); value = true; lock.unlock() }
+        var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
     }
 
     // MARK: - Decoding

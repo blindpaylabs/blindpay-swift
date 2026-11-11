@@ -371,3 +371,70 @@ struct APIErrorTests {
         #expect(error.errorDescription?.contains("test_key") == false)
     }
 }
+
+/// A response whose status line arrived is a response, even if its body
+/// then failed: a mutation must not be resent (the server released the key
+/// on 5xx and would run it again).
+struct IncompleteResponseTests {
+    @Test func aMutationWhose5xxBodyFailsIsSentExactlyOnce() async throws {
+        let server = MockServer(respondWith: MockResponse(status: 503, failsAfterHeaders: true))
+        let response = try await createQuote(server.client)
+        #expect(server.requests.count == 1)
+        let error = try #require(response.error)
+        #expect(error.status == 503)
+        #expect(error.retryable)
+        #expect(error.idempotencyKey != nil)
+    }
+
+    @Test func aMutationWhose2xxBodyFailsIsNotResentAndThrows() async throws {
+        let server = MockServer(respondWith: MockResponse(status: 200, failsAfterHeaders: true))
+        await #expect(throws: BlindPayError.self) { _ = try await createQuote(server.client) }
+        #expect(server.requests.count == 1)
+    }
+
+    @Test func aGetWhoseBodyFailsIsRetried() async throws {
+        let server = MockServer(sequence: [MockResponse(status: 503, failsAfterHeaders: true), .json(railsBody)])
+        let response = try await getRails(server.client)
+        #expect(response.data?.isEmpty == false)
+        #expect(server.requests.count == 2)
+    }
+
+    @Test func aRequestBuildErrorIsNeverRetried() async throws {
+        let server = MockServer(respondWith: .ok)
+        let client = BlindPay(apiKey: "test_key", instanceId: "in_000000000000",
+                              configuration: Configuration(baseURL: "http://[::1", transport: MockServer.transport))
+        await #expect(throws: BlindPayError.self) { _ = try await client.available.getRails() }
+        #expect(server.requests.isEmpty)
+    }
+}
+
+struct KeyAndHeaderValidationTests {
+    @Test(arguments: [" ", "  key", "key ", "\tkey", "key\n"])
+    func paddedOrBlankKeysAreRejectedBeforeSending(key: String) async throws {
+        let server = MockServer(respondWith: .json(quoteBody))
+        await #expect(throws: BlindPayError.self) {
+            _ = try await createQuote(server.client, options: RequestOptions(idempotencyKey: key))
+        }
+        #expect(server.requests.isEmpty)
+    }
+
+    @Test(arguments: ["Idempotency-Key", "idempotency-key", "IDEMPOTENCY-KEY"])
+    func aKeyPassedAsAHeaderIsRejected(name: String) async throws {
+        let server = MockServer(respondWith: .json(quoteBody))
+        await #expect(throws: BlindPayError.self) {
+            _ = try await createQuote(server.client, options: RequestOptions(headers: [name: "k1"]))
+        }
+        #expect(server.requests.isEmpty)
+    }
+
+    @Test func reservedHeadersCantBeOverriddenInAnyCasing() async throws {
+        let server = MockServer(respondWith: .json(quoteBody))
+        _ = try await createQuote(server.client, options: RequestOptions(headers: [
+            "authorization": "Bearer stolen", "USER-AGENT": "evil/1.0", "X-Trace": "abc",
+        ]))
+        let request = try #require(server.requests.first)
+        #expect(request.header("Authorization") == "Bearer test_key")
+        #expect(request.header("User-Agent") == "blindpay-swift/\(BlindPaySDK.version)")
+        #expect(request.header("X-Trace") == "abc")
+    }
+}
