@@ -121,6 +121,26 @@ func paths(of spec: [String: Any]) -> [String: Any] {
     return (spec["paths"] as? [String: Any]) ?? [:]
 }
 
+/// The SDK surface of a spec: every operation marked `"x-sdk": false` is
+/// dropped (yield, card payment, ToS passthrough, upload extract, the VA
+/// deposit simulators; plan D11), along with paths left empty. Schemas
+/// reachable only from those operations then count as unreachable, so they
+/// need no spec-map entry. Specs without the flag are returned unchanged.
+func sdkSurface(_ spec: [String: Any]) -> [String: Any] {
+    var filtered = spec
+    var kept: [String: Any] = [:]
+    for (path, item) in paths(of: spec) {
+        guard var ops = item as? [String: Any] else { kept[path] = item; continue }
+        for (method, op) in ops {
+            if let opDict = op as? [String: Any], (opDict["x-sdk"] as? Bool) == false { ops[method] = nil }
+        }
+        let hasOperation = ops.keys.contains { ["get", "post", "put", "delete", "patch", "head", "options"].contains($0) }
+        if hasOperation { kept[path] = ops }
+    }
+    filtered["paths"] = kept
+    return filtered
+}
+
 /// Returns the properties dictionary of a resolved node, auto-unwrapping a
 /// bare array schema (`{"type": "array", "items": {...}}`) into its item's
 /// properties when the node itself has none.
@@ -1043,6 +1063,14 @@ func specOperations(_ spec: [String: Any]) -> [(method: String, path: String, op
 /// isn't a composition at all; returns nil for genuine multi-branch
 /// polymorphism, which the generator cannot express.
 func effectiveSchemaNode(_ node: [String: Any]) -> [String: Any]? {
+    // OpenAPI 3.1 nullable: `"type": ["string", "null"]` is a nullable string.
+    if let types = node["type"] as? [Any] {
+        let concrete = types.compactMap { $0 as? String }.filter { $0 != "null" }
+        guard concrete.count == 1 else { return nil }
+        var single = node
+        single["type"] = concrete[0]
+        return effectiveSchemaNode(single)
+    }
     guard let branches = (node["allOf"] as? [Any]) ?? (node["anyOf"] as? [Any]) ?? (node["oneOf"] as? [Any]) else {
         return node
     }
@@ -2341,7 +2369,7 @@ func validateMap(spec: [String: Any], scanned: [String: ScannedType]) -> [String
 
 // MARK: - Main
 
-let snapshot = loadJSONRequired(snapshotPath) as! [String: Any]
+let snapshot = sdkSurface(loadJSONRequired(snapshotPath) as! [String: Any])
 
 switch mode {
 case .coverageReport:
@@ -2376,7 +2404,7 @@ case .check:
     exit(1)
 
 case .apply:
-    let newSpec = loadJSONRequired(specPath) as! [String: Any]
+    let newSpec = sdkSurface(loadJSONRequired(specPath) as! [String: Any])
     let scanned = scanSources(under: sourcesPath)
 
     let structuralFindings = detectStructuralChanges(old: snapshot, new: newSpec)

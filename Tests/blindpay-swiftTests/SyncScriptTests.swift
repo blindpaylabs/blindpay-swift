@@ -833,6 +833,52 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(apply.stdout.contains("new operation \"POST /new-thing\""))
 }
 
+/// Operations marked `x-sdk: false` are not part of the SDK surface (plan
+/// D11): neither they nor schemas only they reference need SDK work.
+@Test func xSdkFalseOperationsAndTheirSchemasAreIgnored() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(
+        extraSchemas: ["YieldOnlyOut": schema(["apy": ["type": "number"]])],
+        extraPaths: ["/excluded": ["get": ["x-sdk": false, "responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/YieldOnlyOut"]]]]]]]])
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(!apply.stdout.contains("/excluded"))
+    #expect(!apply.stdout.contains("YieldOnlyOut"))
+
+    // The same operation without the flag is new SDK surface.
+    let included = baseSpec(
+        extraSchemas: ["YieldOnlyOut": schema(["apy": ["type": "number"]])],
+        extraPaths: ["/excluded": ["get": ["x-sdk": true, "responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/YieldOnlyOut"]]]]]]]])
+    let dir2 = makeFixtureDir()
+    setupBaseline(dir2, spec: baseSpec())
+    writeJSON(dir2 + "/spec-current.json", included)
+    let apply2 = runSync(in: dir2, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir2))
+    #expect(apply2.stdout.contains("GET /excluded"))
+}
+
+/// OpenAPI 3.1 nullable types (`"type": ["string", "null"]`) are a nullable
+/// scalar, not an unrecognized shape.
+@Test func nullableTypeListIsAScalarForTheGenerator() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraPaths: ["/instances/{id}/things/{thing_id}": ["get": [
+        "parameters": [["name": "id", "in": "path", "required": true, "schema": ["type": "string"]],
+                       ["name": "thing_id", "in": "path", "required": true, "schema": ["type": "string"]]],
+        "responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/NullableThingOut"]]]]]]]])
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["NullableThingOut"] = schema(["note": ["type": ["string", "null"]]])
+    comps["schemas"] = schemas
+    var full = spec
+    full["components"] = comps
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", full)
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(!apply.stdout.contains("unrecognized schema shape"))
+}
+
 @Test func requiredNessChangeIsNeedsHuman() {
     let dir = makeFixtureDir()
     var spec = baseSpec()
