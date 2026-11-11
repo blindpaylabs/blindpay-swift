@@ -119,6 +119,14 @@ func schemas(of spec: [String: Any]) -> [String: Any] {
     return (spec.dict("components")?.dict("schemas")) ?? [:]
 }
 
+/// The component name of a `#/components/schemas/Name` reference, or nil
+/// for any other reference.
+func schemaRefName(_ ref: String?) -> String? {
+    let prefix = "#/components/schemas/"
+    guard let ref = ref, ref.hasPrefix(prefix) else { return nil }
+    return String(ref.dropFirst(prefix.count))
+}
+
 func paths(of spec: [String: Any]) -> [String: Any] {
     return (spec["paths"] as? [String: Any]) ?? [:]
 }
@@ -586,8 +594,7 @@ func swiftType(for node: [String: Any]) -> String {
 /// their element type instead of defaulting to strings.
 func fieldSwiftType(_ nodeIn: [String: Any], spec: [String: Any]) -> String {
     guard let node = effectiveSchemaNode(inlineEnumRef(nodeIn, spec: spec)) else { return "AnyCodable?" }
-    if let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/") {
-        let name = String(ref.dropFirst("#/components/schemas/".count))
+    if let name = schemaRefName(node.str("$ref")) {
         if let mapped = specMapTypes.first(where: { $0.str("spec") == name }),
            let symbol = (mapped["sdk"] as? [[String: Any]])?.first?.str("symbol") {
             return symbol + "?"
@@ -831,8 +838,8 @@ func swiftBaseType(_ typeText: String) -> String {
 /// `YieldStatus`) is that enum, not an object: inline it so type checks see
 /// the enum.
 func inlineEnumRef(_ node: [String: Any], spec: [String: Any]) -> [String: Any] {
-    guard let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/"),
-          let target = schemas(of: spec)[String(ref.dropFirst("#/components/schemas/".count))] as? [String: Any],
+    guard let name = schemaRefName(node.str("$ref")),
+          let target = schemas(of: spec)[name] as? [String: Any],
           target["enum"] != nil, target["properties"] == nil else { return node }
     var merged = target
     for (key, value) in node where key != "$ref" { merged[key] = value }
@@ -1031,8 +1038,8 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
 /// additionalProperties, or any other nesting) into `set`.
 func collectSchemaRefs(_ node: Any, into set: inout Set<String>) {
     if let dict = node as? [String: Any] {
-        if let ref = dict["$ref"] as? String, ref.hasPrefix("#/components/schemas/") {
-            set.insert(String(ref.dropFirst("#/components/schemas/".count)))
+        if let name = schemaRefName(dict["$ref"] as? String) {
+            set.insert(name)
         }
         for (_, v) in dict { collectSchemaRefs(v, into: &set) }
     } else if let arr = node as? [Any] {
@@ -1147,10 +1154,9 @@ func checkSchemaExpressible(_ nodeIn: [String: Any], spec: [String: Any], visite
         return "is an array of an enum-constrained item; enum naming/placement requires a human decision"
     }
     if let ref = node.str("$ref") {
-        guard ref.hasPrefix("#/components/schemas/") else {
+        guard let name = schemaRefName(ref) else {
             return "uses a $ref outside #/components/schemas, not supported by the generator"
         }
-        let name = String(ref.dropFirst("#/components/schemas/".count))
         if visited.contains(name) { return nil } // recursive/self-referencing schema already in progress
         // Already hand-mapped to an existing SDK type (spec-map.json types[]):
         // swiftTypeForSchema reuses that symbol outright rather than
@@ -1466,8 +1472,7 @@ func swiftStructName(for schemaName: String) -> String {
 func swiftTypeForSchema(_ nodeIn: [String: Any], spec: [String: Any], scanned: [String: ScannedType], isInputContext: Bool, generated: inout [GeneratedStruct], generatedNames: inout Set<String>) -> String? {
     guard let node = effectiveSchemaNode(nodeIn) else { return nil }
 
-    if let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/") {
-        let refName = String(ref.dropFirst("#/components/schemas/".count))
+    if let refName = schemaRefName(node.str("$ref")) {
         if let existing = specMapTypes.first(where: { $0.str("spec") == refName }),
            let sdkSites = existing["sdk"] as? [[String: Any]], let symbol = sdkSites.first?.str("symbol") {
             return symbol
