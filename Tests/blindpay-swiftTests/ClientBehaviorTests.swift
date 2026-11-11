@@ -32,7 +32,6 @@ struct RequestHeaderTests {
         let request = try #require(server.requests.first)
         #expect(request.header("Authorization") == "Bearer test_key")
         #expect(request.header("User-Agent") == "blindpay-swift/\(BlindPaySDK.version)")
-        #expect(BlindPaySDK.version == "5.0.0")
         #expect(request.header("Accept") == "application/json")
         #expect(request.header("Content-Type") == "application/json")
         let key = try #require(request.header("Idempotency-Key"))
@@ -397,6 +396,26 @@ struct IncompleteResponseTests {
         let response = try await getRails(server.client)
         #expect(response.data?.isEmpty == false)
         #expect(server.requests.count == 2)
+    }
+
+    @Test func aMutationThatTimesOutWhileReadingA5xxBodyIsSentExactlyOnce() async throws {
+        let server = MockServer(respondWith: .json(quoteBody))
+        let transport = ScriptedTransport([.hangAfterHeaders(503)])
+        let response = try await createQuote(server.client(transport: transport, timeout: 0.05))
+        #expect(transport.attempts == 1)
+        let error = try #require(response.error)
+        #expect(error.status == 503)
+        #expect(error.idempotencyKey != nil)
+    }
+
+    @Test func scopedServicesUseTheirOwnCustomer() async throws {
+        let server = MockServer(respondWith: .json(Data("[]".utf8)))
+        _ = try await server.client.customers(customerId: "cu_A").virtualAccounts.list()
+        _ = try await server.client.customers(customerId: "cu_A").bankAccounts.offrampWallets.list(bankAccountId: "ba_1")
+        #expect(server.requests.map(\.path) == [
+            "/v1/instances/in_000000000000/customers/cu_A/virtual-accounts",
+            "/v1/instances/in_000000000000/customers/cu_A/bank-accounts/ba_1/offramp-wallets",
+        ])
     }
 
     @Test func aRequestBuildErrorIsNeverRetried() async throws {

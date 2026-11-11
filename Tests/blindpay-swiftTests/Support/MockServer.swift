@@ -238,6 +238,9 @@ final class ScriptedTransport: HTTPTransport, @unchecked Sendable {
     enum Step {
         case fail(URLError.Code)
         case hang
+        /// Headers arrived (with this status), then the body hangs until the
+        /// attempt is cancelled (for example by the per-attempt timeout).
+        case hangAfterHeaders(Int)
         case pass
     }
 
@@ -260,6 +263,14 @@ final class ScriptedTransport: HTTPTransport, @unchecked Sendable {
             // Honours cancellation, like URLSession does.
             try await Task.sleep(nanoseconds: 30_000_000_000)
             throw URLError(.unknown)
+        case .hangAfterHeaders(let status):
+            let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: [:])!
+            do {
+                try await Task.sleep(nanoseconds: 30_000_000_000)
+                throw URLError(.unknown)
+            } catch {
+                throw HTTPTransportError.incompleteResponse(response, underlying: error)
+            }
         case .pass:
             return try await MockServer.transport.send(request)
         }

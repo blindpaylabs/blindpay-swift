@@ -80,7 +80,7 @@ The same applies to `GetFxRateInput.requestAmount`, `CreatePayinQuoteInput.reque
 - `UploadResponse.url` is now `fileUrl`. `NaicsCode` is `{label, value}`.
 - Fields the API can omit or return as null are optional: e.g. `Payout.name`/`type`, `VirtualAccount.us`, `SwiftCodeResponse.address`/`postcode`, the customer limit amounts.
 - `FraudWarning.score`, `OnboardingOwner.ownershipPercentage` are `Double`.
-- `CustodialWalletBalanceResponse` gains `eurc`/`eurb`; `PayoutTrackingPayment.providerIntegration` is removed (the API no longer sends it).
+- `CustodialWalletBalanceResponse` gains `eurc`/`eurb`.
 
 ## Lists return `ListResult`
 
@@ -126,6 +126,8 @@ let data = try response.get()   // throws the APIError
 |---|---|
 | `WebhookEvent` (event names for endpoints) | `WebhookEventType`; `WebhookEvent` is now the typed, verified webhook (`Webhooks.constructEvent`) |
 | `URLSessionTransport(session:)` | `URLSessionTransport(configuration:)` (only in 5.0 pre-releases) |
+| `customers(customerId: "A").virtualAccounts.list(customerId: "B")` (the parameter overrode the scoped customer) | `customers(customerId: "A").virtualAccounts.list()`; same for `get`, `create`, `update` |
+| `bankAccounts.offrampWallets.list(customerId:bankAccountId:)` (and `create`, `get`) | `bankAccounts.offrampWallets.list(bankAccountId:)`; the customer comes from `customers(customerId:)` |
 | facade-only customer, transfer, fee and payout-document methods | still on the facade, now delegating to `instances.customers`, `customers(customerId:)`, `instances.transfers`, `instances.transferQuotes`, `instances.getFees()`, `instances.payouts.submitDocuments(...)` |
 
 ## New

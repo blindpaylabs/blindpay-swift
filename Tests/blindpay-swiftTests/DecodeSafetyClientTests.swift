@@ -44,7 +44,7 @@ struct DecodeSafetyClientTests {
 
     @Test func virtualAccountGet() async throws {
         try await expectClientDecodes("GET /v1/instances/{instance_id}/customers/{customer_id}/virtual-accounts/{id}") {
-            try await $0.customers(customerId: "cu_000000000000").virtualAccounts.get(customerId: "cu_000000000000", id: "va_000000000000")
+            try await $0.customers(customerId: "cu_000000000000").virtualAccounts.get(id: "va_000000000000")
         }
     }
 

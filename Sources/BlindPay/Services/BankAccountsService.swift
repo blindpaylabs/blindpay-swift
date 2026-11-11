@@ -21,7 +21,7 @@ public final class BankAccountsService: Sendable {
         self.apiClient = apiClient
         self.instanceId = instanceId
         self.customerId = customerId
-        self.offrampWallets = OfframpWalletsService(apiClient: apiClient, instanceId: instanceId)
+        self.offrampWallets = OfframpWalletsService(apiClient: apiClient, instanceId: instanceId, customerId: customerId)
     }
     
     /// Lists all bank accounts for the customer

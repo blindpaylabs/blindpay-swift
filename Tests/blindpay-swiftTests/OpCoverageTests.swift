@@ -66,10 +66,10 @@ private let calls: [String: Call] = [
     "GET \(I)/rfi": { _ = try await $0.instances.rfi.get().get() },
     "POST \(I)/rfi": { _ = try await $0.instances.rfi.submit(response: ["proof": ["https://example.com/a.pdf"]]).get() },
     // Offramp wallets
-    "POST \(C)/bank-accounts/{bank_account_id}/offramp-wallets": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.create(customerId: cu, bankAccountId: "ba_1", data: CreateOfframpWalletInput(network: .base)).get() },
-    "GET \(C)/bank-accounts/{bank_account_id}/offramp-wallets": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.list(customerId: cu, bankAccountId: "ba_1").get() },
-    "GET \(C)/bank-accounts/{bank_account_id}/offramp-wallets/{id}": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.get(customerId: cu, bankAccountId: "ba_1", walletId: "ow_1").get() },
-    "PUT \(C)/bank-accounts/{bank_account_id}/offramp-wallets/{id}": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.update(customerId: cu, bankAccountId: "ba_1", walletId: "ow_1", data: UpdateOfframpWalletInput(partnerFee: .clear)).get() },
+    "POST \(C)/bank-accounts/{bank_account_id}/offramp-wallets": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.create(bankAccountId: "ba_1", data: CreateOfframpWalletInput(network: .base)).get() },
+    "GET \(C)/bank-accounts/{bank_account_id}/offramp-wallets": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.list(bankAccountId: "ba_1").get() },
+    "GET \(C)/bank-accounts/{bank_account_id}/offramp-wallets/{id}": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.get(bankAccountId: "ba_1", walletId: "ow_1").get() },
+    "PUT \(C)/bank-accounts/{bank_account_id}/offramp-wallets/{id}": { _ = try await $0.customers(customerId: cu).bankAccounts.offrampWallets.update(bankAccountId: "ba_1", walletId: "ow_1", data: UpdateOfframpWalletInput(partnerFee: .clear)).get() },
     // Partner fees
     "POST \(I)/partner-fees": { _ = try await $0.instances.partnerFees.create(data: CreatePartnerFeeInput(name: "f", payinFlatFee: 0, payinPercentageFee: 0, payoutFlatFee: 0, payoutPercentageFee: 0)).get() },
     "GET \(I)/partner-fees": { _ = try await $0.instances.partnerFees.list().get() },
@@ -116,10 +116,10 @@ private let calls: [String: Call] = [
     "POST /v1/upload": { _ = try await $0.upload.create(data: UploadInput(file: file, fileName: "a.pdf", bucket: .documents)).get() },
     "POST /v1/upload/analyze": { _ = try await $0.upload.analyze(data: UploadAnalyzeInput(file: file, fileName: "a.pdf", type: .passport)).get() },
     // Virtual accounts
-    "POST \(C)/virtual-accounts": { _ = try await $0.customers(customerId: cu).virtualAccounts.create(customerId: cu, data: CreateVirtualAccountInput(bankingPartner: .jpmorgan, token: .usdc, blockchainWalletId: "bw_1")).get() },
-    "GET \(C)/virtual-accounts": { _ = try await $0.customers(customerId: cu).virtualAccounts.list(customerId: cu).get() },
-    "GET \(C)/virtual-accounts/{id}": { _ = try await $0.customers(customerId: cu).virtualAccounts.get(customerId: cu, id: "va_1").get() },
-    "PUT \(C)/virtual-accounts/{id}": { _ = try await $0.customers(customerId: cu).virtualAccounts.update(customerId: cu, id: "va_1", data: UpdateVirtualAccountInput(blockchainWalletId: "bw_1", token: .usdc)).get() },
+    "POST \(C)/virtual-accounts": { _ = try await $0.customers(customerId: cu).virtualAccounts.create(data: CreateVirtualAccountInput(bankingPartner: .jpmorgan, token: .usdc, blockchainWalletId: "bw_1")).get() },
+    "GET \(C)/virtual-accounts": { _ = try await $0.customers(customerId: cu).virtualAccounts.list().get() },
+    "GET \(C)/virtual-accounts/{id}": { _ = try await $0.customers(customerId: cu).virtualAccounts.get(id: "va_1").get() },
+    "PUT \(C)/virtual-accounts/{id}": { _ = try await $0.customers(customerId: cu).virtualAccounts.update(id: "va_1", data: UpdateVirtualAccountInput(blockchainWalletId: "bw_1", token: .usdc)).get() },
     // Managed wallets
     "POST \(C)/wallets": { _ = try await $0.customers(customerId: cu).custodialWallets.create(data: CreateCustodialWalletInput(name: "w", network: .base)).get() },
     "GET \(C)/wallets": { _ = try await $0.customers(customerId: cu).custodialWallets.list().get() },
