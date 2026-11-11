@@ -96,8 +96,9 @@ internal final class APIClient: Sendable {
             guard !key.isEmpty, key.trimmingCharacters(in: .whitespacesAndNewlines) == key else {
                 throw BlindPayError.invalidRequest("idempotencyKey must not be empty or padded with whitespace")
             }
-            guard key.count <= 255 else {
-                throw BlindPayError.invalidRequest("idempotencyKey must be at most 255 characters")
+            // The server measures the key as a JavaScript string (UTF-16 units).
+            guard key.utf16.count <= 255 else {
+                throw BlindPayError.invalidRequest("idempotencyKey must be at most 255 characters (UTF-16 code units)")
             }
             return key
         }
@@ -157,6 +158,9 @@ internal final class APIClient: Sendable {
         options: RequestOptions?
     ) async throws -> APIResponse<T> {
         let timeout = options?.timeout ?? configuration.timeout
+        guard timeout > 0, timeout.isFinite else {
+            throw BlindPayError.invalidRequest("timeout must be a positive number of seconds")
+        }
         var attempt = 0
         while true {
             try Task.checkCancellation()
@@ -164,29 +168,38 @@ internal final class APIClient: Sendable {
             do {
                 let (data, response) = try await self.attempt(request, timeout: timeout)
                 if (200..<300).contains(response.statusCode) {
-                    return try decodeSuccess(data)
+                    return try decodeSuccess(data, status: response.statusCode, idempotencyKey: idempotencyKey)
                 }
-                let error = makeAPIError(data: data, response: response, idempotencyKey: idempotencyKey)
+                let error = makeAPIError(data: data, response: response, method: method, idempotencyKey: idempotencyKey)
                 let outcome = RetryPolicy.Outcome.response(status: error.status, code: error.code, message: error.message)
                 if canRetry, RetryPolicy.shouldRetry(method: method, isMultipart: isMultipart, hasIdempotencyKey: idempotencyKey != nil, outcome: outcome) {
-                    try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: error.headers.value(for: "Retry-After"), jitter: configuration.jitter()))
+                    try await sleepBeforeRetry(RetryPolicy.delay(attempt: attempt, retryAfter: error.headers.value(for: "Retry-After"), jitter: configuration.jitter()), after: error)
                     attempt += 1
                     continue
                 }
                 return APIResponse(data: nil, error: error)
             } catch HTTPTransportError.incompleteResponse(let response, let underlying) {
                 if Task.isCancelled { throw CancellationError() }
-                // The server answered. A mutation is never resent: on a 5xx
-                // the server has released the key and would run it again.
-                if method == .get, canRetry, !isMultipart {
+                // The server answered, so classify by its status. A mutation is
+                // never resent: on a 5xx the server has released the key and
+                // would run it again. A GET is resent for a 2xx or a retryable
+                // status, never for another 4xx.
+                let status = response.statusCode
+                let getMayRetry = (200..<300).contains(status)
+                    || RetryPolicy.shouldRetry(method: .get, isMultipart: false, hasIdempotencyKey: false, outcome: .response(status: status, code: nil, message: nil))
+                if method == .get, !isMultipart, canRetry, getMayRetry {
                     try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: nil, jitter: configuration.jitter()))
                     attempt += 1
                     continue
                 }
-                if response.statusCode >= 400 {
-                    return APIResponse(data: nil, error: makeAPIError(data: Data(), response: response, idempotencyKey: idempotencyKey))
+                if status >= 400 {
+                    return APIResponse(data: nil, error: makeAPIError(data: Data(), response: response, method: method, idempotencyKey: idempotencyKey))
                 }
-                throw BlindPayError.networkError(underlying, idempotencyKey: idempotencyKey)
+                throw BlindPayError.incompleteResponse(status: status, underlying: underlying, idempotencyKey: idempotencyKey)
+            } catch let error as BlindPayError {
+                // Raised by this client (decoding, cancellation after an API
+                // error, ...): never retried.
+                throw error
             } catch {
                 if error is CancellationError || Task.isCancelled { throw CancellationError() }
                 let failure: BlindPayError
@@ -197,8 +210,6 @@ internal final class APIClient: Sendable {
                     failure = .timeout(idempotencyKey: idempotencyKey)
                 case let urlError as URLError:
                     failure = .networkError(urlError, idempotencyKey: idempotencyKey)
-                case let blindPayError as BlindPayError:
-                    throw blindPayError
                 default:
                     failure = .networkError(error, idempotencyKey: idempotencyKey)
                 }
@@ -250,7 +261,18 @@ internal final class APIClient: Sendable {
 
     // MARK: - Decoding
 
-    private func decodeSuccess<T: Decodable & Sendable>(_ data: Data) throws -> APIResponse<T> {
+    /// Sleeps before a retry that follows an API error; a cancellation during
+    /// the wait surfaces that error instead of a bare CancellationError.
+    private func sleepBeforeRetry(_ seconds: TimeInterval, after apiError: APIError) async throws {
+        do {
+            try await configuration.sleep(seconds)
+        } catch {
+            throw BlindPayError.cancelled(lastError: apiError)
+        }
+        if Task.isCancelled { throw BlindPayError.cancelled(lastError: apiError) }
+    }
+
+    private func decodeSuccess<T: Decodable & Sendable>(_ data: Data, status: Int, idempotencyKey: String?) throws -> APIResponse<T> {
         // 204 / empty body / literal null: success with no data.
         let trimmed = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty || trimmed == "null" {
@@ -259,11 +281,11 @@ internal final class APIClient: Sendable {
         do {
             return APIResponse(data: try JSONDecoder().decode(T.self, from: data), error: nil)
         } catch {
-            throw BlindPayError.decodingError(error)
+            throw BlindPayError.decodingError(error, status: status, idempotencyKey: idempotencyKey)
         }
     }
 
-    private func makeAPIError(data: Data, response: HTTPURLResponse, idempotencyKey: String?) -> APIError {
+    private func makeAPIError(data: Data, response: HTTPURLResponse, method: HTTPMethod, idempotencyKey: String?) -> APIError {
         var headers: [String: String] = [:]
         for (name, value) in response.allHeaderFields {
             headers[String(describing: name)] = String(describing: value)
@@ -280,7 +302,8 @@ internal final class APIClient: Sendable {
             traceId: body?.traceId,
             requestId: headers.value(for: "X-Request-Id"),
             idempotencyKey: idempotencyKey,
-            retryable: RetryPolicy.isRetryable(status: response.statusCode, code: body?.code, message: body?.message),
+            retryable: RetryPolicy.isRetryable(method: method, hasIdempotencyKey: idempotencyKey != nil,
+                                               status: response.statusCode, code: body?.code, message: body?.message),
             headers: headers
         )
     }

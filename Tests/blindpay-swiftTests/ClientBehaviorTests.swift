@@ -268,16 +268,26 @@ struct RetryTableTests {
     // Row 1: a retry sleep stops when the caller cancels.
     @Test func backoffSleepStopsOnCancellation() async throws {
         let server = MockServer(respondWith: .status(503))
+        let sleeping = Signal()
         let base = server.configuration()
         let client = BlindPay(apiKey: "test_key", instanceId: server.instanceId, configuration: Configuration(
             baseURL: base.baseURL, timeout: 60, maxRetries: 2, transport: MockServer.transport,
-            sleep: { try await Task.sleep(nanoseconds: UInt64($0 * 60 * 1_000_000_000)) },
+            sleep: { seconds in
+                sleeping.fire()
+                try await Task.sleep(nanoseconds: UInt64(seconds * 60 * 1_000_000_000))
+            },
             jitter: { 1.0 }))
         let task = Task { try await getRails(client) }
-        while server.requests.isEmpty { await Task.yield() }
+        while !sleeping.fired { await Task.yield() }
         let started = Date()
         task.cancel()
-        await #expect(throws: CancellationError.self) { _ = try await task.value }
+        do {
+            _ = try await task.value
+            Issue.record("expected a cancellation error")
+        } catch BlindPayError.cancelled(let lastError) {
+            // The response that was being retried is not lost.
+            #expect(lastError.status == 503)
+        }
         #expect(Date().timeIntervalSince(started) < 5)
         #expect(server.requests.count == 1)
     }
@@ -456,4 +466,81 @@ struct KeyAndHeaderValidationTests {
         #expect(request.header("User-Agent") == "blindpay-swift/\(BlindPaySDK.version)")
         #expect(request.header("X-Trace") == "abc")
     }
+}
+
+
+struct ReviewFindingTests {
+    @Test func retryableDependsOnMethodAndKey() {
+        #expect(RetryPolicy.isRetryable(method: .get, hasIdempotencyKey: false, status: 408, code: nil, message: nil))
+        #expect(!RetryPolicy.isRetryable(method: .post, hasIdempotencyKey: true, status: 408, code: nil, message: nil))
+        #expect(!RetryPolicy.isRetryable(method: .post, hasIdempotencyKey: false, status: 503, code: nil, message: nil))
+        #expect(RetryPolicy.isRetryable(method: .post, hasIdempotencyKey: true, status: 503, code: nil, message: nil))
+    }
+
+    @Test func aKeylessMutation5xxIsNotReportedRetryable() async throws {
+        let server = MockServer(respondWith: .status(503))
+        let response = try await createQuote(server.client(maxRetries: 0))
+        let error = try #require(response.error)
+        #expect(error.idempotencyKey == nil)
+        #expect(!error.retryable)
+    }
+
+    @Test func a2xxThatFailsToDecodeKeepsTheStatusAndKey() async throws {
+        let server = MockServer(respondWith: .json(Data(#"{"unexpected":true}"#.utf8)))
+        do {
+            _ = try await createQuote(server.client, options: RequestOptions(idempotencyKey: "k-decode"))
+            Issue.record("expected a decoding error")
+        } catch BlindPayError.decodingError(_, let status, let key) {
+            #expect(status == 200)
+            #expect(key == "k-decode")
+        }
+        #expect(server.requests.count == 1)
+    }
+
+    @Test func a2xxWhoseBodyFailsCarriesTheStatusAndKey() async throws {
+        let server = MockServer(respondWith: MockResponse(status: 201, failsAfterHeaders: true))
+        do {
+            _ = try await createQuote(server.client, options: RequestOptions(idempotencyKey: "k-body"))
+            Issue.record("expected an incomplete response")
+        } catch BlindPayError.incompleteResponse(let status, _, let key) {
+            #expect(status == 201)
+            #expect(key == "k-body")
+        }
+        #expect(server.requests.count == 1)
+    }
+
+    @Test func aGetWhose4xxBodyFailsIsNotRetried() async throws {
+        let server = MockServer(respondWith: MockResponse(status: 404, failsAfterHeaders: true))
+        let response = try await getRails(server.client)
+        #expect(response.error?.status == 404)
+        #expect(server.requests.count == 1)
+    }
+
+    @Test(arguments: [0.0, -1.0, Double.nan])
+    func aNonPositiveTimeoutIsRejectedBeforeSending(timeout: Double) async throws {
+        let server = MockServer(respondWith: .json(railsBody))
+        await #expect(throws: BlindPayError.self) {
+            _ = try await server.client.available.getRails(options: RequestOptions(timeout: timeout))
+        }
+        await #expect(throws: BlindPayError.self) { _ = try await getRails(server.client(timeout: timeout)) }
+        #expect(server.requests.isEmpty)
+    }
+
+    @Test func theKeyLengthIsCountedInUTF16Units() async throws {
+        let server = MockServer(respondWith: .json(quoteBody))
+        // 128 characters, 256 UTF-16 code units.
+        let key = String(repeating: "😀", count: 128)
+        await #expect(throws: BlindPayError.self) {
+            _ = try await createQuote(server.client, options: RequestOptions(idempotencyKey: key))
+        }
+        #expect(server.requests.isEmpty)
+    }
+}
+
+/// Set once from any task.
+private final class Signal: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+    func fire() { lock.lock(); value = true; lock.unlock() }
+    var fired: Bool { lock.lock(); defer { lock.unlock() }; return value }
 }

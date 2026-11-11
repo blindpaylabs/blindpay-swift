@@ -40,9 +40,14 @@ enum RetryPolicy {
         }
     }
 
-    /// Whether resending could succeed, independent of method: reported on
-    /// ``APIError/retryable`` so callers can decide.
-    static func isRetryable(status: Int, code: String?, message: String?) -> Bool {
+    /// Whether the caller may safely resend: reported on
+    /// ``APIError/retryable``. A mutation is resendable only with the same
+    /// idempotency key it used, and a mutation 408 never (the server may
+    /// still be running it).
+    static func isRetryable(method: HTTPMethod, hasIdempotencyKey: Bool, status: Int, code: String?, message: String?) -> Bool {
+        let isMutation = method != .get
+        if isMutation && !hasIdempotencyKey { return false }
+        if isMutation && status == 408 { return false }
         if status == 409 { return message == inFlightMessage }
         if status == 408 || status == 429 { return true }
         if status >= 500 {

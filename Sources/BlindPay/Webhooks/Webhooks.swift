@@ -70,7 +70,7 @@ public enum Webhooks {
     /// ``WebhookEvent/unknown(type:payload:)`` instead of failing.
     ///
     /// - Throws: ``BlindPayError/webhookVerificationFailed`` when the
-    ///   signature doesn't verify, ``BlindPayError/decodingError(_:)`` when a
+    ///   signature doesn't verify, ``BlindPayError/decodingError(_:status:idempotencyKey:)`` when a
     ///   verified payload doesn't decode.
     public static func constructEvent(
         payload: Data,
