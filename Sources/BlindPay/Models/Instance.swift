@@ -96,16 +96,36 @@ public struct UpdateInstanceInput: Codable, Sendable {
     /// Whether passkey authentication is required (optional)
     public let requirePasskey: Bool?
 
+    public let accentColor: String?
+
+    public let logoUrl: String?
+
+    public let partnerTosLink: String?
+
+    public let partnerTosScreenshot: String?
+
+    public let partnerTosTermsAccepted: Bool?
+
     public init(
         name: String,
         customerInviteRedirectUrl: String? = nil,
         emailNotifications: Bool? = nil,
-        requirePasskey: Bool? = nil
+        requirePasskey: Bool? = nil,
+        accentColor: String? = nil,
+        logoUrl: String? = nil,
+        partnerTosLink: String? = nil,
+        partnerTosScreenshot: String? = nil,
+        partnerTosTermsAccepted: Bool? = nil
     ) {
         self.name = name
         self.customerInviteRedirectUrl = customerInviteRedirectUrl
         self.emailNotifications = emailNotifications
         self.requirePasskey = requirePasskey
+        self.accentColor = accentColor
+        self.logoUrl = logoUrl
+        self.partnerTosLink = partnerTosLink
+        self.partnerTosScreenshot = partnerTosScreenshot
+        self.partnerTosTermsAccepted = partnerTosTermsAccepted
     }
 
     enum CodingKeys: String, CodingKey {
@@ -113,6 +133,11 @@ public struct UpdateInstanceInput: Codable, Sendable {
         case customerInviteRedirectUrl = "customer_invite_redirect_url"
         case emailNotifications = "email_notifications"
         case requirePasskey = "require_passkey"
+        case accentColor = "accent_color"
+        case logoUrl = "logo_url"
+        case partnerTosLink = "partner_tos_link"
+        case partnerTosScreenshot = "partner_tos_screenshot"
+        case partnerTosTermsAccepted = "partner_tos_terms_accepted"
     }
 }
 
@@ -304,7 +329,7 @@ public struct Instance: Codable, Sendable, Equatable {
     public let id: String
     public let name: String
     /// development instances simulate settlement with test tokens (USDB) and move no real money; production instances move real funds
-    public let `type`: InstanceType
+    public let type: InstanceType
     /// completed once the instance can move money; anything else means onboarding is still open in the dashboard
     public let onboardingStep: OnboardingStep
 
@@ -323,7 +348,7 @@ public struct Instance: Codable, Sendable, Equatable {
     enum CodingKeys: String, CodingKey {
         case id
         case name
-        case `type`
+        case type
         case onboardingStep = "onboarding_step"
     }
 }

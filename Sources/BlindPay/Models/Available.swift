@@ -25,6 +25,7 @@ public struct Rail: OpenEnum {
     public static let rtp = Rail(rawValue: "rtp")
     public static let ted = Rail(rawValue: "ted")
     public static let sepa = Rail(rawValue: "sepa")
+    public static let fasterPayments = Rail(rawValue: "faster_payments")
 }
 
 /// Bank account type

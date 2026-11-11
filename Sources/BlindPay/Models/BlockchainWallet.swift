@@ -30,6 +30,8 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
     /// Signature transaction hash (optional)
     public let signatureTxHash: String?
     
+    public let isSelfCustody: Bool?
+
     public init(
         id: String,
         name: String? = nil,
@@ -37,7 +39,8 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         customerId: String,
         address: String? = nil,
         isAccountAbstraction: Bool? = nil,
-        signatureTxHash: String? = nil
+        signatureTxHash: String? = nil,
+        isSelfCustody: Bool? = nil
     ) {
         self.id = id
         self.name = name
@@ -46,6 +49,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         self.address = address
         self.isAccountAbstraction = isAccountAbstraction
         self.signatureTxHash = signatureTxHash
+        self.isSelfCustody = isSelfCustody
     }
     
     enum CodingKeys: String, CodingKey {
@@ -56,6 +60,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         case address
         case isAccountAbstraction = "is_account_abstraction"
         case signatureTxHash = "signature_tx_hash"
+        case isSelfCustody = "is_self_custody"
     }
 }
 
@@ -99,18 +104,22 @@ public struct CreateBlockchainWalletInput: Codable, Sendable {
     /// Signature transaction hash (optional)
     public let signatureTxHash: String?
     
+    public let isSelfCustody: Bool?
+
     public init(
         name: String,
         network: Network,
         address: String? = nil,
         isAccountAbstraction: Bool? = nil,
-        signatureTxHash: String? = nil
+        signatureTxHash: String? = nil,
+        isSelfCustody: Bool? = nil
     ) {
         self.name = name
         self.network = network
         self.address = address
         self.isAccountAbstraction = isAccountAbstraction
         self.signatureTxHash = signatureTxHash
+        self.isSelfCustody = isSelfCustody
     }
     
     enum CodingKeys: String, CodingKey {
@@ -119,6 +128,7 @@ public struct CreateBlockchainWalletInput: Codable, Sendable {
         case address
         case isAccountAbstraction = "is_account_abstraction"
         case signatureTxHash = "signature_tx_hash"
+        case isSelfCustody = "is_self_custody"
     }
 }
 
@@ -217,13 +227,13 @@ public struct MintUsdbSolanaResponse: Codable, Sendable, Equatable {
 /// Input for preparing a Solana delegate transaction
 public struct PrepareDelegateSolanaInput: Codable, Sendable {
     /// Amount to delegate
-    public let amount: String
+    public let amount: String?
     
     /// Owner address
     public let ownerAddress: String
     
     /// Token address
-    public let tokenAddress: String
+    public let tokenAddress: String?
     
     public init(amount: String, ownerAddress: String, tokenAddress: String) {
         self.amount = amount

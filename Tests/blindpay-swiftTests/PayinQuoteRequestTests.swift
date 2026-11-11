@@ -15,7 +15,7 @@ struct PayinQuoteRequestTests {
             blockchainWalletId: "bw_000000000000",
             currencyType: .sender,
             coverFees: true,
-            requestAmount: 19.99,
+            requestAmount: 1999,
             paymentMethod: .pix,
             token: .usdc,
             payerRules: PayinQuotePayerRules(pixAllowedTaxIds: ["123.456.789-09"])

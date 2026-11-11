@@ -29,13 +29,16 @@ public struct CustodialWallet: Codable, Sendable, Equatable {
     /// Timestamp when the wallet was created
     public let createdAt: String?
 
+    public let yieldStatus: WalletYieldStatus?
+
     public init(
         id: String,
         name: String,
         externalId: String? = nil,
         address: String? = nil,
         network: Network,
-        createdAt: String? = nil
+        createdAt: String? = nil,
+        yieldStatus: WalletYieldStatus? = nil
     ) {
         self.id = id
         self.name = name
@@ -43,6 +46,7 @@ public struct CustodialWallet: Codable, Sendable, Equatable {
         self.address = address
         self.network = network
         self.createdAt = createdAt
+        self.yieldStatus = yieldStatus
     }
 
     enum CodingKeys: String, CodingKey {
@@ -52,6 +56,7 @@ public struct CustodialWallet: Codable, Sendable, Equatable {
         case address
         case network
         case createdAt = "created_at"
+        case yieldStatus = "yield_status"
     }
 }
 
@@ -101,16 +106,24 @@ public struct CustodialWalletBalanceResponse: Codable, Sendable, Equatable {
     /// USDB balance
     public let usdb: WalletTokenBalance?
 
-    public init(usdc: WalletTokenBalance? = nil, usdt: WalletTokenBalance? = nil, usdb: WalletTokenBalance? = nil) {
+    public let eurb: WalletTokenBalance?
+
+    public let eurc: WalletTokenBalance?
+
+    public init(usdc: WalletTokenBalance? = nil, usdt: WalletTokenBalance? = nil, usdb: WalletTokenBalance? = nil, eurb: WalletTokenBalance? = nil, eurc: WalletTokenBalance? = nil) {
         self.usdc = usdc
         self.usdt = usdt
         self.usdb = usdb
+        self.eurb = eurb
+        self.eurc = eurc
     }
 
     enum CodingKeys: String, CodingKey {
         case usdc = "USDC"
         case usdt = "USDT"
         case usdb = "USDB"
+        case eurb = "EURB"
+        case eurc = "EURC"
     }
 }
 
@@ -138,6 +151,18 @@ public struct CreateCustodialWalletInput: Codable, Sendable {
         case network
         case externalId = "external_id"
     }
+}
+
+// MARK: - Yield
+
+/// Whether yield is on for a managed wallet.
+public struct WalletYieldStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let disabled = WalletYieldStatus(rawValue: "disabled")
+    public static let enabled = WalletYieldStatus(rawValue: "enabled")
+    public static let disabling = WalletYieldStatus(rawValue: "disabling")
 }
 
 // MARK: - Deposits

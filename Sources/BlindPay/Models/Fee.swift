@@ -75,6 +75,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
 
     /// SPEI fees
     public let spei: FeeOptions?
+    public let sepa: FeeOptions?
+    public let fasterPayments: FeeOptions?
 
     /// Tron fees
     public let tron: FeeOptions?
@@ -103,6 +105,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
     /// Timestamp when the fees were last updated
     public let updatedAt: String?
 
+    public let yield: [String: AnyCodable]?
+
     public init(
         id: String,
         instanceId: String,
@@ -116,6 +120,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         achColombia: FeeOptions? = nil,
         transfers3: FeeOptions? = nil,
         spei: FeeOptions? = nil,
+        sepa: FeeOptions? = nil,
+        fasterPayments: FeeOptions? = nil,
         tron: FeeOptions? = nil,
         ethereum: FeeOptions? = nil,
         polygon: FeeOptions? = nil,
@@ -124,7 +130,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         stellar: FeeOptions? = nil,
         solana: FeeOptions? = nil,
         createdAt: String? = nil,
-        updatedAt: String? = nil
+        updatedAt: String? = nil,
+        yield: [String: AnyCodable]? = nil
     ) {
         self.id = id
         self.instanceId = instanceId
@@ -138,6 +145,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         self.achColombia = achColombia
         self.transfers3 = transfers3
         self.spei = spei
+        self.sepa = sepa
+        self.fasterPayments = fasterPayments
         self.tron = tron
         self.ethereum = ethereum
         self.polygon = polygon
@@ -147,6 +156,7 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         self.solana = solana
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.yield = yield
     }
 
     enum CodingKeys: String, CodingKey {
@@ -162,6 +172,8 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         case achColombia = "ach_colombia"
         case transfers3 = "transfers_3"
         case spei
+        case sepa
+        case fasterPayments = "faster_payments"
         case tron
         case ethereum
         case polygon
@@ -171,5 +183,6 @@ public struct FeesResponse: Codable, Sendable, Equatable {
         case solana
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case yield
     }
 }

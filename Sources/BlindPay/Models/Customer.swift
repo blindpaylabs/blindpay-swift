@@ -159,167 +159,6 @@ public struct BusinessType: OpenEnum {
 
 // MARK: - Business Industry
 
-/// NAICS code for business industry classification
-public struct BusinessIndustry: OpenEnum {
-    public let rawValue: String
-    public init(rawValue: String) { self.rawValue = rawValue }
-
-    public static let n111998 = BusinessIndustry(rawValue: "111998")
-    public static let n112120 = BusinessIndustry(rawValue: "112120")
-    public static let n113310 = BusinessIndustry(rawValue: "113310")
-    public static let n115114 = BusinessIndustry(rawValue: "115114")
-    public static let n541211 = BusinessIndustry(rawValue: "541211")
-    public static let n541810 = BusinessIndustry(rawValue: "541810")
-    public static let n541430 = BusinessIndustry(rawValue: "541430")
-    public static let n541715 = BusinessIndustry(rawValue: "541715")
-    public static let n541930 = BusinessIndustry(rawValue: "541930")
-    public static let n561422 = BusinessIndustry(rawValue: "561422")
-    public static let n561311 = BusinessIndustry(rawValue: "561311")
-    public static let n561612 = BusinessIndustry(rawValue: "561612")
-    public static let n561740 = BusinessIndustry(rawValue: "561740")
-    public static let n561730 = BusinessIndustry(rawValue: "561730")
-    public static let n236115 = BusinessIndustry(rawValue: "236115")
-    public static let n236220 = BusinessIndustry(rawValue: "236220")
-    public static let n237310 = BusinessIndustry(rawValue: "237310")
-    public static let n238210 = BusinessIndustry(rawValue: "238210")
-    public static let n811111 = BusinessIndustry(rawValue: "811111")
-    public static let n812111 = BusinessIndustry(rawValue: "812111")
-    public static let n812112 = BusinessIndustry(rawValue: "812112")
-    public static let n532111 = BusinessIndustry(rawValue: "532111")
-    public static let n624410 = BusinessIndustry(rawValue: "624410")
-    public static let n541922 = BusinessIndustry(rawValue: "541922")
-    public static let n811210 = BusinessIndustry(rawValue: "811210")
-    public static let n812199 = BusinessIndustry(rawValue: "812199")
-    public static let n611110 = BusinessIndustry(rawValue: "611110")
-    public static let n611310 = BusinessIndustry(rawValue: "611310")
-    public static let n611410 = BusinessIndustry(rawValue: "611410")
-    public static let n611710 = BusinessIndustry(rawValue: "611710")
-    public static let n211120 = BusinessIndustry(rawValue: "211120")
-    public static let n212114 = BusinessIndustry(rawValue: "212114")
-    public static let n221310 = BusinessIndustry(rawValue: "221310")
-    public static let n562111 = BusinessIndustry(rawValue: "562111")
-    public static let n562920 = BusinessIndustry(rawValue: "562920")
-    public static let n213112 = BusinessIndustry(rawValue: "213112")
-    public static let n522110 = BusinessIndustry(rawValue: "522110")
-    public static let n522210 = BusinessIndustry(rawValue: "522210")
-    public static let n522320 = BusinessIndustry(rawValue: "522320")
-    public static let n523150 = BusinessIndustry(rawValue: "523150")
-    public static let n523940 = BusinessIndustry(rawValue: "523940")
-    public static let n523999 = BusinessIndustry(rawValue: "523999")
-    public static let n524113 = BusinessIndustry(rawValue: "524113")
-    public static let n813110 = BusinessIndustry(rawValue: "813110")
-    public static let n813211 = BusinessIndustry(rawValue: "813211")
-    public static let n813219 = BusinessIndustry(rawValue: "813219")
-    public static let n551112 = BusinessIndustry(rawValue: "551112")
-    public static let n721110 = BusinessIndustry(rawValue: "721110")
-    public static let n722511 = BusinessIndustry(rawValue: "722511")
-    public static let n722513 = BusinessIndustry(rawValue: "722513")
-    public static let n561510 = BusinessIndustry(rawValue: "561510")
-    public static let n713110 = BusinessIndustry(rawValue: "713110")
-    public static let n713210 = BusinessIndustry(rawValue: "713210")
-    public static let n712110 = BusinessIndustry(rawValue: "712110")
-    public static let n711110 = BusinessIndustry(rawValue: "711110")
-    public static let n711211 = BusinessIndustry(rawValue: "711211")
-    public static let n621111 = BusinessIndustry(rawValue: "621111")
-    public static let n621210 = BusinessIndustry(rawValue: "621210")
-    public static let n622110 = BusinessIndustry(rawValue: "622110")
-    public static let n623110 = BusinessIndustry(rawValue: "623110")
-    public static let n621511 = BusinessIndustry(rawValue: "621511")
-    public static let n623220 = BusinessIndustry(rawValue: "623220")
-    public static let n541940 = BusinessIndustry(rawValue: "541940")
-    public static let n621399 = BusinessIndustry(rawValue: "621399")
-    public static let n621910 = BusinessIndustry(rawValue: "621910")
-    public static let n541110 = BusinessIndustry(rawValue: "541110")
-    public static let n311421 = BusinessIndustry(rawValue: "311421")
-    public static let n337121 = BusinessIndustry(rawValue: "337121")
-    public static let n322220 = BusinessIndustry(rawValue: "322220")
-    public static let n339920 = BusinessIndustry(rawValue: "339920")
-    public static let n334210 = BusinessIndustry(rawValue: "334210")
-    public static let n339930 = BusinessIndustry(rawValue: "339930")
-    public static let n312130 = BusinessIndustry(rawValue: "312130")
-    public static let n334111 = BusinessIndustry(rawValue: "334111")
-    public static let n334118 = BusinessIndustry(rawValue: "334118")
-    public static let n325412 = BusinessIndustry(rawValue: "325412")
-    public static let n339112 = BusinessIndustry(rawValue: "339112")
-    public static let n336110 = BusinessIndustry(rawValue: "336110")
-    public static let n336390 = BusinessIndustry(rawValue: "336390")
-    public static let n315990 = BusinessIndustry(rawValue: "315990")
-    public static let n313110 = BusinessIndustry(rawValue: "313110")
-    public static let n339910 = BusinessIndustry(rawValue: "339910")
-    public static let n516120 = BusinessIndustry(rawValue: "516120")
-    public static let n513130 = BusinessIndustry(rawValue: "513130")
-    public static let n512250 = BusinessIndustry(rawValue: "512250")
-    public static let n519130 = BusinessIndustry(rawValue: "519130")
-    public static let n711410 = BusinessIndustry(rawValue: "711410")
-    public static let n711510 = BusinessIndustry(rawValue: "711510")
-    public static let n531110 = BusinessIndustry(rawValue: "531110")
-    public static let n531120 = BusinessIndustry(rawValue: "531120")
-    public static let n531130 = BusinessIndustry(rawValue: "531130")
-    public static let n531190 = BusinessIndustry(rawValue: "531190")
-    public static let n531210 = BusinessIndustry(rawValue: "531210")
-    public static let n531311 = BusinessIndustry(rawValue: "531311")
-    public static let n531312 = BusinessIndustry(rawValue: "531312")
-    public static let n531320 = BusinessIndustry(rawValue: "531320")
-    public static let n531390 = BusinessIndustry(rawValue: "531390")
-    public static let n454110 = BusinessIndustry(rawValue: "454110")
-    public static let n445110 = BusinessIndustry(rawValue: "445110")
-    public static let n455110 = BusinessIndustry(rawValue: "455110")
-    public static let n457110 = BusinessIndustry(rawValue: "457110")
-    public static let n449210 = BusinessIndustry(rawValue: "449210")
-    public static let n444110 = BusinessIndustry(rawValue: "444110")
-    public static let n459210 = BusinessIndustry(rawValue: "459210")
-    public static let n459120 = BusinessIndustry(rawValue: "459120")
-    public static let n445320 = BusinessIndustry(rawValue: "445320")
-    public static let n458110 = BusinessIndustry(rawValue: "458110")
-    public static let n458210 = BusinessIndustry(rawValue: "458210")
-    public static let n458310 = BusinessIndustry(rawValue: "458310")
-    public static let n455219 = BusinessIndustry(rawValue: "455219")
-    public static let n424210 = BusinessIndustry(rawValue: "424210")
-    public static let n456110 = BusinessIndustry(rawValue: "456110")
-    public static let n541511 = BusinessIndustry(rawValue: "541511")
-    public static let n541512 = BusinessIndustry(rawValue: "541512")
-    public static let n541519 = BusinessIndustry(rawValue: "541519")
-    public static let n518210 = BusinessIndustry(rawValue: "518210")
-    public static let n511210 = BusinessIndustry(rawValue: "511210")
-    public static let n517111 = BusinessIndustry(rawValue: "517111")
-    public static let n517112 = BusinessIndustry(rawValue: "517112")
-    public static let n517410 = BusinessIndustry(rawValue: "517410")
-    public static let n481111 = BusinessIndustry(rawValue: "481111")
-    public static let n483111 = BusinessIndustry(rawValue: "483111")
-    public static let n485210 = BusinessIndustry(rawValue: "485210")
-    public static let n488510 = BusinessIndustry(rawValue: "488510")
-    public static let n484121 = BusinessIndustry(rawValue: "484121")
-    public static let n493110 = BusinessIndustry(rawValue: "493110")
-    public static let n423430 = BusinessIndustry(rawValue: "423430")
-    public static let n423690 = BusinessIndustry(rawValue: "423690")
-    public static let n423110 = BusinessIndustry(rawValue: "423110")
-    public static let n423830 = BusinessIndustry(rawValue: "423830")
-    public static let n423840 = BusinessIndustry(rawValue: "423840")
-    public static let n423510 = BusinessIndustry(rawValue: "423510")
-    public static let n424690 = BusinessIndustry(rawValue: "424690")
-    public static let n424990 = BusinessIndustry(rawValue: "424990")
-    public static let n424410 = BusinessIndustry(rawValue: "424410")
-    public static let n424480 = BusinessIndustry(rawValue: "424480")
-    public static let n423940 = BusinessIndustry(rawValue: "423940")
-    public static let n541611 = BusinessIndustry(rawValue: "541611")
-    public static let n541618 = BusinessIndustry(rawValue: "541618")
-    public static let n541330 = BusinessIndustry(rawValue: "541330")
-    public static let n541990 = BusinessIndustry(rawValue: "541990")
-    public static let n541214 = BusinessIndustry(rawValue: "541214")
-    public static let n561499 = BusinessIndustry(rawValue: "561499")
-    public static let dapp = BusinessIndustry(rawValue: "dapp")
-    public static let exchange = BusinessIndustry(rawValue: "exchange")
-    public static let gambling = BusinessIndustry(rawValue: "gambling")
-    public static let gaming = BusinessIndustry(rawValue: "gaming")
-    public static let infra = BusinessIndustry(rawValue: "infra")
-    public static let marketplace = BusinessIndustry(rawValue: "marketplace")
-    public static let neoBank = BusinessIndustry(rawValue: "neo_bank")
-    public static let other = BusinessIndustry(rawValue: "other")
-    public static let saas = BusinessIndustry(rawValue: "saas")
-    public static let social = BusinessIndustry(rawValue: "social")
-    public static let wallet = BusinessIndustry(rawValue: "wallet")
-}
-
 // MARK: - Estimated Annual Revenue
 
 /// Estimated annual revenue range
@@ -353,6 +192,8 @@ public struct SourceOfWealth: OpenEnum {
     public static let charitableContributions = SourceOfWealth(rawValue: "charitable_contributions")
     public static let inheritance = SourceOfWealth(rawValue: "inheritance")
     public static let affiliateOrRoyaltyIncome = SourceOfWealth(rawValue: "affiliate_or_royalty_income")
+    public static let salaryOrWages = SourceOfWealth(rawValue: "salary_or_wages")
+    public static let savings = SourceOfWealth(rawValue: "savings")
 }
 
 // MARK: - AML Status
@@ -693,8 +534,6 @@ public struct CreateCustomerInput: Codable, Sendable {
     /// Purpose of transactions explanation (optional)
     public let purposeOfTransactionsExplanation: String?
     
-    /// Whether this is an FBO account (optional)
-    public let isFbo: Bool?
     
     /// Terms of service ID (optional)
     public let tosId: String?
@@ -712,7 +551,7 @@ public struct CreateCustomerInput: Codable, Sendable {
     public let businessDescription: String?
 
     /// Business industry NAICS code (optional)
-    public let businessIndustry: BusinessIndustry?
+    public let businessIndustry: String?
 
     /// Estimated annual revenue range (optional)
     public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
@@ -762,13 +601,12 @@ public struct CreateCustomerInput: Codable, Sendable {
         selfieFile: String? = nil,
         purposeOfTransactions: PurposeOfTransactions? = nil,
         purposeOfTransactionsExplanation: String? = nil,
-        isFbo: Bool? = nil,
         tosId: String? = nil,
         accountPurpose: AccountPurpose? = nil,
         accountPurposeOther: String? = nil,
         businessType: BusinessType? = nil,
         businessDescription: String? = nil,
-        businessIndustry: BusinessIndustry? = nil,
+        businessIndustry: String? = nil,
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
@@ -809,7 +647,6 @@ public struct CreateCustomerInput: Codable, Sendable {
         self.selfieFile = selfieFile
         self.purposeOfTransactions = purposeOfTransactions
         self.purposeOfTransactionsExplanation = purposeOfTransactionsExplanation
-        self.isFbo = isFbo
         self.tosId = tosId
         self.accountPurpose = accountPurpose
         self.accountPurposeOther = accountPurposeOther
@@ -858,7 +695,6 @@ public struct CreateCustomerInput: Codable, Sendable {
         case selfieFile = "selfie_file"
         case purposeOfTransactions = "purpose_of_transactions"
         case purposeOfTransactionsExplanation = "purpose_of_transactions_explanation"
-        case isFbo = "is_fbo"
         case tosId = "tos_id"
         case accountPurpose = "account_purpose"
         case accountPurposeOther = "account_purpose_other"
@@ -1128,7 +964,7 @@ public struct Customer: Codable, Sendable, Equatable {
     public let businessDescription: String?
 
     /// Business industry NAICS code
-    public let businessIndustry: BusinessIndustry?
+    public let businessIndustry: String?
 
     /// Estimated annual revenue range
     public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
@@ -1147,6 +983,15 @@ public struct Customer: Codable, Sendable, Equatable {
 
     /// AML screening match details
     public let amlHits: AmlHits?
+
+    /// The customer id (same as `id`).
+    public let customerId: String?
+
+    public let cnaeCondition: [String: AnyCodable]?
+
+    public let isNested: Bool?
+
+    public let virtualAccountPreapproval: [String: AnyCodable]?
 
     public init(
         id: String,
@@ -1200,13 +1045,17 @@ public struct Customer: Codable, Sendable, Equatable {
         accountPurposeOther: String? = nil,
         businessType: BusinessType? = nil,
         businessDescription: String? = nil,
-        businessIndustry: BusinessIndustry? = nil,
+        businessIndustry: String? = nil,
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
         occupation: String? = nil,
         amlStatus: AmlStatus? = nil,
-        amlHits: AmlHits? = nil
+        amlHits: AmlHits? = nil,
+        customerId: String? = nil,
+        cnaeCondition: [String: AnyCodable]? = nil,
+        isNested: Bool? = nil,
+        virtualAccountPreapproval: [String: AnyCodable]? = nil
     ) {
         self.id = id
         self.type = type
@@ -1266,6 +1115,10 @@ public struct Customer: Codable, Sendable, Equatable {
         self.occupation = occupation
         self.amlStatus = amlStatus
         self.amlHits = amlHits
+        self.customerId = customerId
+        self.cnaeCondition = cnaeCondition
+        self.isNested = isNested
+        self.virtualAccountPreapproval = virtualAccountPreapproval
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1327,6 +1180,10 @@ public struct Customer: Codable, Sendable, Equatable {
         case occupation
         case amlStatus = "aml_status"
         case amlHits = "aml_hits"
+        case customerId = "customer_id"
+        case cnaeCondition = "cnae_condition"
+        case isNested = "is_nested"
+        case virtualAccountPreapproval = "virtual_account_preapproval"
     }
 }
 
@@ -1385,8 +1242,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
     /// IP address (optional)
     public let ipAddress: String?
     
-    /// Whether this is an FBO account (optional)
-    public let isFbo: Bool?
     
     /// Last name (optional)
     public let lastName: String?
@@ -1452,7 +1307,7 @@ public struct UpdateCustomerInput: Codable, Sendable {
     public let businessDescription: String?
 
     /// Business industry NAICS code (optional)
-    public let businessIndustry: BusinessIndustry?
+    public let businessIndustry: String?
 
     /// Estimated annual revenue range (optional)
     public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
@@ -1484,7 +1339,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
         imageUrl: String? = nil,
         incorporationDocFile: String? = nil,
         ipAddress: String? = nil,
-        isFbo: Bool? = nil,
         lastName: String? = nil,
         legalName: String? = nil,
         owners: [CustomerOwner]? = nil,
@@ -1506,7 +1360,7 @@ public struct UpdateCustomerInput: Codable, Sendable {
         accountPurposeOther: String? = nil,
         businessType: BusinessType? = nil,
         businessDescription: String? = nil,
-        businessIndustry: BusinessIndustry? = nil,
+        businessIndustry: String? = nil,
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
@@ -1529,7 +1383,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
         self.imageUrl = imageUrl
         self.incorporationDocFile = incorporationDocFile
         self.ipAddress = ipAddress
-        self.isFbo = isFbo
         self.lastName = lastName
         self.legalName = legalName
         self.owners = owners
@@ -1576,7 +1429,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
         case imageUrl = "image_url"
         case incorporationDocFile = "incorporation_doc_file"
         case ipAddress = "ip_address"
-        case isFbo = "is_fbo"
         case lastName = "last_name"
         case legalName = "legal_name"
         case owners

@@ -47,6 +47,7 @@ public struct PaymentMethod: OpenEnum {
     public static let internationalSwift = PaymentMethod(rawValue: "international_swift")
     public static let rtp = PaymentMethod(rawValue: "rtp")
     public static let ted = PaymentMethod(rawValue: "ted")
+    public static let breB = PaymentMethod(rawValue: "bre_b")
 }
 
 /// Payin type
@@ -95,6 +96,21 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
   /// Description
   public let description: String?
 
+  /// Card checkout details, for card payins.
+  public let cardInstruction: PayinQuoteCardInstruction?
+
+  public let cardClaimAt: String?
+
+  public let cardEvidence: [String: AnyCodable]?
+
+  public let cardFailedAttempts: Int?
+
+  public let cardGatesFailedAt: String?
+
+
+
+
+
   public init(
     step: String,
     status: String? = nil,
@@ -106,7 +122,12 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     senderAccountNumber: String? = nil,
     traceNumber: String? = nil,
     transactionReference: String? = nil,
-    description: String? = nil
+    description: String? = nil,
+    cardInstruction: PayinQuoteCardInstruction? = nil,
+    cardClaimAt: String? = nil,
+    cardEvidence: [String: AnyCodable]? = nil,
+    cardFailedAttempts: Int? = nil,
+    cardGatesFailedAt: String? = nil
   ) {
     self.step = step
     self.status = status
@@ -119,6 +140,11 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     self.traceNumber = traceNumber
     self.transactionReference = transactionReference
     self.description = description
+    self.cardInstruction = cardInstruction
+    self.cardClaimAt = cardClaimAt
+    self.cardEvidence = cardEvidence
+    self.cardFailedAttempts = cardFailedAttempts
+    self.cardGatesFailedAt = cardGatesFailedAt
   }
 
   enum CodingKeys: String, CodingKey {
@@ -133,6 +159,11 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     case traceNumber = "trace_number"
     case transactionReference = "transaction_reference"
     case description
+    case cardInstruction = "card_instruction"
+    case cardClaimAt = "card_claim_at"
+    case cardEvidence = "card_evidence"
+    case cardFailedAttempts = "card_failed_attempts"
+    case cardGatesFailedAt = "card_gates_failed_at"
   }
 }
 

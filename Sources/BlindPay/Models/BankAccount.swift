@@ -206,6 +206,28 @@ public struct BankAccount: Codable, Sendable, Equatable {
     /// Timestamp when the bank account was created
     public let createdAt: String?
     
+    public let fasterPaymentsAccountNumber: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine1: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine2: String?
+
+    public let fasterPaymentsBeneficiaryCity: String?
+
+    public let fasterPaymentsBeneficiaryCountry: Country?
+
+    public let fasterPaymentsBeneficiaryLegalName: String?
+
+    public let fasterPaymentsBeneficiaryPostalCode: String?
+
+    public let fasterPaymentsBeneficiaryStateProvinceRegion: String?
+
+    public let fasterPaymentsSortCode: String?
+
+    public let plaidConnectedAt: String?
+
+    public let swiftIntermediaryBankRoutingNumber: String?
+
     public init(
         id: String,
         name: String,
@@ -271,7 +293,18 @@ public struct BankAccount: Codable, Sendable, Equatable {
         tedCpfCnpj: String? = nil,
         tronWalletHash: String? = nil,
         offrampWallets: [OfframpWallet]? = nil,
-        createdAt: String? = nil
+        createdAt: String? = nil,
+        fasterPaymentsAccountNumber: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine1: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine2: String? = nil,
+        fasterPaymentsBeneficiaryCity: String? = nil,
+        fasterPaymentsBeneficiaryCountry: Country? = nil,
+        fasterPaymentsBeneficiaryLegalName: String? = nil,
+        fasterPaymentsBeneficiaryPostalCode: String? = nil,
+        fasterPaymentsBeneficiaryStateProvinceRegion: String? = nil,
+        fasterPaymentsSortCode: String? = nil,
+        plaidConnectedAt: String? = nil,
+        swiftIntermediaryBankRoutingNumber: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -338,6 +371,17 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.tronWalletHash = tronWalletHash
         self.offrampWallets = offrampWallets
         self.createdAt = createdAt
+        self.fasterPaymentsAccountNumber = fasterPaymentsAccountNumber
+        self.fasterPaymentsBeneficiaryAddressLine1 = fasterPaymentsBeneficiaryAddressLine1
+        self.fasterPaymentsBeneficiaryAddressLine2 = fasterPaymentsBeneficiaryAddressLine2
+        self.fasterPaymentsBeneficiaryCity = fasterPaymentsBeneficiaryCity
+        self.fasterPaymentsBeneficiaryCountry = fasterPaymentsBeneficiaryCountry
+        self.fasterPaymentsBeneficiaryLegalName = fasterPaymentsBeneficiaryLegalName
+        self.fasterPaymentsBeneficiaryPostalCode = fasterPaymentsBeneficiaryPostalCode
+        self.fasterPaymentsBeneficiaryStateProvinceRegion = fasterPaymentsBeneficiaryStateProvinceRegion
+        self.fasterPaymentsSortCode = fasterPaymentsSortCode
+        self.plaidConnectedAt = plaidConnectedAt
+        self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
     }
     
     enum CodingKeys: String, CodingKey {
@@ -406,6 +450,17 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case tronWalletHash = "tron_wallet_hash"
         case offrampWallets = "offramp_wallets"
         case createdAt = "created_at"
+        case fasterPaymentsAccountNumber = "faster_payments_account_number"
+        case fasterPaymentsBeneficiaryAddressLine1 = "faster_payments_beneficiary_address_line_1"
+        case fasterPaymentsBeneficiaryAddressLine2 = "faster_payments_beneficiary_address_line_2"
+        case fasterPaymentsBeneficiaryCity = "faster_payments_beneficiary_city"
+        case fasterPaymentsBeneficiaryCountry = "faster_payments_beneficiary_country"
+        case fasterPaymentsBeneficiaryLegalName = "faster_payments_beneficiary_legal_name"
+        case fasterPaymentsBeneficiaryPostalCode = "faster_payments_beneficiary_postal_code"
+        case fasterPaymentsBeneficiaryStateProvinceRegion = "faster_payments_beneficiary_state_province_region"
+        case fasterPaymentsSortCode = "faster_payments_sort_code"
+        case plaidConnectedAt = "plaid_connected_at"
+        case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
     }
 }
 
@@ -679,6 +734,26 @@ public struct CreateBankAccountInput: Codable, Sendable {
     /// TED CPF/CNPJ
     public let tedCpfCnpj: String?
 
+    public let fasterPaymentsAccountNumber: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine1: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine2: String?
+
+    public let fasterPaymentsBeneficiaryCity: String?
+
+    public let fasterPaymentsBeneficiaryCountry: Country?
+
+    public let fasterPaymentsBeneficiaryLegalName: String?
+
+    public let fasterPaymentsBeneficiaryPostalCode: String?
+
+    public let fasterPaymentsBeneficiaryStateProvinceRegion: String?
+
+    public let fasterPaymentsSortCode: String?
+
+    public let swiftIntermediaryBankRoutingNumber: String?
+
     public init(
         name: String,
         type: Rail,
@@ -746,7 +821,17 @@ public struct CreateBankAccountInput: Codable, Sendable {
         dateOfBirth: String? = nil,
         tedBankCode: String? = nil,
         tedBranchCode: String? = nil,
-        tedCpfCnpj: String? = nil
+        tedCpfCnpj: String? = nil,
+        fasterPaymentsAccountNumber: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine1: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine2: String? = nil,
+        fasterPaymentsBeneficiaryCity: String? = nil,
+        fasterPaymentsBeneficiaryCountry: Country? = nil,
+        fasterPaymentsBeneficiaryLegalName: String? = nil,
+        fasterPaymentsBeneficiaryPostalCode: String? = nil,
+        fasterPaymentsBeneficiaryStateProvinceRegion: String? = nil,
+        fasterPaymentsSortCode: String? = nil,
+        swiftIntermediaryBankRoutingNumber: String? = nil
     ) {
         self.name = name
         self.type = type
@@ -815,6 +900,16 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.tedBankCode = tedBankCode
         self.tedBranchCode = tedBranchCode
         self.tedCpfCnpj = tedCpfCnpj
+        self.fasterPaymentsAccountNumber = fasterPaymentsAccountNumber
+        self.fasterPaymentsBeneficiaryAddressLine1 = fasterPaymentsBeneficiaryAddressLine1
+        self.fasterPaymentsBeneficiaryAddressLine2 = fasterPaymentsBeneficiaryAddressLine2
+        self.fasterPaymentsBeneficiaryCity = fasterPaymentsBeneficiaryCity
+        self.fasterPaymentsBeneficiaryCountry = fasterPaymentsBeneficiaryCountry
+        self.fasterPaymentsBeneficiaryLegalName = fasterPaymentsBeneficiaryLegalName
+        self.fasterPaymentsBeneficiaryPostalCode = fasterPaymentsBeneficiaryPostalCode
+        self.fasterPaymentsBeneficiaryStateProvinceRegion = fasterPaymentsBeneficiaryStateProvinceRegion
+        self.fasterPaymentsSortCode = fasterPaymentsSortCode
+        self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
     }
 
     enum CodingKeys: String, CodingKey {
@@ -885,6 +980,16 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case tedBankCode = "ted_bank_code"
         case tedBranchCode = "ted_branch_code"
         case tedCpfCnpj = "ted_cpf_cnpj"
+        case fasterPaymentsAccountNumber = "faster_payments_account_number"
+        case fasterPaymentsBeneficiaryAddressLine1 = "faster_payments_beneficiary_address_line_1"
+        case fasterPaymentsBeneficiaryAddressLine2 = "faster_payments_beneficiary_address_line_2"
+        case fasterPaymentsBeneficiaryCity = "faster_payments_beneficiary_city"
+        case fasterPaymentsBeneficiaryCountry = "faster_payments_beneficiary_country"
+        case fasterPaymentsBeneficiaryLegalName = "faster_payments_beneficiary_legal_name"
+        case fasterPaymentsBeneficiaryPostalCode = "faster_payments_beneficiary_postal_code"
+        case fasterPaymentsBeneficiaryStateProvinceRegion = "faster_payments_beneficiary_state_province_region"
+        case fasterPaymentsSortCode = "faster_payments_sort_code"
+        case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -1085,6 +1190,36 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
         if let tedCpfCnpj = tedCpfCnpj {
             try container.encode(tedCpfCnpj, forKey: .tedCpfCnpj)
+        }
+        if let fasterPaymentsAccountNumber = fasterPaymentsAccountNumber {
+            try container.encode(fasterPaymentsAccountNumber, forKey: .fasterPaymentsAccountNumber)
+        }
+        if let fasterPaymentsBeneficiaryAddressLine1 = fasterPaymentsBeneficiaryAddressLine1 {
+            try container.encode(fasterPaymentsBeneficiaryAddressLine1, forKey: .fasterPaymentsBeneficiaryAddressLine1)
+        }
+        if let fasterPaymentsBeneficiaryAddressLine2 = fasterPaymentsBeneficiaryAddressLine2 {
+            try container.encode(fasterPaymentsBeneficiaryAddressLine2, forKey: .fasterPaymentsBeneficiaryAddressLine2)
+        }
+        if let fasterPaymentsBeneficiaryCity = fasterPaymentsBeneficiaryCity {
+            try container.encode(fasterPaymentsBeneficiaryCity, forKey: .fasterPaymentsBeneficiaryCity)
+        }
+        if let fasterPaymentsBeneficiaryCountry = fasterPaymentsBeneficiaryCountry {
+            try container.encode(fasterPaymentsBeneficiaryCountry, forKey: .fasterPaymentsBeneficiaryCountry)
+        }
+        if let fasterPaymentsBeneficiaryLegalName = fasterPaymentsBeneficiaryLegalName {
+            try container.encode(fasterPaymentsBeneficiaryLegalName, forKey: .fasterPaymentsBeneficiaryLegalName)
+        }
+        if let fasterPaymentsBeneficiaryPostalCode = fasterPaymentsBeneficiaryPostalCode {
+            try container.encode(fasterPaymentsBeneficiaryPostalCode, forKey: .fasterPaymentsBeneficiaryPostalCode)
+        }
+        if let fasterPaymentsBeneficiaryStateProvinceRegion = fasterPaymentsBeneficiaryStateProvinceRegion {
+            try container.encode(fasterPaymentsBeneficiaryStateProvinceRegion, forKey: .fasterPaymentsBeneficiaryStateProvinceRegion)
+        }
+        if let fasterPaymentsSortCode = fasterPaymentsSortCode {
+            try container.encode(fasterPaymentsSortCode, forKey: .fasterPaymentsSortCode)
+        }
+        if let swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber {
+            try container.encode(swiftIntermediaryBankRoutingNumber, forKey: .swiftIntermediaryBankRoutingNumber)
         }
     }
 }

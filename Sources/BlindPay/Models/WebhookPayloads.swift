@@ -175,7 +175,7 @@ public struct CustomerDeleteWebhook: Codable, Sendable, Equatable {
     public let id: String
     public let customerId: String
     public let instanceId: String
-    public let `type`: CustomerType
+    public let type: CustomerType
     /// Use standard for individuals and businesses, or enhanced for individuals. light is not available for new customers, and businesses only support standard.
     public let kycType: KYCType
     public let kycStatus: KYCStatus
@@ -203,7 +203,7 @@ public struct CustomerDeleteWebhook: Codable, Sendable, Equatable {
         case id
         case customerId = "customer_id"
         case instanceId = "instance_id"
-        case `type`
+        case type
         case kycType = "kyc_type"
         case kycStatus = "kyc_status"
         case deletedAt = "deleted_at"

@@ -36,6 +36,8 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
     /// Timestamp when the wallet was last updated (omitted when nested inside a bank account)
     public let updatedAt: String?
 
+    public let partnerFeeId: String?
+
     public init(
         id: String,
         externalId: String? = nil,
@@ -45,7 +47,8 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         instanceId: String? = nil,
         customerId: String? = nil,
         createdAt: String? = nil,
-        updatedAt: String? = nil
+        updatedAt: String? = nil,
+        partnerFeeId: String? = nil
     ) {
         self.id = id
         self.externalId = externalId
@@ -56,6 +59,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         self.customerId = customerId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.partnerFeeId = partnerFeeId
     }
     
     enum CodingKeys: String, CodingKey {
@@ -68,6 +72,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         case customerId = "customer_id"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case partnerFeeId = "partner_fee_id"
     }
 }
 

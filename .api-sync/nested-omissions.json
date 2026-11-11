@@ -172,5 +172,23 @@
     "field": "items",
     "reason": "SDK models this shape (Available.swift's BankDetailItem struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
     "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinOut.tracking_transaction",
+    "field": "card_evidence",
+    "reason": "Card 3-D Secure/AVS evidence; decoded as a free-form object ([String: AnyCodable]).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "field": "card_evidence",
+    "reason": "Card 3-D Secure/AVS evidence; decoded as a free-form object ([String: AnyCodable]).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut",
+    "field": "blindpay_bank_details",
+    "reason": "SDK models this shape (Payin.swift's BlindPayBankDetails struct, itself with further-nested ach/wire/rtp/beneficiary/receiving_bank sub-shapes and a pre-existing gap: no swift_receiving_bank/swift_account_number field) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "eric@blindpay.com"
   }
 ]

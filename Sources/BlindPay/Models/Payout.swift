@@ -29,6 +29,7 @@ public struct TrackingStep: OpenEnum {
     public static let processing = TrackingStep(rawValue: "processing")
     public static let onHold = TrackingStep(rawValue: "on_hold")
     public static let completed = TrackingStep(rawValue: "completed")
+    public static let pendingRefundReview = TrackingStep(rawValue: "pending_refund_review")
 }
 
 /// Provider status for liquidity tracking
@@ -67,6 +68,7 @@ public struct PaymentType: OpenEnum {
     public static let internationalSwift = PaymentType(rawValue: "international_swift")
     public static let rtp = PaymentType(rawValue: "rtp")
     public static let ted = PaymentType(rawValue: "ted")
+    public static let fasterPayments = PaymentType(rawValue: "faster_payments")
 }
 
 /// Account type
@@ -216,6 +218,34 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
+  public let refundReviewActionedAt: String?
+
+  public let refundReviewDetectedAt: String?
+
+  public let refundReviewReason: String?
+
+  public let returnedAmount: Int?
+
+  public let reviewContext: [String: AnyCodable]?
+
+  public let reviewSource: String?
+
+  public let reviewSources: [String]?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   public init(
     step: TrackingStep,
     providerName: String? = nil,
@@ -228,7 +258,14 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     recipientAccountNumber: String? = nil,
     recipientAccountType: String? = nil,
     estimatedTimeOfArrival: EstimatedTimeOfArrival? = nil,
-    completedAt: String? = nil
+    completedAt: String? = nil,
+    refundReviewActionedAt: String? = nil,
+    refundReviewDetectedAt: String? = nil,
+    refundReviewReason: String? = nil,
+    returnedAmount: Int? = nil,
+    reviewContext: [String: AnyCodable]? = nil,
+    reviewSource: String? = nil,
+    reviewSources: [String]? = nil
   ) {
     self.step = step
     self.providerName = providerName
@@ -242,6 +279,13 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     self.recipientAccountType = recipientAccountType
     self.estimatedTimeOfArrival = estimatedTimeOfArrival
     self.completedAt = completedAt
+    self.refundReviewActionedAt = refundReviewActionedAt
+    self.refundReviewDetectedAt = refundReviewDetectedAt
+    self.refundReviewReason = refundReviewReason
+    self.returnedAmount = returnedAmount
+    self.reviewContext = reviewContext
+    self.reviewSource = reviewSource
+    self.reviewSources = reviewSources
   }
 
   enum CodingKeys: String, CodingKey {
@@ -257,6 +301,13 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     case recipientAccountType = "recipient_account_type"
     case estimatedTimeOfArrival = "estimated_time_of_arrival"
     case completedAt = "completed_at"
+    case refundReviewActionedAt = "refund_review_actioned_at"
+    case refundReviewDetectedAt = "refund_review_detected_at"
+    case refundReviewReason = "refund_review_reason"
+    case returnedAmount = "returned_amount"
+    case reviewContext = "review_context"
+    case reviewSource = "review_source"
+    case reviewSources = "review_sources"
   }
 }
 
@@ -582,6 +633,36 @@ public struct Payout: Codable, Sendable, Equatable {
   /// Has virtual account
   public let hasVirtualAccount: Bool?
 
+  public let bankAccountId: String?
+
+  public let fasterPaymentsAccountNumber: String?
+
+  public let fasterPaymentsBeneficiaryAddressLine1: String?
+
+  public let fasterPaymentsBeneficiaryCity: String?
+
+  public let fasterPaymentsBeneficiaryCountry: Country?
+
+  public let fasterPaymentsBeneficiaryLegalName: String?
+
+  public let fasterPaymentsBeneficiaryPostalCode: String?
+
+  public let fasterPaymentsSortCode: String?
+
+  public let payableId: String?
+
+  public let sepaBeneficiaryAddressLine1: String?
+
+  public let sepaBeneficiaryCity: String?
+
+  public let sepaBeneficiaryCountry: Country?
+
+  public let sepaBeneficiaryLegalName: String?
+
+  public let sepaBeneficiaryPostalCode: String?
+
+  public let sepaIban: String?
+
   public init(
     id: String,
     customerId: String,
@@ -654,7 +735,22 @@ public struct Payout: Codable, Sendable, Equatable {
     swiftAccountNumberIban: String? = nil,
     transfersAccount: String? = nil,
     transfersType: TransfersType? = nil,
-    hasVirtualAccount: Bool? = nil
+    hasVirtualAccount: Bool? = nil,
+    bankAccountId: String? = nil,
+    fasterPaymentsAccountNumber: String? = nil,
+    fasterPaymentsBeneficiaryAddressLine1: String? = nil,
+    fasterPaymentsBeneficiaryCity: String? = nil,
+    fasterPaymentsBeneficiaryCountry: Country? = nil,
+    fasterPaymentsBeneficiaryLegalName: String? = nil,
+    fasterPaymentsBeneficiaryPostalCode: String? = nil,
+    fasterPaymentsSortCode: String? = nil,
+    payableId: String? = nil,
+    sepaBeneficiaryAddressLine1: String? = nil,
+    sepaBeneficiaryCity: String? = nil,
+    sepaBeneficiaryCountry: Country? = nil,
+    sepaBeneficiaryLegalName: String? = nil,
+    sepaBeneficiaryPostalCode: String? = nil,
+    sepaIban: String? = nil
   ) {
     self.id = id
     self.customerId = customerId
@@ -728,6 +824,21 @@ public struct Payout: Codable, Sendable, Equatable {
     self.transfersAccount = transfersAccount
     self.transfersType = transfersType
     self.hasVirtualAccount = hasVirtualAccount
+    self.bankAccountId = bankAccountId
+    self.fasterPaymentsAccountNumber = fasterPaymentsAccountNumber
+    self.fasterPaymentsBeneficiaryAddressLine1 = fasterPaymentsBeneficiaryAddressLine1
+    self.fasterPaymentsBeneficiaryCity = fasterPaymentsBeneficiaryCity
+    self.fasterPaymentsBeneficiaryCountry = fasterPaymentsBeneficiaryCountry
+    self.fasterPaymentsBeneficiaryLegalName = fasterPaymentsBeneficiaryLegalName
+    self.fasterPaymentsBeneficiaryPostalCode = fasterPaymentsBeneficiaryPostalCode
+    self.fasterPaymentsSortCode = fasterPaymentsSortCode
+    self.payableId = payableId
+    self.sepaBeneficiaryAddressLine1 = sepaBeneficiaryAddressLine1
+    self.sepaBeneficiaryCity = sepaBeneficiaryCity
+    self.sepaBeneficiaryCountry = sepaBeneficiaryCountry
+    self.sepaBeneficiaryLegalName = sepaBeneficiaryLegalName
+    self.sepaBeneficiaryPostalCode = sepaBeneficiaryPostalCode
+    self.sepaIban = sepaIban
   }
 
   enum CodingKeys: String, CodingKey {
@@ -803,6 +914,21 @@ public struct Payout: Codable, Sendable, Equatable {
     case transfersAccount = "transfers_account"
     case transfersType = "transfers_type"
     case hasVirtualAccount = "has_virtual_account"
+    case bankAccountId = "bank_account_id"
+    case fasterPaymentsAccountNumber = "faster_payments_account_number"
+    case fasterPaymentsBeneficiaryAddressLine1 = "faster_payments_beneficiary_address_line_1"
+    case fasterPaymentsBeneficiaryCity = "faster_payments_beneficiary_city"
+    case fasterPaymentsBeneficiaryCountry = "faster_payments_beneficiary_country"
+    case fasterPaymentsBeneficiaryLegalName = "faster_payments_beneficiary_legal_name"
+    case fasterPaymentsBeneficiaryPostalCode = "faster_payments_beneficiary_postal_code"
+    case fasterPaymentsSortCode = "faster_payments_sort_code"
+    case payableId = "payable_id"
+    case sepaBeneficiaryAddressLine1 = "sepa_beneficiary_address_line_1"
+    case sepaBeneficiaryCity = "sepa_beneficiary_city"
+    case sepaBeneficiaryCountry = "sepa_beneficiary_country"
+    case sepaBeneficiaryLegalName = "sepa_beneficiary_legal_name"
+    case sepaBeneficiaryPostalCode = "sepa_beneficiary_postal_code"
+    case sepaIban = "sepa_iban"
   }
 }
 
@@ -843,6 +969,8 @@ public struct CreatePayoutResponse: Codable, Sendable {
   /// Customer ID
   public let customerId: String?
 
+  public let payableId: String?
+
   public init(
     id: String,
     status: PayoutStatus,
@@ -852,7 +980,8 @@ public struct CreatePayoutResponse: Codable, Sendable {
     trackingTransaction: PayoutTrackingTransaction,
     trackingPartnerFee: PayoutTrackingPartnerFee? = nil,
     trackingLiquidity: PayoutTrackingLiquidity? = nil,
-    customerId: String? = nil
+    customerId: String? = nil,
+    payableId: String? = nil
   ) {
     self.id = id
     self.status = status
@@ -863,6 +992,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
     self.trackingPartnerFee = trackingPartnerFee
     self.trackingLiquidity = trackingLiquidity
     self.customerId = customerId
+    self.payableId = payableId
   }
 
   enum CodingKeys: String, CodingKey {
@@ -875,6 +1005,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
     case trackingPartnerFee = "tracking_partner_fee"
     case trackingLiquidity = "tracking_liquidity"
     case customerId = "customer_id"
+    case payableId = "payable_id"
   }
 }
 
@@ -981,89 +1112,121 @@ public struct ListPayoutsInput: CursorPaginatedInput {
   }
 }
 
-/// Input for creating a payout on EVM chains
+/// Input for creating a payout on an EVM chain (`PayoutOnEvmIn`).
+///
+/// Set exactly one of `senderWalletAddress` or `walletId`; the API rejects
+/// both or neither with a 400 (no client-side check).
 public struct CreatePayoutEvmInput: Codable, Sendable {
-  /// Quote ID
+  /// The quote to execute. Quotes are single-use.
   public let quoteId: String
 
-  /// Sender wallet address
-  public let senderWalletAddress: String
+  /// The wallet that sends the stablecoins. Exactly one of this or `walletId`.
+  public let senderWalletAddress: String?
 
-  public init(quoteId: String, senderWalletAddress: String) {
+  /// A managed wallet (`bw_...`) to pay from. Exactly one of this or `senderWalletAddress`.
+  public let walletId: String?
+
+  public init(quoteId: String, senderWalletAddress: String? = nil, walletId: String? = nil) {
     self.quoteId = quoteId
     self.senderWalletAddress = senderWalletAddress
+    self.walletId = walletId
   }
 
   enum CodingKeys: String, CodingKey {
     case quoteId = "quote_id"
     case senderWalletAddress = "sender_wallet_address"
+    case walletId = "wallet_id"
   }
 }
 
-/// Input for creating a payout on Stellar
+/// Input for creating a payout on Stellar (`PayoutOnStellarIn`).
+///
+/// Set exactly one of `senderWalletAddress` or `walletId`; the API rejects
+/// both or neither with a 400 (no client-side check).
 public struct CreatePayoutStellarInput: Codable, Sendable {
-  /// Quote ID
+  /// The quote to execute. Quotes are single-use.
   public let quoteId: String
 
-  /// Sender wallet address
-  public let senderWalletAddress: String
+  /// The wallet that sends the stablecoins. Exactly one of this or `walletId`.
+  public let senderWalletAddress: String?
 
-  /// Signed transaction (optional)
+  /// A managed wallet (`bw_...`) to pay from. Exactly one of this or `senderWalletAddress`.
+  public let walletId: String?
+
+  /// The signed transaction, when you sign it yourself.
   public let signedTransaction: String?
 
-  public init(quoteId: String, senderWalletAddress: String, signedTransaction: String? = nil) {
+  public init(quoteId: String, senderWalletAddress: String? = nil, walletId: String? = nil, signedTransaction: String? = nil) {
     self.quoteId = quoteId
     self.senderWalletAddress = senderWalletAddress
+    self.walletId = walletId
     self.signedTransaction = signedTransaction
   }
 
   enum CodingKeys: String, CodingKey {
     case quoteId = "quote_id"
     case senderWalletAddress = "sender_wallet_address"
+    case walletId = "wallet_id"
     case signedTransaction = "signed_transaction"
   }
 }
 
-/// Input for creating a payout on Solana
+/// Input for creating a payout on Solana (`PayoutOnSolanaIn`).
+///
+/// Set exactly one of `senderWalletAddress` or `walletId`; the API rejects
+/// both or neither with a 400 (no client-side check).
 public struct CreatePayoutSolanaInput: Codable, Sendable {
-  /// Quote ID
+  /// The quote to execute. Quotes are single-use.
   public let quoteId: String
 
-  /// Sender wallet address
-  public let senderWalletAddress: String
+  /// The wallet that sends the stablecoins. Exactly one of this or `walletId`.
+  public let senderWalletAddress: String?
 
-  /// Signed transaction (optional)
+  /// A managed wallet (`bw_...`) to pay from. Exactly one of this or `senderWalletAddress`.
+  public let walletId: String?
+
+  /// The signed transaction, when you sign it yourself.
   public let signedTransaction: String?
 
-  public init(quoteId: String, senderWalletAddress: String, signedTransaction: String? = nil) {
+  public init(quoteId: String, senderWalletAddress: String? = nil, walletId: String? = nil, signedTransaction: String? = nil) {
     self.quoteId = quoteId
     self.senderWalletAddress = senderWalletAddress
+    self.walletId = walletId
     self.signedTransaction = signedTransaction
   }
 
   enum CodingKeys: String, CodingKey {
     case quoteId = "quote_id"
     case senderWalletAddress = "sender_wallet_address"
+    case walletId = "wallet_id"
     case signedTransaction = "signed_transaction"
   }
 }
 
-/// Input for authorizing Stellar token
+/// Input for authorizing a Stellar payout (`PayoutOnStellarAuthorizeIn`).
+///
+/// Set exactly one of `senderWalletAddress` or `walletId`; the API rejects
+/// both or neither with a 400 (no client-side check).
 public struct AuthorizeStellarInput: Codable, Sendable {
-  /// Quote ID
+  /// The quote to execute. Quotes are single-use.
   public let quoteId: String
 
-  /// Sender wallet address
-  public let senderWalletAddress: String
+  /// The wallet that sends the stablecoins. Exactly one of this or `walletId`.
+  public let senderWalletAddress: String?
 
-  public init(quoteId: String, senderWalletAddress: String) {
+  /// A managed wallet (`bw_...`) to pay from. Exactly one of this or `senderWalletAddress`.
+  public let walletId: String?
+
+  public init(quoteId: String, senderWalletAddress: String? = nil, walletId: String? = nil) {
     self.quoteId = quoteId
     self.senderWalletAddress = senderWalletAddress
+    self.walletId = walletId
   }
 
   enum CodingKeys: String, CodingKey {
     case quoteId = "quote_id"
     case senderWalletAddress = "sender_wallet_address"
+    case walletId = "wallet_id"
   }
 }
 

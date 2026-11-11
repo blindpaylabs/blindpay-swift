@@ -607,5 +607,383 @@
     "reason": "Present in the spec's VirtualAccountOut but not mirrored onto the SDK's VirtualAccount struct (which already carries the customer via the enclosing resource path).",
     "schema": "VirtualAccountOut",
     "symbol": "VirtualAccount"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "BlockchainWalletWebhookOut",
+    "symbol": "BlockchainWallet"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "BlockchainWalletUpdateWebhookOut",
+    "symbol": "BlockchainWallet"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "BankAccountWebhookOut",
+    "symbol": "BankAccount"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayinNewWebhookOut",
+    "symbol": "PayinWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayinCompleteWebhookOut",
+    "symbol": "PayinWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "LimitIncreaseNewWebhookOut",
+    "symbol": "LimitIncreaseRequest"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "LimitIncreaseUpdateWebhookOut",
+    "symbol": "LimitIncreaseRequest"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayinUpdateWebhookOut",
+    "symbol": "PayinWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayinPartnerFeeWebhookOut",
+    "symbol": "PayinWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayoutNewWebhookOut",
+    "symbol": "PayoutWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayoutCompleteWebhookOut",
+    "symbol": "PayoutWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayoutUpdateWebhookOut",
+    "symbol": "PayoutWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayoutPartnerFeeWebhookOut",
+    "symbol": "PayoutWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "CustomerNewWebhookOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "CustomerUpdateWebhookOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "CustomerDeleteWebhookOut",
+    "symbol": "CustomerDeleteWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "TosAcceptWebhookOut",
+    "symbol": "TosAcceptWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "TransferNewWebhookOut",
+    "symbol": "Transfer"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "TransferUpdateWebhookOut",
+    "symbol": "Transfer"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "TransferCompleteWebhookOut",
+    "symbol": "Transfer"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "VirtualAccountNewWebhookOut",
+    "symbol": "VirtualAccount"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "VirtualAccountCompleteWebhookOut",
+    "symbol": "VirtualAccount"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "WalletNewWebhookOut",
+    "symbol": "CustodialWallet"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "WalletUpdateWebhookOut",
+    "symbol": "CustodialWallet"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "WalletInboundWebhookOut",
+    "symbol": "WalletInboundWebhook"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayableNewWebhookOut",
+    "symbol": "Payable"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayableUpdateWebhookOut",
+    "symbol": "Payable"
+  },
+  {
+    "field": "webhook_event",
+    "owner": "sdk-maintainers",
+    "reason": "Event discriminator; carried by the WebhookEvent case, not by the payload type.",
+    "schema": "PayableCompleteWebhookOut",
+    "symbol": "Payable"
+  },
+  {
+    "field": "approved_risk_sources",
+    "owner": "eric@blindpay.com",
+    "reason": "Fraud/risk-review metadata added to the payin tracking_payment object; not yet modeled on PayinTrackingPayment.",
+    "schema": "PayinNewWebhookOut.tracking_payment",
+    "symbol": "PayinTrackingPayment"
+  },
+  {
+    "field": "review_context",
+    "owner": "eric@blindpay.com",
+    "reason": "Fraud/risk-review metadata added to the payin tracking_payment object; not yet modeled on PayinTrackingPayment.",
+    "schema": "PayinNewWebhookOut.tracking_payment",
+    "symbol": "PayinTrackingPayment"
+  },
+  {
+    "field": "review_source",
+    "owner": "eric@blindpay.com",
+    "reason": "Fraud/risk-review metadata added to the payin tracking_payment object; not yet modeled on PayinTrackingPayment.",
+    "schema": "PayinNewWebhookOut.tracking_payment",
+    "symbol": "PayinTrackingPayment"
+  },
+  {
+    "field": "end_to_end_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "provider_name",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "provider_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "pse_instruction",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "sender_bank_name",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "ted_instruction",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "transaction_hash",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "transfers_instruction",
+    "owner": "eric@blindpay.com",
+    "reason": "Rail-specific trace/reference field added to the payin tracking_transaction object; not yet modeled on PayinTrackingTransaction.",
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "symbol": "PayinTrackingTransaction"
+  },
+  {
+    "field": "provider_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayoutTrackingPayment already; not yet mirrored onto PayoutTrackingComplete.",
+    "schema": "PayoutNewWebhookOut.tracking_complete",
+    "symbol": "PayoutTrackingComplete"
+  },
+  {
+    "field": "refund_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "New refund-detail field; not yet modeled on PayoutTrackingComplete.",
+    "schema": "PayoutNewWebhookOut.tracking_complete",
+    "symbol": "PayoutTrackingComplete"
+  },
+  {
+    "field": "coelsa_id",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "end_to_end_id",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_clearing_system",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_error_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_imad",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_integration",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_reference",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "provider_uetr",
+    "owner": "eric@blindpay.com",
+    "reason": "SDK's PayoutTrackingPayment struct models a 6-of-14-provider-field subset of the payout tracking_payment object (step/providerName/providerTransactionId/providerStatus/recipientName/recipientTaxId/recipientBankCode/recipientBranchCode/recipientAccountNumber/recipientAccountType/estimatedTimeOfArrival/completedAt already covered). Exposing the remaining payout-only provider-reference fields (including provider_reference) is a deliberate additive change that needs one reviewed PR across all SDKs, not a blind per-field add in this sync-infrastructure PR.",
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "symbol": "PayoutTrackingPayment"
+  },
+  {
+    "field": "ledger_in_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Internal ledger cross-reference field; not modeled, no consumer-facing use identified.",
+    "schema": "PayoutNewWebhookOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "ledger_out_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Internal ledger cross-reference field; not modeled, no consumer-facing use identified.",
+    "schema": "PayoutNewWebhookOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "provider_error_reason",
+    "owner": "eric@blindpay.com",
+    "reason": "Provider error detail added to payout tracking_transaction; not yet modeled on PayoutTrackingTransaction.",
+    "schema": "PayoutNewWebhookOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "provider_transaction_id",
+    "owner": "eric@blindpay.com",
+    "reason": "Present on PayoutTrackingPayment already; not yet mirrored onto PayoutTrackingTransaction.",
+    "schema": "PayoutNewWebhookOut.tracking_transaction",
+    "symbol": "PayoutTrackingTransaction"
+  },
+  {
+    "field": "aiprise_document_type",
+    "owner": "sdk-maintainers",
+    "reason": "provider-named field; pending blindpay-v2 decision",
+    "schema": "RfiField",
+    "symbol": "RfiField"
   }
 ]

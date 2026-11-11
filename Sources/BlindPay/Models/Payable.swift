@@ -108,7 +108,7 @@ public struct PayableLineItem: Codable, Sendable, Equatable {
 
 /// The beneficiary bank account of a payable.
 public struct PayableBankAccount: Codable, Sendable, Equatable {
-    public let `type`: PayableBankAccountType
+    public let type: PayableBankAccountType
     public let beneficiaryName: String?
     public let routingNumber: String?
     public let accountNumber: String?
@@ -129,7 +129,7 @@ public struct PayableBankAccount: Codable, Sendable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case `type`
+        case type
         case beneficiaryName = "beneficiary_name"
         case routingNumber = "routing_number"
         case accountNumber = "account_number"

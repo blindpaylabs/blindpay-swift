@@ -106,5 +106,107 @@
     "field": "pse_document_type",
     "reason": "Two-value request enum (CC, NIT, or null). Modeled as an optional String so a new document type never needs an SDK release; documented on the property.",
     "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateCustomerIn",
+    "field": "business_industry",
+    "reason": "NAICS code (hundreds of values; plan C7 types it as String). CustomerOut.business_industry is a plain string in the spec.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "UpdateCustomerIn",
+    "field": "business_industry",
+    "reason": "NAICS code (hundreds of values; plan C7 types it as String). CustomerOut.business_industry is a plain string in the spec.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TosAcceptWebhookOut",
+    "field": "version",
+    "reason": "Terms of service version label (e.g. 1.0.0); a version string, not a closed set.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateVirtualAccountIn.bre_b",
+    "field": "gender",
+    "reason": "Two-value input field (male/female) modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_payment",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "field": "status",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_complete",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "eric@blindpay.com"
+  },
+  {
+    "schema": "TransferOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateTransferOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountOut",
+    "field": "swift_intermediary_bank_routing_number",
+    "reason": "Routing number value (the spec enum lists sample codes); modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateBankAccountIn",
+    "field": "swift_intermediary_bank_routing_number",
+    "reason": "Routing number value (the spec enum lists sample codes); modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "UpdateInstanceIn",
+    "field": "partner_tos_terms_accepted",
+    "reason": "Boolean that must be true (enum [true]); modeled as Bool.",
+    "owner": "sdk-maintainers"
   }
 ]

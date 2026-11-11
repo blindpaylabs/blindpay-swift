@@ -1,14 +1,5 @@
 [
   {
-    "enum": "BusinessIndustry",
-    "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
-    "reason": "New NAICS code added to the business_industry enum. Deferred to keep this PR's enum changes limited to the explicitly reviewed set; a 150+ member enum gaining one more code is low risk but out of this PR's charter.",
-    "specValues": [
-      "446120"
-    ]
-  },
-  {
     "field": "request_amount",
     "kind": "type-conversion",
     "owner": "eric@blindpay.com",

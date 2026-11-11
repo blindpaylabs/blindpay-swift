@@ -14,8 +14,27 @@ public struct TransferTrackingStep: Codable, Sendable, Equatable {
     /// Step name
     public let step: String
 
-    public init(step: String) {
+    public let completedAt: String?
+
+    public let errorMessage: String?
+
+    public let gasFee: String?
+
+    public let transactionHash: String?
+
+    public init(step: String, completedAt: String? = nil, errorMessage: String? = nil, gasFee: String? = nil, transactionHash: String? = nil) {
         self.step = step
+        self.completedAt = completedAt
+        self.errorMessage = errorMessage
+        self.gasFee = gasFee
+        self.transactionHash = transactionHash
+    }
+    enum CodingKeys: String, CodingKey {
+        case step
+        case completedAt = "completed_at"
+        case errorMessage = "error_message"
+        case gasFee = "gas_fee"
+        case transactionHash = "transaction_hash"
     }
 }
 
@@ -128,6 +147,10 @@ public struct Transfer: Codable, Sendable, Equatable {
     /// Legal name
     public let legalName: String?
 
+    public let partnerFlatFee: Int?
+
+    public let partnerPercentageFee: Int?
+
     public init(
         id: String,
         status: TransactionStatus,
@@ -155,7 +178,9 @@ public struct Transfer: Codable, Sendable, Equatable {
         imageUrl: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
-        legalName: String? = nil
+        legalName: String? = nil,
+        partnerFlatFee: Int? = nil,
+        partnerPercentageFee: Int? = nil
     ) {
         self.id = id
         self.status = status
@@ -184,6 +209,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         self.firstName = firstName
         self.lastName = lastName
         self.legalName = legalName
+        self.partnerFlatFee = partnerFlatFee
+        self.partnerPercentageFee = partnerPercentageFee
     }
 
     enum CodingKeys: String, CodingKey {
@@ -214,6 +241,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         case firstName = "first_name"
         case lastName = "last_name"
         case legalName = "legal_name"
+        case partnerFlatFee = "partner_flat_fee"
+        case partnerPercentageFee = "partner_percentage_fee"
     }
 }
 
@@ -244,8 +273,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Customer network
     public let customerNetwork: Network
 
-    /// Request amount
-    public let requestAmount: Double
+    /// Amount in integer cents (`1999` = 19.99). Convert with ``Amount/cents(fromMajorUnits:)``.
+    public let requestAmount: Int
 
     /// Whether to cover fees
     public let coverFees: Bool?
@@ -256,16 +285,22 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Partner fee ID (optional)
     public let partnerFeeId: String?
 
+    public let partnerFlatFee: Int?
+
+    public let partnerPercentageFee: Int?
+
     public init(
         walletId: String,
         senderToken: StablecoinToken,
         customerWalletAddress: String,
         customerToken: StablecoinToken,
         customerNetwork: Network,
-        requestAmount: Double,
+        requestAmount: Int,
         coverFees: Bool? = nil,
         amountReference: String,
-        partnerFeeId: String? = nil
+        partnerFeeId: String? = nil,
+        partnerFlatFee: Int? = nil,
+        partnerPercentageFee: Int? = nil
     ) {
         self.walletId = walletId
         self.senderToken = senderToken
@@ -276,6 +311,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         self.coverFees = coverFees
         self.amountReference = amountReference
         self.partnerFeeId = partnerFeeId
+        self.partnerFlatFee = partnerFlatFee
+        self.partnerPercentageFee = partnerPercentageFee
     }
 
     enum CodingKeys: String, CodingKey {
@@ -288,6 +325,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         case coverFees = "cover_fees"
         case amountReference = "amount_reference"
         case partnerFeeId = "partner_fee_id"
+        case partnerFlatFee = "partner_flat_fee"
+        case partnerPercentageFee = "partner_percentage_fee"
     }
 }
 
@@ -317,6 +356,10 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
     /// Flat fee
     public let flatFee: Double?
 
+    public let partnerFlatFee: Int?
+
+    public let partnerPercentageFee: Int?
+
     public init(
         id: String,
         expiresAt: Double? = nil,
@@ -325,7 +368,9 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
         receiverAmount: Double,
         senderAmount: Double,
         partnerFeeAmount: Double? = nil,
-        flatFee: Double? = nil
+        flatFee: Double? = nil,
+        partnerFlatFee: Int? = nil,
+        partnerPercentageFee: Int? = nil
     ) {
         self.id = id
         self.expiresAt = expiresAt
@@ -335,6 +380,8 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
         self.senderAmount = senderAmount
         self.partnerFeeAmount = partnerFeeAmount
         self.flatFee = flatFee
+        self.partnerFlatFee = partnerFlatFee
+        self.partnerPercentageFee = partnerPercentageFee
     }
 
     enum CodingKeys: String, CodingKey {
@@ -346,6 +393,8 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
         case senderAmount = "sender_amount"
         case partnerFeeAmount = "partner_fee_amount"
         case flatFee = "flat_fee"
+        case partnerFlatFee = "partner_flat_fee"
+        case partnerPercentageFee = "partner_percentage_fee"
     }
 }
 

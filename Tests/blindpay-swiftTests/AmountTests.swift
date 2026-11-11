@@ -2,8 +2,8 @@
 //  AmountTests.swift
 //  blindpay-swift
 //
-//  Dollar inputs are converted to integer cents (plan C10): 19.99 must be
-//  sent as 1999, not the truncated 1998.
+//  Amount inputs are integer cents. Amount.cents(fromMajorUnits:) converts
+//  a major-unit value without truncating: 19.99 is 1999, not 1998.
 //
 
 import Foundation
@@ -37,25 +37,35 @@ struct AmountTests {
         #expect(throws: EncodingError.self) { try Amount.cents(fromMajorUnits: 1e300) }
     }
 
-    @Test func createQuoteSendsRoundedCentsOnTheWire() async throws {
+    @Test func createQuoteSendsIntegerCentsAndOnlyTheSpecFields() async throws {
         let server = MockServer(respondWith: .json(try Fixtures.response("POST /v1/instances/{instance_id}/quotes", variant: "full")))
         let input = CreateQuoteInput(
             bankAccountId: "ba_000000000000",
             currencyType: .sender,
-            requestAmount: 19.99,
-            transactionDocumentType: .invoice
+            network: .base,
+            requestAmount: try Amount.cents(fromMajorUnits: 19.99),
+            token: .usdc
         )
-        // Only the request matters here; response decoding is covered elsewhere.
-        _ = try? await server.client.instances.quotes.create(data: input)
+        _ = try await server.client.instances.quotes.create(data: input)
 
         let request = try #require(server.requests.first)
         #expect(request.method == "POST")
         #expect(request.path == "/v1/instances/in_000000000000/quotes")
-        #expect(try request.jsonBody()["request_amount"] as? Int == 1999)
+        let body = try request.jsonBody()
+        #expect(body["request_amount"] as? Int == 1999)
+        #expect(Set(body.keys) == ["bank_account_id", "currency_type", "network", "request_amount", "token"])
     }
 
-    @Test func fxRateInputEncodesRoundedCents() throws {
-        let input = GetFxRateInput(currencyType: .sender, from: .usdc, to: .brl, requestAmount: 19.99)
+    @Test func aPayableQuoteSendsOnlyThePayable() throws {
+        let input = CreateQuoteInput(payableId: "pb_000000000000", network: .base, token: .usdc)
+        let body = try JSONSerialization.jsonObject(with: JSONEncoder().encode(input)) as? [String: Any]
+        #expect(body?["payable_id"] as? String == "pb_000000000000")
+        #expect(body?["bank_account_id"] == nil)
+        #expect(body?["request_amount"] == nil)
+    }
+
+    @Test func fxRateInputSendsCents() throws {
+        let input = GetFxRateInput(currencyType: .sender, from: .usdc, to: .brl, requestAmount: 1999)
         let body = try JSONSerialization.jsonObject(with: JSONEncoder().encode(input)) as? [String: Any]
         #expect(body?["request_amount"] as? Int == 1999)
     }

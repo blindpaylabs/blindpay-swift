@@ -36,6 +36,10 @@ public struct Network: OpenEnum {
     public static let tron = Network(rawValue: "tron")
     public static let solana = Network(rawValue: "solana")
     public static let solanaDevnet = Network(rawValue: "solana_devnet")
+    public static let arc = Network(rawValue: "arc")
+    public static let arcTestnet = Network(rawValue: "arc_testnet")
+    public static let tempo = Network(rawValue: "tempo")
+    public static let tempoTestnet = Network(rawValue: "tempo_testnet")
 }
 
 /// Stablecoin token
@@ -75,64 +79,60 @@ public struct Currency: OpenEnum {
     public static let mxn = Currency(rawValue: "MXN")
     public static let cop = Currency(rawValue: "COP")
     public static let ars = Currency(rawValue: "ARS")
+    public static let gbp = Currency(rawValue: "GBP")
 }
 
 // MARK: - Create Quote
 
-/// Input for creating a quote
+/// Input for creating a payout quote (`QuoteIn`).
+///
+/// Set exactly one of `bankAccountId` (pay a bank account) or `payableId`
+/// (pay a payable); the API rejects both or neither with a 400. Bank account
+/// quotes also need `currencyType` and `requestAmount`; payable quotes take
+/// the amount from the payable and always cover fees.
 public struct CreateQuoteInput: Codable, Sendable {
-    /// Bank account ID
-    public let bankAccountId: String
-    
-    /// Currency type (sender or receiver)
-    public let currencyType: CurrencyType
-    
-    /// Network (optional)
-    public let network: Network?
-    
-    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
-    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
-    /// enforces a per-currency minimum and returns 400 below it.
-    public let requestAmount: Double
-    
-    /// Token (optional)
-    public let token: StablecoinToken?
-    
-    /// Whether to cover fees
+    /// The bank account to pay. Exactly one of this or `payableId`.
+    public let bankAccountId: String?
+
+    /// The payable to pay. Exactly one of this or `bankAccountId`.
+    public let payableId: String?
+
+    /// Whether `requestAmount` is what the sender sends or the receiver gets.
+    public let currencyType: CurrencyType?
+
+    /// The network the stablecoins are sent from.
+    public let network: Network
+
+    /// Amount in integer cents (`1999` = 19.99). See ``Amount/cents(fromMajorUnits:)``.
+    public let requestAmount: Int?
+
+    /// The token the stablecoins are sent in.
+    public let token: StablecoinToken
+
+    /// Whether the sender covers the fees. Defaults to false on bank account quotes.
     public let coverFees: Bool?
-    
-    /// Description (optional)
+
     public let description: String?
-    
-    /// Partner fee ID (optional)
+
     public let partnerFeeId: String?
-    
-    /// Transaction document file (optional)
-    public let transactionDocumentFile: String?
-    
-    /// Transaction document ID (optional)
-    public let transactionDocumentId: String?
-    
-    /// Transaction document type
-    public let transactionDocumentType: TransactionDocumentType
-    
+
+    /// Where refunds go if the payout fails after funding.
     public let refundWalletAddress: String?
 
     public init(
-        bankAccountId: String,
-        currencyType: CurrencyType,
-        network: Network? = nil,
-        requestAmount: Double,
-        token: StablecoinToken? = nil,
+        bankAccountId: String? = nil,
+        payableId: String? = nil,
+        currencyType: CurrencyType? = nil,
+        network: Network,
+        requestAmount: Int? = nil,
+        token: StablecoinToken,
         coverFees: Bool? = nil,
         description: String? = nil,
         partnerFeeId: String? = nil,
-        transactionDocumentFile: String? = nil,
-        transactionDocumentId: String? = nil,
-        transactionDocumentType: TransactionDocumentType,
         refundWalletAddress: String? = nil
     ) {
         self.bankAccountId = bankAccountId
+        self.payableId = payableId
         self.currencyType = currencyType
         self.network = network
         self.requestAmount = requestAmount
@@ -140,14 +140,12 @@ public struct CreateQuoteInput: Codable, Sendable {
         self.coverFees = coverFees
         self.description = description
         self.partnerFeeId = partnerFeeId
-        self.transactionDocumentFile = transactionDocumentFile
-        self.transactionDocumentId = transactionDocumentId
-        self.transactionDocumentType = transactionDocumentType
         self.refundWalletAddress = refundWalletAddress
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case bankAccountId = "bank_account_id"
+        case payableId = "payable_id"
         case currencyType = "currency_type"
         case network
         case requestAmount = "request_amount"
@@ -155,27 +153,7 @@ public struct CreateQuoteInput: Codable, Sendable {
         case coverFees = "cover_fees"
         case description
         case partnerFeeId = "partner_fee_id"
-        case transactionDocumentFile = "transaction_document_file"
-        case transactionDocumentId = "transaction_document_id"
-        case transactionDocumentType = "transaction_document_type"
         case refundWalletAddress = "refund_wallet_address"
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(bankAccountId, forKey: .bankAccountId)
-        try container.encode(currencyType, forKey: .currencyType)
-        try container.encodeIfPresent(network, forKey: .network)
-        // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encodeCents(requestAmount, forKey: .requestAmount)
-        try container.encodeIfPresent(token, forKey: .token)
-        try container.encodeIfPresent(coverFees, forKey: .coverFees)
-        try container.encodeIfPresent(description, forKey: .description)
-        try container.encodeIfPresent(partnerFeeId, forKey: .partnerFeeId)
-        try container.encodeIfPresent(transactionDocumentFile, forKey: .transactionDocumentFile)
-        try container.encodeIfPresent(transactionDocumentId, forKey: .transactionDocumentId)
-        try container.encode(transactionDocumentType, forKey: .transactionDocumentType)
-        try container.encodeIfPresent(refundWalletAddress, forKey: .refundWalletAddress)
     }
 }
 
@@ -333,16 +311,16 @@ public struct GetFxRateInput: Codable, Sendable {
     /// To currency
     public let to: Currency
     
-    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
-    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
+    /// Amount in integer cents (`1999` = 19.99), or whole units for currencies
+    /// without cents. Convert with ``Amount/cents(fromMajorUnits:)``. The API
     /// enforces a per-currency minimum and returns 400 below it.
-    public let requestAmount: Double
+    public let requestAmount: Int
     
     public init(
         currencyType: CurrencyType,
         from: Currency,
         to: Currency,
-        requestAmount: Double
+        requestAmount: Int
     ) {
         self.currencyType = currencyType
         self.from = from
@@ -362,8 +340,7 @@ public struct GetFxRateInput: Codable, Sendable {
         try container.encode(currencyType, forKey: .currencyType)
         try container.encode(from, forKey: .from)
         try container.encode(to, forKey: .to)
-        // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encodeCents(requestAmount, forKey: .requestAmount)
+        try container.encode(requestAmount, forKey: .requestAmount)
     }
 }
 

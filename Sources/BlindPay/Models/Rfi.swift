@@ -59,21 +59,33 @@ public struct RfiSubmitResponse: Codable, Sendable, Equatable {
     }
 }
 
+/// One choice of an RFI select field.
+public struct RfiFieldOption: Codable, Sendable, Equatable {
+    public let label: String
+    public let value: String
+
+    public init(label: String, value: String) {
+        self.label = label
+        self.value = value
+    }
+}
+
 /// One field to answer in an RFI section.
 public struct RfiField: Codable, Sendable, Equatable {
     public let key: String
     public let label: String
     public let regex: String?
     public let required: Bool
-    public let items: [String]?
+    public let items: [RfiFieldOption]?
     public let multiple: Bool?
+
 
     public init(
         key: String,
         label: String,
         regex: String? = nil,
         required: Bool,
-        items: [String]? = nil,
+        items: [RfiFieldOption]? = nil,
         multiple: Bool? = nil
     ) {
         self.key = key
@@ -135,6 +147,10 @@ public struct Rfi: Codable, Sendable, Equatable {
     public let customerType: CustomerType?
     public let customerKycStatus: String?
 
+    public let customerAipriseSessionId: String?
+
+    public let customerAipriseUserProfileId: String?
+
     public init(
         id: String,
         customerId: String,
@@ -146,7 +162,9 @@ public struct Rfi: Codable, Sendable, Equatable {
         submittedAt: String? = nil,
         createdAt: String,
         customerType: CustomerType? = nil,
-        customerKycStatus: String? = nil
+        customerKycStatus: String? = nil,
+        customerAipriseSessionId: String? = nil,
+        customerAipriseUserProfileId: String? = nil
     ) {
         self.id = id
         self.customerId = customerId
@@ -159,6 +177,8 @@ public struct Rfi: Codable, Sendable, Equatable {
         self.createdAt = createdAt
         self.customerType = customerType
         self.customerKycStatus = customerKycStatus
+        self.customerAipriseSessionId = customerAipriseSessionId
+        self.customerAipriseUserProfileId = customerAipriseUserProfileId
     }
 
     enum CodingKeys: String, CodingKey {
@@ -173,6 +193,8 @@ public struct Rfi: Codable, Sendable, Equatable {
         case createdAt = "created_at"
         case customerType = "customer_type"
         case customerKycStatus = "customer_kyc_status"
+        case customerAipriseSessionId = "customer_aiprise_session_id"
+        case customerAipriseUserProfileId = "customer_aiprise_user_profile_id"
     }
 }
 

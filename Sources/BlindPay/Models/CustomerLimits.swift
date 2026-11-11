@@ -96,41 +96,70 @@ public struct CustomerLimitsDetail: Codable, Sendable, Equatable {
 
 /// Input for requesting a limit increase
 public struct RequestLimitIncreaseInput: Codable, Sendable {
-    /// Per transaction limit (optional, max: 100000000000)
+    /// Requested per-transaction limit in cents; `nil` leaves it unchanged (sent as `null`).
     public let perTransaction: Int?
-    
-    /// Daily limit (optional, max: 100000000000)
+
+    /// Requested daily limit in cents; `nil` leaves it unchanged (sent as `null`).
     public let daily: Int?
-    
-    /// Monthly limit (optional, max: 100000000000)
+
+    /// Requested monthly limit in cents; `nil` leaves it unchanged (sent as `null`).
     public let monthly: Int?
-    
-    /// Supporting document type
-    public let supportingDocumentType: SupportingDocumentType
-    
-    /// Supporting document file URL
-    public let supportingDocumentFile: String
-    
+
+    /// Single supporting document type (legacy; prefer `supportingDocuments`).
+    public let supportingDocumentType: SupportingDocumentType?
+
+    /// Single supporting document file URL (legacy; prefer `supportingDocuments`).
+    public let supportingDocumentFile: String?
+
+    /// Supporting documents (upload each file first).
+    public let supportingDocuments: [LimitIncreaseSupportingDocument]?
+
     public init(
-        perTransaction: Int? = nil,
-        daily: Int? = nil,
-        monthly: Int? = nil,
-        supportingDocumentType: SupportingDocumentType,
-        supportingDocumentFile: String
+        perTransaction: Int?,
+        daily: Int?,
+        monthly: Int?,
+        supportingDocumentType: SupportingDocumentType? = nil,
+        supportingDocumentFile: String? = nil,
+        supportingDocuments: [LimitIncreaseSupportingDocument]? = nil
     ) {
         self.perTransaction = perTransaction
         self.daily = daily
         self.monthly = monthly
         self.supportingDocumentType = supportingDocumentType
         self.supportingDocumentFile = supportingDocumentFile
+        self.supportingDocuments = supportingDocuments
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case perTransaction = "per_transaction"
         case daily
         case monthly
         case supportingDocumentType = "supporting_document_type"
         case supportingDocumentFile = "supporting_document_file"
+        case supportingDocuments = "supporting_documents"
+    }
+
+    /// The three limits are required keys that accept `null`.
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(perTransaction, forKey: .perTransaction)
+        try container.encode(daily, forKey: .daily)
+        try container.encode(monthly, forKey: .monthly)
+        try container.encodeIfPresent(supportingDocumentType, forKey: .supportingDocumentType)
+        try container.encodeIfPresent(supportingDocumentFile, forKey: .supportingDocumentFile)
+        try container.encodeIfPresent(supportingDocuments, forKey: .supportingDocuments)
+    }
+}
+
+/// One supporting document of a limit increase request.
+public struct LimitIncreaseSupportingDocument: Codable, Sendable, Equatable {
+    public let type: SupportingDocumentType
+    /// URL of the uploaded file.
+    public let file: String
+
+    public init(type: SupportingDocumentType, file: String) {
+        self.type = type
+        self.file = file
     }
 }
 
@@ -180,6 +209,9 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     /// Supporting document type (optional)
     public let supportingDocumentType: SupportingDocumentType?
     
+    /// Every supporting document attached to the request (up to 5).
+    public let supportingDocuments: [LimitIncreaseSupportingDocument]?
+
     public init(
         id: String,
         customerId: String,
@@ -190,7 +222,8 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         daily: Int? = nil,
         monthly: Int? = nil,
         supportingDocumentFile: String? = nil,
-        supportingDocumentType: SupportingDocumentType? = nil
+        supportingDocumentType: SupportingDocumentType? = nil,
+        supportingDocuments: [LimitIncreaseSupportingDocument]? = nil
     ) {
         self.id = id
         self.customerId = customerId
@@ -202,6 +235,7 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         self.monthly = monthly
         self.supportingDocumentFile = supportingDocumentFile
         self.supportingDocumentType = supportingDocumentType
+        self.supportingDocuments = supportingDocuments
     }
     
     enum CodingKeys: String, CodingKey {
@@ -215,5 +249,6 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         case monthly
         case supportingDocumentFile = "supporting_document_file"
         case supportingDocumentType = "supporting_document_type"
+        case supportingDocuments = "supporting_documents"
     }
 }
