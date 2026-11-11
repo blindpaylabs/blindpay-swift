@@ -123,14 +123,19 @@ public struct CreateOfframpWalletInput: Codable, Sendable {
     /// External ID (optional)
     public let externalId: String?
     
-    public init(network: Network, externalId: String? = nil) {
+    /// Partner fee applied to payouts through this wallet.
+    public let partnerFeeId: String?
+
+    public init(network: Network, externalId: String? = nil, partnerFeeId: String? = nil) {
         self.network = network
         self.externalId = externalId
+        self.partnerFeeId = partnerFeeId
     }
     
     enum CodingKeys: String, CodingKey {
         case network
         case externalId = "external_id"
+        case partnerFeeId = "partner_fee_id"
     }
 }
 

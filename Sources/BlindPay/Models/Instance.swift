@@ -240,7 +240,7 @@ public struct OnboardingOwner: Codable, Sendable, Equatable {
     public let firstName: String?
     public let lastName: String?
     /// Share of the business the owner holds, 0 to 100.
-    public let ownershipPercentage: Int?
+    public let ownershipPercentage: Double?
     public let dateOfBirth: String?
     public let taxId: String?
     public let addressLine1: String?
@@ -262,7 +262,7 @@ public struct OnboardingOwner: Codable, Sendable, Equatable {
         role: OwnerRole? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
-        ownershipPercentage: Int? = nil,
+        ownershipPercentage: Double? = nil,
         dateOfBirth: String? = nil,
         taxId: String? = nil,
         addressLine1: String? = nil,

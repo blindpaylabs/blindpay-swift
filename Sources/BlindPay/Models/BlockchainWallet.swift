@@ -235,16 +235,21 @@ public struct PrepareDelegateSolanaInput: Codable, Sendable {
     /// Token address
     public let tokenAddress: String?
     
-    public init(amount: String, ownerAddress: String, tokenAddress: String) {
+    /// The payout quote the delegation is for.
+    public let quoteId: String?
+
+    public init(ownerAddress: String, amount: String? = nil, tokenAddress: String? = nil, quoteId: String? = nil) {
         self.amount = amount
         self.ownerAddress = ownerAddress
         self.tokenAddress = tokenAddress
+        self.quoteId = quoteId
     }
     
     enum CodingKeys: String, CodingKey {
         case amount
         case ownerAddress = "owner_address"
         case tokenAddress = "token_address"
+        case quoteId = "quote_id"
     }
 }
 
@@ -257,9 +262,9 @@ public struct PrepareDelegateSolanaResponse: Codable, Sendable, Equatable {
     public let transaction: String?
     
     /// Debug information (optional)
-    public let debug: String?
+    public let debug: [String: AnyCodable]?
     
-    public init(success: Bool, transaction: String? = nil, debug: String? = nil) {
+    public init(success: Bool, transaction: String? = nil, debug: [String: AnyCodable]? = nil) {
         self.success = success
         self.transaction = transaction
         self.debug = debug
