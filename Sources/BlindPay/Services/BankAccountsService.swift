@@ -143,5 +143,15 @@ public final class BankAccountsService: Sendable {
             options: options
         )
     }
-}
 
+    /// Creates a Plaid Link session to connect the customer's bank account.
+    /// Send the customer to the returned `url`.
+    public func createPlaidLink(data: CreatePlaidLinkInput = CreatePlaidLinkInput(), options: RequestOptions? = nil) async throws -> APIResponse<PlaidLinkResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/plaid",
+            method: .post,
+            body: data,
+            options: options
+        )
+    }
+}

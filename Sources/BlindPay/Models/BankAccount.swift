@@ -1088,3 +1088,28 @@ public struct CreateBankAccountInput: Codable, Sendable {
         }
     }
 }
+
+// MARK: - Plaid
+
+/// Input for creating a Plaid Link session for a customer's bank account.
+public struct CreatePlaidLinkInput: Codable, Sendable {
+    /// Where Plaid sends the customer when they finish.
+    public let redirectUrl: String?
+
+    public init(redirectUrl: String? = nil) {
+        self.redirectUrl = redirectUrl
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case redirectUrl = "redirect_url"
+    }
+}
+
+/// A Plaid Link session: send the customer to `url`.
+public struct PlaidLinkResponse: Codable, Sendable, Equatable {
+    public let url: String
+
+    public init(url: String) {
+        self.url = url
+    }
+}

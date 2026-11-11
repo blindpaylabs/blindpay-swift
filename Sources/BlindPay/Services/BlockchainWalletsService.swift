@@ -152,5 +152,16 @@ public final class BlockchainWalletsService: Sendable {
             options: options
         )
     }
-}
 
+    /// Declares whether the customer holds the wallet's keys (self-custody).
+    /// Required for Brazilian customers. It can be set once, while it is still
+    /// `null`; a second call returns `409 WALLETS_SELF_CUSTODY_ALREADY_SET`.
+    public func setSelfCustody(id: String, isSelfCustody: Bool, options: RequestOptions? = nil) async throws -> APIResponse<BlockchainWallet> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/\(id)",
+            method: .patch,
+            body: UpdateBlockchainWalletInput(isSelfCustody: isSelfCustody),
+            options: options
+        )
+    }
+}

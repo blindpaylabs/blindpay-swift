@@ -255,3 +255,15 @@ public struct PrepareDelegateSolanaResponse: Codable, Sendable, Equatable {
         self.debug = debug
     }
 }
+
+// MARK: - Self-custody
+
+/// Body of `PATCH .../blockchain-wallets/{id}`: declares whether the customer
+/// holds the wallet's keys. It can be set once, while it is still `null`.
+struct UpdateBlockchainWalletInput: Codable, Sendable {
+    let isSelfCustody: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case isSelfCustody = "is_self_custody"
+    }
+}

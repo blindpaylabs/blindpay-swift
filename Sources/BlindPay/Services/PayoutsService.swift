@@ -231,5 +231,15 @@ public final class PayoutsService: Sendable {
             options: options
         )
     }
-}
 
+    /// Submits supporting documents for a payout that is waiting for them
+    /// (see ``Payout/trackingDocuments``).
+    public func submitDocuments(payoutId: String, data: SubmitPayoutDocumentsInput, options: RequestOptions? = nil) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)/documents",
+            method: .post,
+            body: data,
+            options: options
+        )
+    }
+}

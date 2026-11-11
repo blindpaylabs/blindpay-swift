@@ -260,3 +260,154 @@ public struct Payable: Codable, Sendable, Equatable {
     }
 }
 
+
+/// The kind of bill a payable pays.
+public struct PayableType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let boleto = PayableType(rawValue: "boleto")
+    public static let pixCode = PayableType(rawValue: "pix_code")
+    public static let invoice = PayableType(rawValue: "invoice")
+}
+
+/// One page of payables (see ``ListResult``).
+public typealias ListPayablesResponse = ListResult<Payable>
+
+// MARK: - Inputs
+
+/// Input for creating a payable. Amounts (`discount`, `taxes`, line item `price`) are in cents.
+public struct CreatePayableInput: Codable, Sendable {
+    public let customerId: String
+    public let from: PayableParty?
+    public let to: PayableParty?
+    /// ISO 4217 currency code of the payable.
+    public let currency: Currency
+    /// Invoice line items. The payable total is the line item sum plus taxes minus discount.
+    public let lineItems: [PayableLineItem]?
+    public let note: String?
+    /// Discount in cents of the payable currency.
+    public let discount: Int?
+    /// Taxes in cents of the payable currency.
+    public let taxes: Int?
+    /// Boleto or arrecadação code (linha digitável or barcode).
+    public let boletoBarcode: String?
+    /// PIX copia e cola (EMV) payload.
+    public let pixQrcode: String?
+    /// The boleto or invoice document, as a file URL returned by POST /upload with bucket `documents`. Not accepted for PIX payables. Read it through POST /presign.
+    public let documentFile: String?
+    public let dueDate: String?
+    /// When to pay this payable automatically. Not executed yet: stored for the upcoming scheduling feature.
+    public let scheduledAt: String?
+    public let bankAccount: CreateBankAccountInput?
+
+    public init(
+        customerId: String,
+        from: PayableParty? = nil,
+        to: PayableParty? = nil,
+        currency: Currency,
+        lineItems: [PayableLineItem]? = nil,
+        note: String? = nil,
+        discount: Int? = nil,
+        taxes: Int? = nil,
+        boletoBarcode: String? = nil,
+        pixQrcode: String? = nil,
+        documentFile: String? = nil,
+        dueDate: String? = nil,
+        scheduledAt: String? = nil,
+        bankAccount: CreateBankAccountInput? = nil
+    ) {
+        self.customerId = customerId
+        self.from = from
+        self.to = to
+        self.currency = currency
+        self.lineItems = lineItems
+        self.note = note
+        self.discount = discount
+        self.taxes = taxes
+        self.boletoBarcode = boletoBarcode
+        self.pixQrcode = pixQrcode
+        self.documentFile = documentFile
+        self.dueDate = dueDate
+        self.scheduledAt = scheduledAt
+        self.bankAccount = bankAccount
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case customerId = "customer_id"
+        case from
+        case to
+        case currency
+        case lineItems = "line_items"
+        case note
+        case discount
+        case taxes
+        case boletoBarcode = "boleto_barcode"
+        case pixQrcode = "pix_qrcode"
+        case documentFile = "document_file"
+        case dueDate = "due_date"
+        case scheduledAt = "scheduled_at"
+        case bankAccount = "bank_account"
+    }
+}
+
+
+/// Filters and cursors for listing payables. Every value is optional; unset ones are not sent.
+public struct ListPayablesInput: CursorPaginatedInput {
+    /// Page size (10, 50, 100, 200, 500 or 1000).
+    public var limit: Int?
+
+    /// Return items after this id (the previous page's `pagination.nextPage`).
+    public var startingAfter: String?
+
+    /// Return items before this id.
+    public var endingBefore: String?
+
+    /// Only this status.
+    public var status: PayableStatus?
+
+    /// Only this customer.
+    public var customerId: String?
+
+    /// Customer name contains this text.
+    public var customerName: String?
+
+    /// Only this kind of bill.
+    public var type: PayableType?
+
+    /// Beneficiary name contains this text.
+    public var beneficiaryName: String?
+
+    public init(
+        limit: Int? = nil,
+        startingAfter: String? = nil,
+        endingBefore: String? = nil,
+        status: PayableStatus? = nil,
+        customerId: String? = nil,
+        customerName: String? = nil,
+        type: PayableType? = nil,
+        beneficiaryName: String? = nil
+    ) {
+        self.limit = limit
+        self.startingAfter = startingAfter
+        self.endingBefore = endingBefore
+        self.status = status
+        self.customerId = customerId
+        self.customerName = customerName
+        self.type = type
+        self.beneficiaryName = beneficiaryName
+    }
+
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
+        params["limit"] = limit.map(String.init)
+        params["starting_after"] = startingAfter
+        params["ending_before"] = endingBefore
+        params["status"] = status?.rawValue
+        params["customer_id"] = customerId
+        params["customer_name"] = customerName
+        params["type"] = type?.rawValue
+        params["beneficiary_name"] = beneficiaryName
+        return params
+    }
+}

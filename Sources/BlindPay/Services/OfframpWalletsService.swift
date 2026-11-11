@@ -103,5 +103,19 @@ public final class OfframpWalletsService: Sendable {
             options: options
         )
     }
-}
 
+    /// Updates an offramp wallet: set or clear its partner fee.
+    ///
+    /// ```swift
+    /// _ = try await service.update(customerId: "cu_1", bankAccountId: "ba_1", walletId: "ow_1",
+    ///                              data: UpdateOfframpWalletInput(partnerFee: .clear))
+    /// ```
+    public func update(customerId: String, bankAccountId: String, walletId: String, data: UpdateOfframpWalletInput, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(bankAccountId)/offramp-wallets/\(walletId)",
+            method: .put,
+            body: data,
+            options: options
+        )
+    }
+}

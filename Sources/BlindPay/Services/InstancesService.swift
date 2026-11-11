@@ -40,6 +40,15 @@ public final class InstancesService: Sendable {
     /// Transfer quotes
     public let transferQuotes: TransferQuotesService
 
+    /// Payables (bills paid out to a beneficiary)
+    public let payables: PayablesService
+
+    /// The instance's onboarding answers
+    public let onboarding: OnboardingService
+
+    /// The instance's open request for information
+    public let rfi: InstanceRfiService
+
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -52,6 +61,27 @@ public final class InstancesService: Sendable {
         self.customers = InstanceCustomersService(apiClient: apiClient, instanceId: instanceId)
         self.transfers = TransfersService(apiClient: apiClient, instanceId: instanceId)
         self.transferQuotes = TransferQuotesService(apiClient: apiClient, instanceId: instanceId)
+        self.payables = PayablesService(apiClient: apiClient, instanceId: instanceId)
+        self.onboarding = OnboardingService(apiClient: apiClient, instanceId: instanceId)
+        self.rfi = InstanceRfiService(apiClient: apiClient, instanceId: instanceId)
+    }
+
+    /// Retrieves the instance (name, production or development, onboarding step).
+    public func get(options: RequestOptions? = nil) async throws -> APIResponse<Instance> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)",
+            method: .get,
+            options: options
+        )
+    }
+
+    /// Retrieves the instance's billing fees per rail.
+    public func getFees(options: RequestOptions? = nil) async throws -> APIResponse<FeesResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/billing/fees",
+            method: .get,
+            options: options
+        )
     }
     
     /// Retrieves all members of the instance

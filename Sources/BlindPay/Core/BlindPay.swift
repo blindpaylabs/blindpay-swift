@@ -55,11 +55,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getRails(options: RequestOptions? = nil) async throws -> APIResponse<[RailResponse]> {
-        return try await apiClient.request(
-            endpoint: "/v1/available/rails",
-            method: .get,
-            options: options
-        )
+        return try await available.getRails(options: options)
     }
 
     /// Retrieves bank detail fields required for a specific payment rail
@@ -85,12 +81,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/available/bank-details",
-            method: .get,
-            queryParameters: ["rail": rail],
-            options: options
-        )
+        return try await available.getBankDetails(rail: rail, options: options)
     }
 
     /// Retrieves bank information for a specific SWIFT code
@@ -113,11 +104,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getSwiftCode(swift: String, options: RequestOptions? = nil) async throws -> APIResponse<[SwiftCodeResponse]> {
-        return try await apiClient.request(
-            endpoint: "/v1/available/swift/\(swift)",
-            method: .get,
-            options: options
-        )
+        return try await available.getSwiftCode(swift: swift, options: options)
     }
 
     // MARK: - Instance Service Methods
@@ -140,11 +127,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getMembers(options: RequestOptions? = nil) async throws -> APIResponse<InstanceMembersResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/members",
-            method: .get,
-            options: options
-        )
+        return try await instances.getMembers(options: options)
     }
     
     /// Updates the instance with new data
@@ -170,12 +153,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func updateInstance(data: UpdateInstanceInput, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)",
-            method: .put,
-            body: data,
-            options: options
-        )
+        return try await instances.update(data: data, options: options)
     }
     
     /// Deletes the instance
@@ -195,11 +173,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func deleteInstance(options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)",
-            method: .delete,
-            options: options
-        )
+        return try await instances.delete(options: options)
     }
     
     /// Deletes a member from the instance
@@ -220,11 +194,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func deleteMember(memberId: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
-            method: .delete,
-            options: options
-        )
+        return try await instances.deleteMember(memberId: memberId, options: options)
     }
     
     /// Updates a member's role in the instance
@@ -250,13 +220,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func updateMemberRole(memberId: String, role: InstanceMemberRole, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
-        let updateInput = UpdateMemberRoleInput(role: role)
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
-            method: .put,
-            body: updateInput,
-            options: options
-        )
+        return try await instances.updateMemberRole(memberId: memberId, role: role, options: options)
     }
 
     /// Migrates instance ownership to a new user
@@ -297,12 +261,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createAssetTrustline(data: CreateAssetTrustlineInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateAssetTrustlineResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/create-asset-trustline",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.createAssetTrustline(data: data, options: options)
     }
     
     /// Mints USDB on Stellar
@@ -326,12 +285,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func mintUsdbStellar(data: MintUsdbStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<MintUsdbStellarResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/mint-usdb-stellar",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.mintUsdbStellar(data: data, options: options)
     }
     
     /// Mints USDB on Solana Devnet
@@ -357,12 +311,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func mintUsdbSolana(data: MintUsdbSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<MintUsdbSolanaResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/mint-usdb-solana",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.mintUsdbSolana(data: data, options: options)
     }
     
     /// Prepares a Solana delegate transaction
@@ -389,12 +338,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func prepareDelegateSolana(data: PrepareDelegateSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<PrepareDelegateSolanaResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/prepare-delegate-solana",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.prepareDelegateSolana(data: data, options: options)
     }
     
     // MARK: - Partner Fees Service Methods
@@ -416,11 +360,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func listPartnerFees(options: RequestOptions? = nil) async throws -> APIResponse<PartnerFeesResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/partner-fees",
-            method: .get,
-            options: options
-        )
+        return try await instances.partnerFees.list(options: options)
     }
     
     /// Creates a new partner fee for the instance
@@ -447,12 +387,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createPartnerFee(data: CreatePartnerFeeInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePartnerFeeResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/partner-fees",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.partnerFees.create(data: data, options: options)
     }
     
     /// Retrieves a specific partner fee by ID
@@ -471,11 +406,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getPartnerFee(id: String, options: RequestOptions? = nil) async throws -> APIResponse<PartnerFee> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-            method: .get,
-            options: options
-        )
+        return try await instances.partnerFees.get(id: id, options: options)
     }
     
     /// Deletes a partner fee
@@ -496,11 +427,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func deletePartnerFee(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-            method: .delete,
-            options: options
-        )
+        return try await instances.partnerFees.delete(id: id, options: options)
     }
     
     // MARK: - Quotes Service Methods
@@ -537,12 +464,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createQuote(data: CreateQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateQuoteResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/quotes",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.quotes.create(data: data, options: options)
     }
     
     /// Gets the foreign exchange rate between two currencies
@@ -570,12 +492,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/quotes/fx",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.quotes.getFxRate(data: data, options: options)
     }
     
     // MARK: - Webhook Endpoints Service Methods
@@ -597,11 +514,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func listWebhookEndpoints(options: RequestOptions? = nil) async throws -> APIResponse<WebhookEndpointsResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/webhook-endpoints",
-            method: .get,
-            options: options
-        )
+        return try await instances.webhookEndpoints.list(options: options)
     }
     
     /// Creates a new webhook endpoint for the instance
@@ -624,12 +537,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createWebhookEndpoint(data: CreateWebhookEndpointInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateWebhookEndpointResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/webhook-endpoints",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.webhookEndpoints.create(data: data, options: options)
     }
     
     /// Deletes a webhook endpoint
@@ -648,11 +556,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func deleteWebhookEndpoint(id: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteWebhookEndpointResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/\(id)",
-            method: .delete,
-            options: options
-        )
+        return try await instances.webhookEndpoints.delete(id: id, options: options)
     }
     
     /// Retrieves the secret key for a webhook endpoint
@@ -671,11 +575,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getWebhookEndpointSecret(id: String, options: RequestOptions? = nil) async throws -> APIResponse<WebhookEndpointSecret> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/\(id)/secret",
-            method: .get,
-            options: options
-        )
+        return try await instances.webhookEndpoints.getSecret(id: id, options: options)
     }
     
     /// Retrieves the portal access URL for webhook endpoints
@@ -694,11 +594,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getWebhookPortalAccessUrl(options: RequestOptions? = nil) async throws -> APIResponse<WebhookPortalAccess> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/portal-access",
-            method: .get,
-            options: options
-        )
+        return try await instances.webhookEndpoints.getPortalAccessUrl(options: options)
     }
     
     // MARK: - Payins Service Methods
@@ -746,11 +642,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getPayin(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payins/\(payinId)",
-            method: .get,
-            options: options
-        )
+        return try await instances.payins.get(payinId: payinId, options: options)
     }
     
     /// Retrieves payin tracking information
@@ -795,12 +687,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createPayinEvm(data: CreatePayinInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payins/evm",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payins.createEvm(data: data, options: options)
     }
     
     // MARK: - Payin Quotes Service Methods
@@ -863,12 +750,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getPayinQuoteFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payin-quotes/fx",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payins.quotes.getFxRate(data: data, options: options)
     }
     
     // MARK: - Payouts Service Methods
@@ -916,11 +798,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getPayout(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)",
-            method: .get,
-            options: options
-        )
+        return try await instances.payouts.get(payoutId: payoutId, options: options)
     }
     
     /// Retrieves payout tracking information
@@ -940,11 +818,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getPayoutTrack(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/e/payouts/\(payoutId)",
-            method: .get,
-            options: options
-        )
+        return try await instances.payouts.getTrack(payoutId: payoutId, options: options)
     }
     
     /// Creates a new payout on EVM chains
@@ -969,12 +843,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createPayoutEvm(data: CreatePayoutEvmInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/evm",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payouts.createEvm(data: data, options: options)
     }
     
     /// Creates a new payout on Stellar
@@ -1000,12 +869,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createPayoutStellar(data: CreatePayoutStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/stellar",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payouts.createStellar(data: data, options: options)
     }
     
     /// Creates a new payout on Solana
@@ -1031,12 +895,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func createPayoutSolana(data: CreatePayoutSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/solana",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payouts.createSolana(data: data, options: options)
     }
     
     /// Authorizes a token on Stellar wallet
@@ -1059,12 +918,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func authorizeStellar(data: AuthorizeStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<AuthorizeStellarResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/stellar/authorize",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payouts.authorizeStellar(data: data, options: options)
     }
 
     // MARK: - Transfers Service Methods
@@ -1107,11 +961,7 @@ public final class BlindPay: Sendable {
     /// - Returns: An `APIResponse` containing fees for all rails
     /// - Throws: `BlindPayError` if the request fails
     public func getFees(options: RequestOptions? = nil) async throws -> APIResponse<FeesResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/billing/fees",
-            method: .get,
-            options: options
-        )
+        return try await instances.getFees(options: options)
     }
 
     // MARK: - Payout Documents
@@ -1124,12 +974,7 @@ public final class BlindPay: Sendable {
     /// - Returns: An `APIResponse` containing the submission result
     /// - Throws: `BlindPayError` if the request fails
     public func submitPayoutDocuments(payoutId: String, data: SubmitPayoutDocumentsInput, options: RequestOptions? = nil) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)/documents",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.payouts.submitDocuments(payoutId: payoutId, data: data, options: options)
     }
 
     // MARK: - Available NAICS Codes
@@ -1206,12 +1051,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func initiateTermsOfService(data: InitiateTosInput, options: RequestOptions? = nil) async throws -> APIResponse<InitiateTosResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/e/instances/\(instanceId)/tos",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await instances.termsOfService.initiate(data: data, options: options)
     }
 
     // MARK: - Customers Service Methods
@@ -1284,11 +1124,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getCustomer(id: String, options: RequestOptions? = nil) async throws -> APIResponse<Customer> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
-            method: .get,
-            options: options
-        )
+        return try await customers(customerId: id).get(options: options)
     }
     
     /// Updates an existing customer
@@ -1315,12 +1151,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func updateCustomer(id: String, data: UpdateCustomerInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdateCustomerResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
-            method: .put,
-            body: data,
-            options: options
-        )
+        return try await customers(customerId: id).update(data: data, options: options)
     }
     
     /// Deletes a customer
@@ -1339,11 +1170,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func deleteCustomer(id: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteCustomerResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
-            method: .delete,
-            options: options
-        )
+        return try await customers(customerId: id).delete(options: options)
     }
     
     /// Gets customer limits
@@ -1363,11 +1190,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func getCustomerLimits(id: String, options: RequestOptions? = nil) async throws -> APIResponse<CustomerLimitsResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/limits/customers/\(id)",
-            method: .get,
-            options: options
-        )
+        return try await customers(customerId: id).getLimits(options: options)
     }
     
     /// Requests a limit increase for a customer
@@ -1396,12 +1219,7 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func requestCustomerLimitIncrease(customerId: String, data: RequestLimitIncreaseInput, options: RequestOptions? = nil) async throws -> APIResponse<RequestLimitIncreaseResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/limit-increase",
-            method: .post,
-            body: data,
-            options: options
-        )
+        return try await customers(customerId: customerId).requestLimitIncrease(data: data, options: options)
     }
     
     /// Lists limit increase requests for a customer
@@ -1422,11 +1240,89 @@ public final class BlindPay: Sendable {
     /// }
     /// ```
     public func listCustomerLimitIncreaseRequests(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<[LimitIncreaseRequest]> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/limit-increase",
-            method: .get,
-            options: options
-        )
+        return try await customers(customerId: customerId).listLimitIncreases(options: options)
+    }
+
+
+    // MARK: - Instance, onboarding and RFI
+
+    /// Retrieves the instance. See ``InstancesService/get(options:)``.
+    public func getInstance(options: RequestOptions? = nil) async throws -> APIResponse<Instance> {
+        return try await instances.get(options: options)
+    }
+
+    /// See ``OnboardingService/getBusinessDetails(options:)``.
+    public func getOnboardingBusinessDetails(options: RequestOptions? = nil) async throws -> APIResponse<BusinessDetails> {
+        return try await instances.onboarding.getBusinessDetails(options: options)
+    }
+
+    /// See ``OnboardingService/getBusinessProfile(options:)``.
+    public func getOnboardingBusinessProfile(options: RequestOptions? = nil) async throws -> APIResponse<BusinessProfile> {
+        return try await instances.onboarding.getBusinessProfile(options: options)
+    }
+
+    /// See ``OnboardingService/getOwnershipDocuments(options:)``.
+    public func getOnboardingOwnershipDocuments(options: RequestOptions? = nil) async throws -> APIResponse<OwnershipDocuments> {
+        return try await instances.onboarding.getOwnershipDocuments(options: options)
+    }
+
+    /// The instance's open RFI, or `nil`. See ``InstanceRfiService/get(options:)``.
+    public func getInstanceRfi(options: RequestOptions? = nil) async throws -> APIResponse<InstanceRfi> {
+        return try await instances.rfi.get(options: options)
+    }
+
+    /// See ``InstanceRfiService/submit(response:options:)``.
+    public func submitInstanceRfi(response: RfiResponse, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
+        return try await instances.rfi.submit(response: response, options: options)
+    }
+
+    /// A customer's open RFI, or `nil`. See ``CustomerRfiService/get(options:)``.
+    public func getCustomerRfi(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<Rfi> {
+        return try await customers(customerId: customerId).rfi.get(options: options)
+    }
+
+    /// See ``CustomerRfiService/submit(response:options:)``.
+    public func submitCustomerRfi(customerId: String, response: RfiResponse, options: RequestOptions? = nil) async throws -> APIResponse<RfiSubmitResponse> {
+        return try await customers(customerId: customerId).rfi.submit(response: response, options: options)
+    }
+
+    // MARK: - Payables
+
+    /// See ``PayablesService/create(data:options:)``.
+    public func createPayable(data: CreatePayableInput, options: RequestOptions? = nil) async throws -> APIResponse<Payable> {
+        return try await instances.payables.create(data: data, options: options)
+    }
+
+    /// See ``PayablesService/list(params:options:)``.
+    public func listPayables(params: ListPayablesInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayablesResponse> {
+        return try await instances.payables.list(params: params, options: options)
+    }
+
+    /// See ``PayablesService/listAutoPaging(params:options:)``.
+    public func listPayablesAutoPaging(params: ListPayablesInput = ListPayablesInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payable, Error> {
+        return instances.payables.listAutoPaging(params: params, options: options)
+    }
+
+    /// See ``PayablesService/get(id:options:)``.
+    public func getPayable(id: String, options: RequestOptions? = nil) async throws -> APIResponse<Payable> {
+        return try await instances.payables.get(id: id, options: options)
+    }
+
+    /// See ``PayablesService/delete(id:options:)``.
+    public func deletePayable(id: String, options: RequestOptions? = nil) async throws -> APIResponse<Payable> {
+        return try await instances.payables.delete(id: id, options: options)
+    }
+
+    // MARK: - Upload extras
+
+    /// See ``UploadService/analyze(data:options:)``.
+    public func analyzeUpload(data: UploadAnalyzeInput, options: RequestOptions? = nil) async throws -> APIResponse<UploadAnalyzeResponse> {
+        return try await upload.analyze(data: data, options: options)
+    }
+
+    /// See ``UploadService/presign(fileUrl:options:)``.
+    public func presignUpload(fileUrl: String, options: RequestOptions? = nil) async throws -> APIResponse<PresignResponse> {
+        return try await upload.presign(fileUrl: fileUrl, options: options)
     }
 
 

@@ -47,4 +47,36 @@ public final class UploadService: Sendable {
             options: options
         )
     }
+
+    /// Checks a document before you submit it and rates how likely
+    /// compliance is to approve it. Sent as `multipart/form-data` to
+    /// `POST /v1/upload/analyze?instance_id=<your instance>`; never retried.
+    public func analyze(data: UploadAnalyzeInput, options: RequestOptions? = nil) async throws -> APIResponse<UploadAnalyzeResponse> {
+        var form = MultipartFormData()
+        form.addFile(name: "file", fileName: data.fileName, contentType: data.contentType, data: data.file)
+        form.addField(name: "type", value: data.type.rawValue)
+        if let metadata = data.metadata {
+            let json = try JSONSerialization.data(withJSONObject: metadata, options: [.sortedKeys])
+            form.addField(name: "metadata", value: String(decoding: json, as: UTF8.self))
+        }
+        return try await apiClient.requestMultipart(
+            endpoint: "/v1/upload/analyze",
+            method: .post,
+            form: form,
+            queryParameters: ["instance_id": instanceId],
+            options: options
+        )
+    }
+
+    /// Returns a temporary signed URL for a file you uploaded (`fileUrl` from
+    /// ``create(data:options:)``).
+    public func presign(fileUrl: String, options: RequestOptions? = nil) async throws -> APIResponse<PresignResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/presign",
+            method: .post,
+            body: PresignInput(fileUrl: fileUrl),
+            queryParameters: ["instance_id": instanceId],
+            options: options
+        )
+    }
 }

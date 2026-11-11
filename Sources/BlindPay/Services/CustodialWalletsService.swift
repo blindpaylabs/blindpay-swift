@@ -84,4 +84,22 @@ public final class CustodialWalletsService: Sendable {
             options: options
         )
     }
+
+    /// Lists one page of deposits into a managed wallet. The API always
+    /// paginates this list (default page size 10).
+    public func getDeposits(id: String, params: ListWalletDepositsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<WalletDepositsResponse> {
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)/deposits",
+            method: .get,
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
+        )
+    }
+
+    /// Iterates every deposit into a managed wallet, fetching pages of 100 (or
+    /// `params.limit`) on demand. `endingBefore` is not supported.
+    public func getDepositsAutoPaging(id: String, params: ListWalletDepositsInput = ListWalletDepositsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<WalletDeposit, Error> {
+        AutoPager.stream(params: params) { [self] page in try await self.getDeposits(id: id, params: page, options: options) }
+    }
 }
