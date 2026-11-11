@@ -4,7 +4,7 @@
     {
       "sdk": {
         "file": "Sources/BlindPay/Models/WebhookEndpoint.swift",
-        "symbol": "WebhookEvent"
+        "symbol": "WebhookEventType"
       },
       "spec": {
         "items": true,

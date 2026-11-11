@@ -124,5 +124,71 @@
     "field": "checkout_url",
     "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
     "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "bank_account",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "boleto_barcode",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "document_file",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "due_date",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "last_attempt_status",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "line_items",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "payout_id",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "pix_qrcode",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "Payable",
+    "field": "scheduled_at",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutWebhook",
+    "field": "payable_id",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "WalletInboundWebhook",
+    "field": "deposit_id",
+    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
+    "owner": "sdk-maintainers"
   }
 ]

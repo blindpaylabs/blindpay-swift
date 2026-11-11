@@ -1110,3 +1110,46 @@ public struct SubmitPayoutDocumentsResponse: Codable, Sendable {
         self.success = success
     }
 }
+
+// MARK: - Documents tracking
+
+/// Status of a payout's documents step.
+public struct PayoutDocumentsStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let waitingDocuments = PayoutDocumentsStatus(rawValue: "waiting_documents")
+    public static let complianceReviewing = PayoutDocumentsStatus(rawValue: "compliance_reviewing")
+}
+
+/// Documents step of a payout that needs supporting documents.
+public struct PayoutTrackingDocuments: Codable, Sendable, Equatable {
+    /// Documents step
+    public let step: TrackingStep
+    /// Documents status
+    public let status: PayoutDocumentsStatus?
+    /// Reviewer email/name
+    public let reviewedBy: String?
+    /// Documents completed date
+    public let completedAt: String?
+
+    public init(
+        step: TrackingStep,
+        status: PayoutDocumentsStatus? = nil,
+        reviewedBy: String? = nil,
+        completedAt: String? = nil
+    ) {
+        self.step = step
+        self.status = status
+        self.reviewedBy = reviewedBy
+        self.completedAt = completedAt
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case step
+        case status
+        case reviewedBy = "reviewed_by"
+        case completedAt = "completed_at"
+    }
+}
+

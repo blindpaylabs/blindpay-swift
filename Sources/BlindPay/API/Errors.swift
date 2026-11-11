@@ -22,6 +22,8 @@ public enum BlindPayError: Error, LocalizedError, Sendable {
     case networkError(Error, idempotencyKey: String?)
     /// An attempt exceeded its total timeout and retries were exhausted.
     case timeout(idempotencyKey: String?)
+    /// A webhook's signature, timestamp or headers didn't verify.
+    case webhookVerificationFailed
 
     public var errorDescription: String? {
         switch self {
@@ -39,6 +41,8 @@ public enum BlindPayError: Error, LocalizedError, Sendable {
             return "Network error: \(error.localizedDescription)"
         case .timeout:
             return "The request timed out"
+        case .webhookVerificationFailed:
+            return "Webhook signature verification failed"
         }
     }
 

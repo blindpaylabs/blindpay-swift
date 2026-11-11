@@ -47,7 +47,9 @@ let package = Package(
                 // Shared spec-shaped fixtures from the SDK parity effort
                 // (reference/fixtures). Keep the layout so a regeneration is a
                 // plain copy.
-                .copy("Fixtures")
+                .copy("Fixtures"),
+                // Shared Svix webhook vectors (reference/webhook-vectors.json).
+                .copy("Vectors"),
             ]
         ),
     ]

@@ -503,7 +503,7 @@ let swiftKeywords: Set<String> = ["as", "do", "is", "in", "for", "case", "self",
 
 /// Derives a lowerCamelCase Swift identifier from a wire-format enum raw value
 /// (snake_case or dotted.camelCase), matching this repo's existing convention
-/// (e.g. WebhookEvent's "customer.new" -> customerNew; BusinessIndustry's bare
+/// (e.g. WebhookEventType's "customer.new" -> customerNew; BusinessIndustry's bare
 /// numeric NAICS codes get an "n" prefix, e.g. "446120" -> n446120).
 func deriveCaseName(from value: String) -> String {
     let parts = value.split(whereSeparator: { $0 == "_" || $0 == "." || $0 == " " || $0 == "-" })

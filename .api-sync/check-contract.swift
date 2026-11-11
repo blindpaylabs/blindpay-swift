@@ -6,7 +6,7 @@
 //
 // Verifies that every wire key this SDK declares (CodingKeys string values and
 // query-parameter dictionary literals) actually exists somewhere in the committed
-// API spec snapshot, and that mapped SDK enums (WebhookEvent, CurrencyType) cover
+// API spec snapshot, and that mapped SDK enums (WebhookEventType, CurrencyType) cover
 // every enum member the spec declares for them.
 //
 // Usage:
@@ -238,7 +238,7 @@ struct MappedEnum {
 }
 
 let mappedEnums: [MappedEnum] = [
-    MappedEnum(sdkEnumName: "WebhookEvent", specKey: "events"),
+    MappedEnum(sdkEnumName: "WebhookEventType", specKey: "events"),
     MappedEnum(sdkEnumName: "CurrencyType", specKey: "currency_type"),
 ]
 
