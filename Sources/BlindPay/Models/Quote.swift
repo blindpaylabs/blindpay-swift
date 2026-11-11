@@ -10,56 +10,71 @@ import Foundation
 // MARK: - Enums
 
 /// Type of currency (sender or receiver)
-public enum CurrencyType: String, Codable, Sendable {
-    case sender = "sender"
-    case receiver = "receiver"
+public struct CurrencyType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let sender = CurrencyType(rawValue: "sender")
+    public static let receiver = CurrencyType(rawValue: "receiver")
 }
 
 /// Blockchain network
-public enum Network: String, Codable, Sendable {
-    case base = "base"
-    case sepolia = "sepolia"
-    case arbitrumSepolia = "arbitrum_sepolia"
-    case baseSepolia = "base_sepolia"
-    case arbitrum = "arbitrum"
-    case polygon = "polygon"
-    case polygonAmoy = "polygon_amoy"
-    case ethereum = "ethereum"
-    case stellar = "stellar"
-    case stellarTestnet = "stellar_testnet"
-    case tron = "tron"
-    case solana = "solana"
-    case solanaDevnet = "solana_devnet"
+public struct Network: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let base = Network(rawValue: "base")
+    public static let sepolia = Network(rawValue: "sepolia")
+    public static let arbitrumSepolia = Network(rawValue: "arbitrum_sepolia")
+    public static let baseSepolia = Network(rawValue: "base_sepolia")
+    public static let arbitrum = Network(rawValue: "arbitrum")
+    public static let polygon = Network(rawValue: "polygon")
+    public static let polygonAmoy = Network(rawValue: "polygon_amoy")
+    public static let ethereum = Network(rawValue: "ethereum")
+    public static let stellar = Network(rawValue: "stellar")
+    public static let stellarTestnet = Network(rawValue: "stellar_testnet")
+    public static let tron = Network(rawValue: "tron")
+    public static let solana = Network(rawValue: "solana")
+    public static let solanaDevnet = Network(rawValue: "solana_devnet")
 }
 
 /// Stablecoin token
-public enum StablecoinToken: String, Codable, Sendable {
-    case usdc = "USDC"
-    case usdt = "USDT"
-    case usdb = "USDB"
+public struct StablecoinToken: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let usdc = StablecoinToken(rawValue: "USDC")
+    public static let usdt = StablecoinToken(rawValue: "USDT")
+    public static let usdb = StablecoinToken(rawValue: "USDB")
 }
 
 /// Transaction document type
-public enum TransactionDocumentType: String, Codable, Sendable {
-    case invoice = "invoice"
-    case purchaseOrder = "purchase_order"
-    case deliverySlip = "delivery_slip"
-    case contract = "contract"
-    case customsDeclaration = "customs_declaration"
-    case billOfLading = "bill_of_lading"
-    case others = "others"
+public struct TransactionDocumentType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let invoice = TransactionDocumentType(rawValue: "invoice")
+    public static let purchaseOrder = TransactionDocumentType(rawValue: "purchase_order")
+    public static let deliverySlip = TransactionDocumentType(rawValue: "delivery_slip")
+    public static let contract = TransactionDocumentType(rawValue: "contract")
+    public static let customsDeclaration = TransactionDocumentType(rawValue: "customs_declaration")
+    public static let billOfLading = TransactionDocumentType(rawValue: "bill_of_lading")
+    public static let others = TransactionDocumentType(rawValue: "others")
 }
 
 /// Currency type
-public enum Currency: String, Codable, Sendable {
-    case usdc = "USDC"
-    case usdt = "USDT"
-    case usdb = "USDB"
-    case brl = "BRL"
-    case usd = "USD"
-    case mxn = "MXN"
-    case cop = "COP"
-    case ars = "ARS"
+public struct Currency: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let usdc = Currency(rawValue: "USDC")
+    public static let usdt = Currency(rawValue: "USDT")
+    public static let usdb = Currency(rawValue: "USDB")
+    public static let brl = Currency(rawValue: "BRL")
+    public static let usd = Currency(rawValue: "USD")
+    public static let mxn = Currency(rawValue: "MXN")
+    public static let cop = Currency(rawValue: "COP")
+    public static let ars = Currency(rawValue: "ARS")
 }
 
 // MARK: - Create Quote

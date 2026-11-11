@@ -8,11 +8,14 @@ import Foundation
 // MARK: - Enums
 
 /// Represents the available upload bucket types
-public enum UploadBucket: String, Codable, Sendable {
-    case avatar = "avatar"
-    case onboarding = "onboarding"
-    case limitIncrease = "limit_increase"
-    case documents = "documents"
+public struct UploadBucket: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let avatar = UploadBucket(rawValue: "avatar")
+    public static let onboarding = UploadBucket(rawValue: "onboarding")
+    public static let limitIncrease = UploadBucket(rawValue: "limit_increase")
+    public static let documents = UploadBucket(rawValue: "documents")
 }
 
 // MARK: - Input Types

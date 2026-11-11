@@ -310,6 +310,15 @@ let letDeclRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+let\s+(\w+
 let codingKeyEqRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+(\w+)\s*=\s*"([^"]*)""#)
 let codingKeyBareRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+((?:\w+\s*,\s*)*\w+)\s*$"#)
 let enumCaseEqRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+`?(\w+)`?\s*=\s*"([^"]*)""#)
+/// A value of an open enum (`public struct X: OpenEnum`), the SDK's
+/// forward-compatible enum pattern (plan C7):
+/// `public static let base = Network(rawValue: "base")`.
+let openEnumValueRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+static\s+let\s+`?(\w+)`?\s*=\s*\w+\(rawValue:\s*"([^"]*)"\)"#)
+
+/// Whether a type declaration line declares an open enum.
+func declaresOpenEnum(_ line: String) -> Bool {
+    line.range(of: #"\bstruct\s+\w+\s*:[^{]*\bOpenEnum\b"#, options: .regularExpression) != nil
+}
 let initDeclRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+init\s*\("#)
 
 func matchGroups(_ regex: NSRegularExpression, _ line: String) -> [String]? {
@@ -363,7 +372,8 @@ func scanSources(under path: String) -> [String: ScannedType] {
         for (idx, line) in lines.enumerated() {
             if let g = matchGroups(typeDeclRegex, line) {
                 let indent = g[1]
-                let kind = g[2]
+                // Open enums are structs in Swift but enums to the spec.
+                let kind = declaresOpenEnum(line) ? "enum" : g[2]
                 let name = g[3]
                 var scanned: ScannedType? = nil
                 if stack.isEmpty {
@@ -383,7 +393,7 @@ func scanSources(under path: String) -> [String: ScannedType] {
                 if let g = matchGroups(letDeclRegex, line) {
                     owner.properties.append(ScannedProperty(name: g[2], wireKey: g[2], declLineIndex: idx, typeText: g[3].trimmingCharacters(in: .whitespaces)))
                 }
-                if owner.kind == "enum", let g = matchGroups(enumCaseEqRegex, line) {
+                if owner.kind == "enum", let g = matchGroups(enumCaseEqRegex, line) ?? matchGroups(openEnumValueRegex, line) {
                     owner.rawValues.append((name: g[2], value: g[3], lineIndex: idx))
                 }
             } else if stack.count >= 2, stack.last!.name == "CodingKeys" {
@@ -1861,18 +1871,22 @@ func applyFindings(_ findings: [Finding]) {
         guard let symbol = finding.enumSymbol, let value = finding.enumValue, let file = fileOfSymbol[symbol] else { continue }
         var lines = linesFor(file)
         guard let declIdx = lines.firstIndex(where: { matchGroups(typeDeclRegex, $0)?[3] == symbol }) else { continue }
+        let isOpen = declaresOpenEnum(lines[declIdx])
         var depth = 0
         var closeIdx = -1
         var lastCaseIdx = declIdx
         for i in declIdx..<lines.count {
             depth += braceDelta(lines[i])
-            if i > declIdx, lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("case ") { lastCaseIdx = i }
+            let isValueLine = isOpen ? matchGroups(openEnumValueRegex, lines[i]) != nil : lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("case ")
+            if i > declIdx, isValueLine { lastCaseIdx = i }
             if depth == 0 && i > declIdx { closeIdx = i; break }
         }
         guard closeIdx != -1 else { continue }
-        let indent = indentOf(lines[lastCaseIdx])
+        let indent = lastCaseIdx == declIdx ? indentOf(lines[declIdx]) + "    " : indentOf(lines[lastCaseIdx])
         let caseName = deriveCaseName(from: value)
-        let newLine = "\(indent)case \(caseName) = \"\(value)\""
+        let newLine = isOpen
+            ? "\(indent)public static let \(caseName) = \(symbol)(rawValue: \"\(value)\")"
+            : "\(indent)case \(caseName) = \"\(value)\""
         lines.insert(newLine, at: lastCaseIdx + 1)
         fileLines[file] = lines
     }

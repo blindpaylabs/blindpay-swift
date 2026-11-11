@@ -10,13 +10,16 @@ import Foundation
 // MARK: - Banking Partner
 
 /// Banking partner for virtual accounts
-public enum BankingPartner: String, Codable, Sendable {
-    case jpmorgan = "jpmorgan"
-    case citi = "citi"
-    case hsbc = "hsbc"
-    case cfsb = "cfsb"
-    case portage = "portage"
-    case ssb = "ssb"
+public struct BankingPartner: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let jpmorgan = BankingPartner(rawValue: "jpmorgan")
+    public static let citi = BankingPartner(rawValue: "citi")
+    public static let hsbc = BankingPartner(rawValue: "hsbc")
+    public static let cfsb = BankingPartner(rawValue: "cfsb")
+    public static let portage = BankingPartner(rawValue: "portage")
+    public static let ssb = BankingPartner(rawValue: "ssb")
 }
 
 // MARK: - Blockchain Wallet Reference
@@ -38,9 +41,12 @@ public struct BlockchainWalletRef: Codable, Sendable, Equatable {
 // MARK: - Virtual Account Account Type
 
 /// Represents the account type for a virtual account
-public enum VirtualAccountAccountType: String, Codable, Sendable {
-    case personalChecking = "Personal checking"
-    case businessChecking = "Business checking"
+public struct VirtualAccountAccountType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let personalChecking = VirtualAccountAccountType(rawValue: "Personal checking")
+    public static let businessChecking = VirtualAccountAccountType(rawValue: "Business checking")
 }
 
 // MARK: - Virtual Account ACH

@@ -10,296 +10,329 @@ import Foundation
 // MARK: - KYC Type
 
 /// KYC verification type
-public enum KYCType: String, Codable, Sendable {
-    case light = "light"
-    case standard = "standard"
-    case enhanced = "enhanced"
+public struct KYCType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let light = KYCType(rawValue: "light")
+    public static let standard = KYCType(rawValue: "standard")
+    public static let enhanced = KYCType(rawValue: "enhanced")
 }
 
 // MARK: - Customer Type
 
 /// Type of customer
-public enum CustomerType: String, Codable, Sendable {
-    case individual = "individual"
-    case business = "business"
+public struct CustomerType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let individual = CustomerType(rawValue: "individual")
+    public static let business = CustomerType(rawValue: "business")
 }
 
 // MARK: - ID Document Type
 
 /// Type of ID document
-public enum IDDocType: String, Codable, Sendable {
-    case passport = "PASSPORT"
-    case idCard = "ID_CARD"
-    case drivers = "DRIVERS"
-    case driversLicense = "DRIVERS_LICENSE"
-    case nationalId = "NATIONAL_ID"
-    case other = "OTHER"
+public struct IDDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let passport = IDDocType(rawValue: "PASSPORT")
+    public static let idCard = IDDocType(rawValue: "ID_CARD")
+    public static let drivers = IDDocType(rawValue: "DRIVERS")
+    public static let driversLicense = IDDocType(rawValue: "DRIVERS_LICENSE")
+    public static let nationalId = IDDocType(rawValue: "NATIONAL_ID")
+    public static let other = IDDocType(rawValue: "OTHER")
 }
 
 // MARK: - Proof of Address Document Type
 
 /// Type of proof of address document
-public enum ProofOfAddressDocType: String, Codable, Sendable {
-    case utilityBill = "UTILITY_BILL"
-    case bankStatement = "BANK_STATEMENT"
-    case rentalAgreement = "RENTAL_AGREEMENT"
-    case taxDocument = "TAX_DOCUMENT"
-    case governmentCorrespondence = "GOVERNMENT_CORRESPONDENCE"
-    case governmentLetter = "GOVERNMENT_LETTER"
-    case other = "OTHER"
+public struct ProofOfAddressDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let utilityBill = ProofOfAddressDocType(rawValue: "UTILITY_BILL")
+    public static let bankStatement = ProofOfAddressDocType(rawValue: "BANK_STATEMENT")
+    public static let rentalAgreement = ProofOfAddressDocType(rawValue: "RENTAL_AGREEMENT")
+    public static let taxDocument = ProofOfAddressDocType(rawValue: "TAX_DOCUMENT")
+    public static let governmentCorrespondence = ProofOfAddressDocType(rawValue: "GOVERNMENT_CORRESPONDENCE")
+    public static let governmentLetter = ProofOfAddressDocType(rawValue: "GOVERNMENT_LETTER")
+    public static let other = ProofOfAddressDocType(rawValue: "OTHER")
 }
 
 // MARK: - Sole Proprietor Document Type
 
 /// Type of sole proprietor document
-public enum SoleProprietorDocType: String, Codable, Sendable {
-    case bankStatement = "bank_statement"
-    case masterServiceAgreement = "master_service_agreement"
-    case salarySlip = "salary_slip"
+public struct SoleProprietorDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let bankStatement = SoleProprietorDocType(rawValue: "bank_statement")
+    public static let masterServiceAgreement = SoleProprietorDocType(rawValue: "master_service_agreement")
+    public static let salarySlip = SoleProprietorDocType(rawValue: "salary_slip")
 }
 
 // MARK: - Source of Funds Document Type
 
 /// Type of source of funds document
-public enum SourceOfFundsDocType: String, Codable, Sendable {
-    case businessIncome = "business_income"
-    case gamblingProceeds = "gambling_proceeds"
-    case gifts = "gifts"
-    case governmentBenefits = "government_benefits"
-    case inheritance = "inheritance"
-    case salary = "salary"
-    case investment = "investment"
-    case gift = "gift"
-    case other = "other"
-    case investmentLoans = "investment_loans"
-    case pensionRetirement = "pension_retirement"
-    case saleOfAssetsRealEstate = "sale_of_assets_real_estate"
-    case savings = "savings"
-    case esops = "esops"
-    case investmentProceeds = "investment_proceeds"
-    case someoneElseFunds = "someone_else_funds"
+public struct SourceOfFundsDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let businessIncome = SourceOfFundsDocType(rawValue: "business_income")
+    public static let gamblingProceeds = SourceOfFundsDocType(rawValue: "gambling_proceeds")
+    public static let gifts = SourceOfFundsDocType(rawValue: "gifts")
+    public static let governmentBenefits = SourceOfFundsDocType(rawValue: "government_benefits")
+    public static let inheritance = SourceOfFundsDocType(rawValue: "inheritance")
+    public static let salary = SourceOfFundsDocType(rawValue: "salary")
+    public static let investment = SourceOfFundsDocType(rawValue: "investment")
+    public static let gift = SourceOfFundsDocType(rawValue: "gift")
+    public static let other = SourceOfFundsDocType(rawValue: "other")
+    public static let investmentLoans = SourceOfFundsDocType(rawValue: "investment_loans")
+    public static let pensionRetirement = SourceOfFundsDocType(rawValue: "pension_retirement")
+    public static let saleOfAssetsRealEstate = SourceOfFundsDocType(rawValue: "sale_of_assets_real_estate")
+    public static let savings = SourceOfFundsDocType(rawValue: "savings")
+    public static let esops = SourceOfFundsDocType(rawValue: "esops")
+    public static let investmentProceeds = SourceOfFundsDocType(rawValue: "investment_proceeds")
+    public static let someoneElseFunds = SourceOfFundsDocType(rawValue: "someone_else_funds")
 }
 
 // MARK: - Purpose of Transactions
 
 /// Purpose of transactions
-public enum PurposeOfTransactions: String, Codable, Sendable {
-    case businessTransactions = "business_transactions"
-    case charitableDonations = "charitable_donations"
-    case investmentPurposes = "investment_purposes"
-    case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
-    case personalOrLivingExpenses = "personal_or_living_expenses"
-    case personalTransactions = "personal_transactions"
-    case investment = "investment"
-    case other = "other"
-    case protectWealth = "protect_wealth"
-    case purchaseGoodAndServices = "purchase_good_and_services"
-    case receivePaymentForFreelancing = "receive_payment_for_freelancing"
-    case receiveSalary = "receive_salary"
+public struct PurposeOfTransactions: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let businessTransactions = PurposeOfTransactions(rawValue: "business_transactions")
+    public static let charitableDonations = PurposeOfTransactions(rawValue: "charitable_donations")
+    public static let investmentPurposes = PurposeOfTransactions(rawValue: "investment_purposes")
+    public static let paymentsToFriendsOrFamilyAbroad = PurposeOfTransactions(rawValue: "payments_to_friends_or_family_abroad")
+    public static let personalOrLivingExpenses = PurposeOfTransactions(rawValue: "personal_or_living_expenses")
+    public static let personalTransactions = PurposeOfTransactions(rawValue: "personal_transactions")
+    public static let investment = PurposeOfTransactions(rawValue: "investment")
+    public static let other = PurposeOfTransactions(rawValue: "other")
+    public static let protectWealth = PurposeOfTransactions(rawValue: "protect_wealth")
+    public static let purchaseGoodAndServices = PurposeOfTransactions(rawValue: "purchase_good_and_services")
+    public static let receivePaymentForFreelancing = PurposeOfTransactions(rawValue: "receive_payment_for_freelancing")
+    public static let receiveSalary = PurposeOfTransactions(rawValue: "receive_salary")
 }
 
 // MARK: - Account Purpose
 
 /// Purpose of the account
-public enum AccountPurpose: String, Codable, Sendable {
-    case charitableDonations = "charitable_donations"
-    case ecommerceRetailPayments = "ecommerce_retail_payments"
-    case investmentPurposes = "investment_purposes"
-    case businessExpenses = "business_expenses"
-    case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
-    case personalOrLivingExpenses = "personal_or_living_expenses"
-    case protectWealth = "protect_wealth"
-    case purchaseGoodsAndServices = "purchase_goods_and_services"
-    case receivePaymentsForGoodsAndServices = "receive_payments_for_goods_and_services"
-    case taxOptimization = "tax_optimization"
-    case thirdPartyMoneyTransmission = "third_party_money_transmission"
-    case payroll = "payroll"
-    case treasuryManagement = "treasury_management"
-    case other = "other"
+public struct AccountPurpose: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let charitableDonations = AccountPurpose(rawValue: "charitable_donations")
+    public static let ecommerceRetailPayments = AccountPurpose(rawValue: "ecommerce_retail_payments")
+    public static let investmentPurposes = AccountPurpose(rawValue: "investment_purposes")
+    public static let businessExpenses = AccountPurpose(rawValue: "business_expenses")
+    public static let paymentsToFriendsOrFamilyAbroad = AccountPurpose(rawValue: "payments_to_friends_or_family_abroad")
+    public static let personalOrLivingExpenses = AccountPurpose(rawValue: "personal_or_living_expenses")
+    public static let protectWealth = AccountPurpose(rawValue: "protect_wealth")
+    public static let purchaseGoodsAndServices = AccountPurpose(rawValue: "purchase_goods_and_services")
+    public static let receivePaymentsForGoodsAndServices = AccountPurpose(rawValue: "receive_payments_for_goods_and_services")
+    public static let taxOptimization = AccountPurpose(rawValue: "tax_optimization")
+    public static let thirdPartyMoneyTransmission = AccountPurpose(rawValue: "third_party_money_transmission")
+    public static let payroll = AccountPurpose(rawValue: "payroll")
+    public static let treasuryManagement = AccountPurpose(rawValue: "treasury_management")
+    public static let other = AccountPurpose(rawValue: "other")
 }
 
 // MARK: - Business Type
 
 /// Type of business entity
-public enum BusinessType: String, Codable, Sendable {
-    case corporation = "corporation"
-    case llc = "llc"
-    case partnership = "partnership"
-    case soleProprietorship = "sole_proprietorship"
-    case trust = "trust"
-    case nonProfit = "non_profit"
+public struct BusinessType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let corporation = BusinessType(rawValue: "corporation")
+    public static let llc = BusinessType(rawValue: "llc")
+    public static let partnership = BusinessType(rawValue: "partnership")
+    public static let soleProprietorship = BusinessType(rawValue: "sole_proprietorship")
+    public static let trust = BusinessType(rawValue: "trust")
+    public static let nonProfit = BusinessType(rawValue: "non_profit")
 }
 
 // MARK: - Business Industry
 
 /// NAICS code for business industry classification
-public enum BusinessIndustry: String, Codable, Sendable {
-    case n111998 = "111998"
-    case n112120 = "112120"
-    case n113310 = "113310"
-    case n115114 = "115114"
-    case n541211 = "541211"
-    case n541810 = "541810"
-    case n541430 = "541430"
-    case n541715 = "541715"
-    case n541930 = "541930"
-    case n561422 = "561422"
-    case n561311 = "561311"
-    case n561612 = "561612"
-    case n561740 = "561740"
-    case n561730 = "561730"
-    case n236115 = "236115"
-    case n236220 = "236220"
-    case n237310 = "237310"
-    case n238210 = "238210"
-    case n811111 = "811111"
-    case n812111 = "812111"
-    case n812112 = "812112"
-    case n532111 = "532111"
-    case n624410 = "624410"
-    case n541922 = "541922"
-    case n811210 = "811210"
-    case n812199 = "812199"
-    case n611110 = "611110"
-    case n611310 = "611310"
-    case n611410 = "611410"
-    case n611710 = "611710"
-    case n211120 = "211120"
-    case n212114 = "212114"
-    case n221310 = "221310"
-    case n562111 = "562111"
-    case n562920 = "562920"
-    case n213112 = "213112"
-    case n522110 = "522110"
-    case n522210 = "522210"
-    case n522320 = "522320"
-    case n523150 = "523150"
-    case n523940 = "523940"
-    case n523999 = "523999"
-    case n524113 = "524113"
-    case n813110 = "813110"
-    case n813211 = "813211"
-    case n813219 = "813219"
-    case n551112 = "551112"
-    case n721110 = "721110"
-    case n722511 = "722511"
-    case n722513 = "722513"
-    case n561510 = "561510"
-    case n713110 = "713110"
-    case n713210 = "713210"
-    case n712110 = "712110"
-    case n711110 = "711110"
-    case n711211 = "711211"
-    case n621111 = "621111"
-    case n621210 = "621210"
-    case n622110 = "622110"
-    case n623110 = "623110"
-    case n621511 = "621511"
-    case n623220 = "623220"
-    case n541940 = "541940"
-    case n621399 = "621399"
-    case n621910 = "621910"
-    case n541110 = "541110"
-    case n311421 = "311421"
-    case n337121 = "337121"
-    case n322220 = "322220"
-    case n339920 = "339920"
-    case n334210 = "334210"
-    case n339930 = "339930"
-    case n312130 = "312130"
-    case n334111 = "334111"
-    case n334118 = "334118"
-    case n325412 = "325412"
-    case n339112 = "339112"
-    case n336110 = "336110"
-    case n336390 = "336390"
-    case n315990 = "315990"
-    case n313110 = "313110"
-    case n339910 = "339910"
-    case n516120 = "516120"
-    case n513130 = "513130"
-    case n512250 = "512250"
-    case n519130 = "519130"
-    case n711410 = "711410"
-    case n711510 = "711510"
-    case n531110 = "531110"
-    case n531120 = "531120"
-    case n531130 = "531130"
-    case n531190 = "531190"
-    case n531210 = "531210"
-    case n531311 = "531311"
-    case n531312 = "531312"
-    case n531320 = "531320"
-    case n531390 = "531390"
-    case n454110 = "454110"
-    case n445110 = "445110"
-    case n455110 = "455110"
-    case n457110 = "457110"
-    case n449210 = "449210"
-    case n444110 = "444110"
-    case n459210 = "459210"
-    case n459120 = "459120"
-    case n445320 = "445320"
-    case n458110 = "458110"
-    case n458210 = "458210"
-    case n458310 = "458310"
-    case n455219 = "455219"
-    case n424210 = "424210"
-    case n456110 = "456110"
-    case n541511 = "541511"
-    case n541512 = "541512"
-    case n541519 = "541519"
-    case n518210 = "518210"
-    case n511210 = "511210"
-    case n517111 = "517111"
-    case n517112 = "517112"
-    case n517410 = "517410"
-    case n481111 = "481111"
-    case n483111 = "483111"
-    case n485210 = "485210"
-    case n488510 = "488510"
-    case n484121 = "484121"
-    case n493110 = "493110"
-    case n423430 = "423430"
-    case n423690 = "423690"
-    case n423110 = "423110"
-    case n423830 = "423830"
-    case n423840 = "423840"
-    case n423510 = "423510"
-    case n424690 = "424690"
-    case n424990 = "424990"
-    case n424410 = "424410"
-    case n424480 = "424480"
-    case n423940 = "423940"
-    case n541611 = "541611"
-    case n541618 = "541618"
-    case n541330 = "541330"
-    case n541990 = "541990"
-    case n541214 = "541214"
-    case n561499 = "561499"
-    case dapp = "dapp"
-    case exchange = "exchange"
-    case gambling = "gambling"
-    case gaming = "gaming"
-    case infra = "infra"
-    case marketplace = "marketplace"
-    case neoBank = "neo_bank"
-    case other = "other"
-    case saas = "saas"
-    case social = "social"
-    case wallet = "wallet"
+public struct BusinessIndustry: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let n111998 = BusinessIndustry(rawValue: "111998")
+    public static let n112120 = BusinessIndustry(rawValue: "112120")
+    public static let n113310 = BusinessIndustry(rawValue: "113310")
+    public static let n115114 = BusinessIndustry(rawValue: "115114")
+    public static let n541211 = BusinessIndustry(rawValue: "541211")
+    public static let n541810 = BusinessIndustry(rawValue: "541810")
+    public static let n541430 = BusinessIndustry(rawValue: "541430")
+    public static let n541715 = BusinessIndustry(rawValue: "541715")
+    public static let n541930 = BusinessIndustry(rawValue: "541930")
+    public static let n561422 = BusinessIndustry(rawValue: "561422")
+    public static let n561311 = BusinessIndustry(rawValue: "561311")
+    public static let n561612 = BusinessIndustry(rawValue: "561612")
+    public static let n561740 = BusinessIndustry(rawValue: "561740")
+    public static let n561730 = BusinessIndustry(rawValue: "561730")
+    public static let n236115 = BusinessIndustry(rawValue: "236115")
+    public static let n236220 = BusinessIndustry(rawValue: "236220")
+    public static let n237310 = BusinessIndustry(rawValue: "237310")
+    public static let n238210 = BusinessIndustry(rawValue: "238210")
+    public static let n811111 = BusinessIndustry(rawValue: "811111")
+    public static let n812111 = BusinessIndustry(rawValue: "812111")
+    public static let n812112 = BusinessIndustry(rawValue: "812112")
+    public static let n532111 = BusinessIndustry(rawValue: "532111")
+    public static let n624410 = BusinessIndustry(rawValue: "624410")
+    public static let n541922 = BusinessIndustry(rawValue: "541922")
+    public static let n811210 = BusinessIndustry(rawValue: "811210")
+    public static let n812199 = BusinessIndustry(rawValue: "812199")
+    public static let n611110 = BusinessIndustry(rawValue: "611110")
+    public static let n611310 = BusinessIndustry(rawValue: "611310")
+    public static let n611410 = BusinessIndustry(rawValue: "611410")
+    public static let n611710 = BusinessIndustry(rawValue: "611710")
+    public static let n211120 = BusinessIndustry(rawValue: "211120")
+    public static let n212114 = BusinessIndustry(rawValue: "212114")
+    public static let n221310 = BusinessIndustry(rawValue: "221310")
+    public static let n562111 = BusinessIndustry(rawValue: "562111")
+    public static let n562920 = BusinessIndustry(rawValue: "562920")
+    public static let n213112 = BusinessIndustry(rawValue: "213112")
+    public static let n522110 = BusinessIndustry(rawValue: "522110")
+    public static let n522210 = BusinessIndustry(rawValue: "522210")
+    public static let n522320 = BusinessIndustry(rawValue: "522320")
+    public static let n523150 = BusinessIndustry(rawValue: "523150")
+    public static let n523940 = BusinessIndustry(rawValue: "523940")
+    public static let n523999 = BusinessIndustry(rawValue: "523999")
+    public static let n524113 = BusinessIndustry(rawValue: "524113")
+    public static let n813110 = BusinessIndustry(rawValue: "813110")
+    public static let n813211 = BusinessIndustry(rawValue: "813211")
+    public static let n813219 = BusinessIndustry(rawValue: "813219")
+    public static let n551112 = BusinessIndustry(rawValue: "551112")
+    public static let n721110 = BusinessIndustry(rawValue: "721110")
+    public static let n722511 = BusinessIndustry(rawValue: "722511")
+    public static let n722513 = BusinessIndustry(rawValue: "722513")
+    public static let n561510 = BusinessIndustry(rawValue: "561510")
+    public static let n713110 = BusinessIndustry(rawValue: "713110")
+    public static let n713210 = BusinessIndustry(rawValue: "713210")
+    public static let n712110 = BusinessIndustry(rawValue: "712110")
+    public static let n711110 = BusinessIndustry(rawValue: "711110")
+    public static let n711211 = BusinessIndustry(rawValue: "711211")
+    public static let n621111 = BusinessIndustry(rawValue: "621111")
+    public static let n621210 = BusinessIndustry(rawValue: "621210")
+    public static let n622110 = BusinessIndustry(rawValue: "622110")
+    public static let n623110 = BusinessIndustry(rawValue: "623110")
+    public static let n621511 = BusinessIndustry(rawValue: "621511")
+    public static let n623220 = BusinessIndustry(rawValue: "623220")
+    public static let n541940 = BusinessIndustry(rawValue: "541940")
+    public static let n621399 = BusinessIndustry(rawValue: "621399")
+    public static let n621910 = BusinessIndustry(rawValue: "621910")
+    public static let n541110 = BusinessIndustry(rawValue: "541110")
+    public static let n311421 = BusinessIndustry(rawValue: "311421")
+    public static let n337121 = BusinessIndustry(rawValue: "337121")
+    public static let n322220 = BusinessIndustry(rawValue: "322220")
+    public static let n339920 = BusinessIndustry(rawValue: "339920")
+    public static let n334210 = BusinessIndustry(rawValue: "334210")
+    public static let n339930 = BusinessIndustry(rawValue: "339930")
+    public static let n312130 = BusinessIndustry(rawValue: "312130")
+    public static let n334111 = BusinessIndustry(rawValue: "334111")
+    public static let n334118 = BusinessIndustry(rawValue: "334118")
+    public static let n325412 = BusinessIndustry(rawValue: "325412")
+    public static let n339112 = BusinessIndustry(rawValue: "339112")
+    public static let n336110 = BusinessIndustry(rawValue: "336110")
+    public static let n336390 = BusinessIndustry(rawValue: "336390")
+    public static let n315990 = BusinessIndustry(rawValue: "315990")
+    public static let n313110 = BusinessIndustry(rawValue: "313110")
+    public static let n339910 = BusinessIndustry(rawValue: "339910")
+    public static let n516120 = BusinessIndustry(rawValue: "516120")
+    public static let n513130 = BusinessIndustry(rawValue: "513130")
+    public static let n512250 = BusinessIndustry(rawValue: "512250")
+    public static let n519130 = BusinessIndustry(rawValue: "519130")
+    public static let n711410 = BusinessIndustry(rawValue: "711410")
+    public static let n711510 = BusinessIndustry(rawValue: "711510")
+    public static let n531110 = BusinessIndustry(rawValue: "531110")
+    public static let n531120 = BusinessIndustry(rawValue: "531120")
+    public static let n531130 = BusinessIndustry(rawValue: "531130")
+    public static let n531190 = BusinessIndustry(rawValue: "531190")
+    public static let n531210 = BusinessIndustry(rawValue: "531210")
+    public static let n531311 = BusinessIndustry(rawValue: "531311")
+    public static let n531312 = BusinessIndustry(rawValue: "531312")
+    public static let n531320 = BusinessIndustry(rawValue: "531320")
+    public static let n531390 = BusinessIndustry(rawValue: "531390")
+    public static let n454110 = BusinessIndustry(rawValue: "454110")
+    public static let n445110 = BusinessIndustry(rawValue: "445110")
+    public static let n455110 = BusinessIndustry(rawValue: "455110")
+    public static let n457110 = BusinessIndustry(rawValue: "457110")
+    public static let n449210 = BusinessIndustry(rawValue: "449210")
+    public static let n444110 = BusinessIndustry(rawValue: "444110")
+    public static let n459210 = BusinessIndustry(rawValue: "459210")
+    public static let n459120 = BusinessIndustry(rawValue: "459120")
+    public static let n445320 = BusinessIndustry(rawValue: "445320")
+    public static let n458110 = BusinessIndustry(rawValue: "458110")
+    public static let n458210 = BusinessIndustry(rawValue: "458210")
+    public static let n458310 = BusinessIndustry(rawValue: "458310")
+    public static let n455219 = BusinessIndustry(rawValue: "455219")
+    public static let n424210 = BusinessIndustry(rawValue: "424210")
+    public static let n456110 = BusinessIndustry(rawValue: "456110")
+    public static let n541511 = BusinessIndustry(rawValue: "541511")
+    public static let n541512 = BusinessIndustry(rawValue: "541512")
+    public static let n541519 = BusinessIndustry(rawValue: "541519")
+    public static let n518210 = BusinessIndustry(rawValue: "518210")
+    public static let n511210 = BusinessIndustry(rawValue: "511210")
+    public static let n517111 = BusinessIndustry(rawValue: "517111")
+    public static let n517112 = BusinessIndustry(rawValue: "517112")
+    public static let n517410 = BusinessIndustry(rawValue: "517410")
+    public static let n481111 = BusinessIndustry(rawValue: "481111")
+    public static let n483111 = BusinessIndustry(rawValue: "483111")
+    public static let n485210 = BusinessIndustry(rawValue: "485210")
+    public static let n488510 = BusinessIndustry(rawValue: "488510")
+    public static let n484121 = BusinessIndustry(rawValue: "484121")
+    public static let n493110 = BusinessIndustry(rawValue: "493110")
+    public static let n423430 = BusinessIndustry(rawValue: "423430")
+    public static let n423690 = BusinessIndustry(rawValue: "423690")
+    public static let n423110 = BusinessIndustry(rawValue: "423110")
+    public static let n423830 = BusinessIndustry(rawValue: "423830")
+    public static let n423840 = BusinessIndustry(rawValue: "423840")
+    public static let n423510 = BusinessIndustry(rawValue: "423510")
+    public static let n424690 = BusinessIndustry(rawValue: "424690")
+    public static let n424990 = BusinessIndustry(rawValue: "424990")
+    public static let n424410 = BusinessIndustry(rawValue: "424410")
+    public static let n424480 = BusinessIndustry(rawValue: "424480")
+    public static let n423940 = BusinessIndustry(rawValue: "423940")
+    public static let n541611 = BusinessIndustry(rawValue: "541611")
+    public static let n541618 = BusinessIndustry(rawValue: "541618")
+    public static let n541330 = BusinessIndustry(rawValue: "541330")
+    public static let n541990 = BusinessIndustry(rawValue: "541990")
+    public static let n541214 = BusinessIndustry(rawValue: "541214")
+    public static let n561499 = BusinessIndustry(rawValue: "561499")
+    public static let dapp = BusinessIndustry(rawValue: "dapp")
+    public static let exchange = BusinessIndustry(rawValue: "exchange")
+    public static let gambling = BusinessIndustry(rawValue: "gambling")
+    public static let gaming = BusinessIndustry(rawValue: "gaming")
+    public static let infra = BusinessIndustry(rawValue: "infra")
+    public static let marketplace = BusinessIndustry(rawValue: "marketplace")
+    public static let neoBank = BusinessIndustry(rawValue: "neo_bank")
+    public static let other = BusinessIndustry(rawValue: "other")
+    public static let saas = BusinessIndustry(rawValue: "saas")
+    public static let social = BusinessIndustry(rawValue: "social")
+    public static let wallet = BusinessIndustry(rawValue: "wallet")
 }
 
 // MARK: - Estimated Annual Revenue
 
 /// Estimated annual revenue range
-public enum EstimatedAnnualRevenue: String, Codable, Sendable {
-    case zeroTo99999 = "0_99999"
-    case hundredKTo999999 = "100000_999999"
-    case oneMillionTo9999999 = "1000000_9999999"
-    case tenMillionTo49999999 = "10000000_49999999"
-    case fiftyMillionTo249999999 = "50000000_249999999"
-    case twoHundredFiftyMillionPlus = "250000000_plus"
+public struct EstimatedAnnualRevenue: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let zeroTo99999 = EstimatedAnnualRevenue(rawValue: "0_99999")
+    public static let hundredKTo999999 = EstimatedAnnualRevenue(rawValue: "100000_999999")
+    public static let oneMillionTo9999999 = EstimatedAnnualRevenue(rawValue: "1000000_9999999")
+    public static let tenMillionTo49999999 = EstimatedAnnualRevenue(rawValue: "10000000_49999999")
+    public static let fiftyMillionTo249999999 = EstimatedAnnualRevenue(rawValue: "50000000_249999999")
+    public static let twoHundredFiftyMillionPlus = EstimatedAnnualRevenue(rawValue: "250000000_plus")
 
     @available(*, deprecated, renamed: "twoHundredFiftyMillionPlus")
     public static var twoAndAHalfBillionPlus: Self { .twoHundredFiftyMillionPlus }
@@ -308,32 +341,41 @@ public enum EstimatedAnnualRevenue: String, Codable, Sendable {
 // MARK: - Source of Wealth
 
 /// Source of wealth for business customers
-public enum SourceOfWealth: String, Codable, Sendable {
-    case businessDividendsOrProfits = "business_dividends_or_profits"
-    case investments = "investments"
-    case assetSales = "asset_sales"
-    case clientInvestorContributions = "client_investor_contributions"
-    case gambling = "gambling"
-    case charitableContributions = "charitable_contributions"
-    case inheritance = "inheritance"
-    case affiliateOrRoyaltyIncome = "affiliate_or_royalty_income"
+public struct SourceOfWealth: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let businessDividendsOrProfits = SourceOfWealth(rawValue: "business_dividends_or_profits")
+    public static let investments = SourceOfWealth(rawValue: "investments")
+    public static let assetSales = SourceOfWealth(rawValue: "asset_sales")
+    public static let clientInvestorContributions = SourceOfWealth(rawValue: "client_investor_contributions")
+    public static let gambling = SourceOfWealth(rawValue: "gambling")
+    public static let charitableContributions = SourceOfWealth(rawValue: "charitable_contributions")
+    public static let inheritance = SourceOfWealth(rawValue: "inheritance")
+    public static let affiliateOrRoyaltyIncome = SourceOfWealth(rawValue: "affiliate_or_royalty_income")
 }
 
 // MARK: - AML Status
 
 /// AML screening status
-public enum AmlStatus: String, Codable, Sendable {
-    case clear = "clear"
-    case hit = "hit"
-    case error = "error"
+public struct AmlStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let clear = AmlStatus(rawValue: "clear")
+    public static let hit = AmlStatus(rawValue: "hit")
+    public static let error = AmlStatus(rawValue: "error")
 }
 
 // MARK: - Owner Tax Type
 
 /// Tax identifier type for owner
-public enum OwnerTaxType: String, Codable, Sendable {
-    case ssn = "SSN"
-    case itin = "ITIN"
+public struct OwnerTaxType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let ssn = OwnerTaxType(rawValue: "SSN")
+    public static let itin = OwnerTaxType(rawValue: "ITIN")
 }
 
 // MARK: - AML Hits
@@ -381,12 +423,15 @@ public struct AmlHits: Codable, Sendable, Equatable {
 // MARK: - Owner Role
 
 /// Role of an owner
-public enum OwnerRole: String, Codable, Sendable {
-    case beneficialOwner = "beneficial_owner"
-    case authorizedSigner = "authorized_signer"
-    case other = "other"
-    case beneficialControlling = "beneficial_controlling"
-    case controllingPerson = "controlling_person"
+public struct OwnerRole: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let beneficialOwner = OwnerRole(rawValue: "beneficial_owner")
+    public static let authorizedSigner = OwnerRole(rawValue: "authorized_signer")
+    public static let other = OwnerRole(rawValue: "other")
+    public static let beneficialControlling = OwnerRole(rawValue: "beneficial_controlling")
+    public static let controllingPerson = OwnerRole(rawValue: "controlling_person")
 }
 
 // MARK: - Owner
@@ -830,15 +875,18 @@ public struct CreateCustomerInput: Codable, Sendable {
 // MARK: - KYC Status
 
 /// KYC verification status
-public enum KYCStatus: String, Codable, Sendable {
-    case verifying = "verifying"
-    case approved = "approved"
-    case rejected = "rejected"
-    case deprecated = "deprecated"
-    case pendingReview = "pending_review"
-    case awaitingContract = "awaiting_contract"
-    case complianceRequest = "compliance_request"
-    case approvedRFI = "approved_rfi"
+public struct KYCStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let verifying = KYCStatus(rawValue: "verifying")
+    public static let approved = KYCStatus(rawValue: "approved")
+    public static let rejected = KYCStatus(rawValue: "rejected")
+    public static let deprecated = KYCStatus(rawValue: "deprecated")
+    public static let pendingReview = KYCStatus(rawValue: "pending_review")
+    public static let awaitingContract = KYCStatus(rawValue: "awaiting_contract")
+    public static let complianceRequest = KYCStatus(rawValue: "compliance_request")
+    public static let approvedRFI = KYCStatus(rawValue: "approved_rfi")
 }
 
 // MARK: - KYC Warning

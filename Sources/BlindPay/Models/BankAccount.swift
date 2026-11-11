@@ -422,11 +422,14 @@ public typealias CreateBankAccountResponse = BankAccount
 
 
 /// Review status of a bank account.
-public enum BankAccountStatus: String, Codable, Sendable {
-    case verifying = "verifying"
-    case approved = "approved"
-    case rejected = "rejected"
-    case deprecated = "deprecated"
+public struct BankAccountStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let verifying = BankAccountStatus(rawValue: "verifying")
+    public static let approved = BankAccountStatus(rawValue: "approved")
+    public static let rejected = BankAccountStatus(rawValue: "rejected")
+    public static let deprecated = BankAccountStatus(rawValue: "deprecated")
 }
 
 /// Filters for listing a customer's bank accounts. Every value is optional; unset ones are not sent.

@@ -10,40 +10,52 @@ import Foundation
 // MARK: - Enums
 
 /// Payin status
-public enum PayinStatus: String, Codable, Sendable {
-  case processing = "processing"
-  case onHold = "on_hold"
-  case failed = "failed"
-  case refunded = "refunded"
-  case completed = "completed"
+public struct PayinStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let processing = PayinStatus(rawValue: "processing")
+    public static let onHold = PayinStatus(rawValue: "on_hold")
+    public static let failed = PayinStatus(rawValue: "failed")
+    public static let refunded = PayinStatus(rawValue: "refunded")
+    public static let completed = PayinStatus(rawValue: "completed")
 }
 
 /// Manual execution status for payin
-public enum ManualExecutionStatus: String, Codable, Sendable {
-  case pending = "pending"
-  case concluded = "concluded"
-  case failed = "failed"
+public struct ManualExecutionStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let pending = ManualExecutionStatus(rawValue: "pending")
+    public static let concluded = ManualExecutionStatus(rawValue: "concluded")
+    public static let failed = ManualExecutionStatus(rawValue: "failed")
 }
 
 /// Payment method for payin
-public enum PaymentMethod: String, Codable, Sendable {
-  case ach = "ach"
-  case achPull = "ach_pull"
-  case wire = "wire"
-  case pix = "pix"
-  case card = "card"
-  case spei = "spei"
-  case transfers = "transfers"
-  case pse = "pse"
-  case internationalSwift = "international_swift"
-  case rtp = "rtp"
-  case ted = "ted"
+public struct PaymentMethod: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let ach = PaymentMethod(rawValue: "ach")
+    public static let achPull = PaymentMethod(rawValue: "ach_pull")
+    public static let wire = PaymentMethod(rawValue: "wire")
+    public static let pix = PaymentMethod(rawValue: "pix")
+    public static let card = PaymentMethod(rawValue: "card")
+    public static let spei = PaymentMethod(rawValue: "spei")
+    public static let transfers = PaymentMethod(rawValue: "transfers")
+    public static let pse = PaymentMethod(rawValue: "pse")
+    public static let internationalSwift = PaymentMethod(rawValue: "international_swift")
+    public static let rtp = PaymentMethod(rawValue: "rtp")
+    public static let ted = PaymentMethod(rawValue: "ted")
 }
 
 /// Payin type
-public enum PayinType: String, Codable, Sendable {
-  case individual = "individual"
-  case business = "business"
+public struct PayinType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let individual = PayinType(rawValue: "individual")
+    public static let business = PayinType(rawValue: "business")
 }
 
 // MARK: - Tracking Types

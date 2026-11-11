@@ -8,14 +8,17 @@
 import Foundation
 
 /// Represents a role that can be assigned to an instance member
-public enum InstanceMemberRole: String, Codable, Sendable {
-    case owner = "owner"
-    case admin = "admin"
-    case finance = "finance"
-    case checker = "checker"
-    case operations = "operations"
-    case developer = "developer"
-    case viewer = "viewer"
+public struct InstanceMemberRole: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let owner = InstanceMemberRole(rawValue: "owner")
+    public static let admin = InstanceMemberRole(rawValue: "admin")
+    public static let finance = InstanceMemberRole(rawValue: "finance")
+    public static let checker = InstanceMemberRole(rawValue: "checker")
+    public static let operations = InstanceMemberRole(rawValue: "operations")
+    public static let developer = InstanceMemberRole(rawValue: "developer")
+    public static let viewer = InstanceMemberRole(rawValue: "viewer")
 }
 
 /// Represents a member of an instance

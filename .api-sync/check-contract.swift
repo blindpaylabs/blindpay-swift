@@ -243,8 +243,9 @@ let mappedEnums: [MappedEnum] = [
 ]
 
 func sdkEnumRawValues(named enumName: String, under path: String) -> Set<String>? {
-    let declRegex = try! NSRegularExpression(pattern: #"^\s*(?:public\s+)?enum\s+\#(enumName)\b"#)
-    let caseRegex = try! NSRegularExpression(pattern: #"^\s*case\s+\w+\s*=\s*"([^"]+)""#)
+    // Closed `enum X: String` or open `struct X: OpenEnum` (plan C7).
+    let declRegex = try! NSRegularExpression(pattern: #"^\s*(?:public\s+)?(?:enum\s+\#(enumName)\b|struct\s+\#(enumName)\s*:[^{]*\bOpenEnum\b)"#)
+    let caseRegex = try! NSRegularExpression(pattern: #"^\s*(?:case\s+`?\w+`?\s*=\s*|public\s+static\s+let\s+`?\w+`?\s*=\s*\w+\(rawValue:\s*)"([^"]+)""#)
 
     for file in swiftFiles(under: path) {
         guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }

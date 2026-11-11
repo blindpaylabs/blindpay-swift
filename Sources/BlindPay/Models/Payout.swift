@@ -10,100 +10,136 @@ import Foundation
 // MARK: - Enums
 
 /// Payout status
-public enum PayoutStatus: String, Codable, Sendable {
-  case processing = "processing"
-  case onHold = "on_hold"
-  case failed = "failed"
-  case refunded = "refunded"
-  case completed = "completed"
+public struct PayoutStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let processing = PayoutStatus(rawValue: "processing")
+    public static let onHold = PayoutStatus(rawValue: "on_hold")
+    public static let failed = PayoutStatus(rawValue: "failed")
+    public static let refunded = PayoutStatus(rawValue: "refunded")
+    public static let completed = PayoutStatus(rawValue: "completed")
 }
 
 /// Tracking step
-public enum TrackingStep: String, Codable, Sendable {
-  case processing = "processing"
-  case onHold = "on_hold"
-  case completed = "completed"
+public struct TrackingStep: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let processing = TrackingStep(rawValue: "processing")
+    public static let onHold = TrackingStep(rawValue: "on_hold")
+    public static let completed = TrackingStep(rawValue: "completed")
 }
 
 /// Provider status for liquidity tracking
-public enum ProviderStatus: String, Codable, Sendable {
-  case deposited = "deposited"
-  case converted = "converted"
-  case withdrawn = "withdrawn"
+public struct ProviderStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let deposited = ProviderStatus(rawValue: "deposited")
+    public static let converted = ProviderStatus(rawValue: "converted")
+    public static let withdrawn = ProviderStatus(rawValue: "withdrawn")
 }
 
 /// Provider status for payment tracking
-public enum PaymentProviderStatus: String, Codable, Sendable {
-  case canceled = "canceled"
-  case failed = "failed"
-  case returned = "returned"
-  case sent = "sent"
+public struct PaymentProviderStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let canceled = PaymentProviderStatus(rawValue: "canceled")
+    public static let failed = PaymentProviderStatus(rawValue: "failed")
+    public static let returned = PaymentProviderStatus(rawValue: "returned")
+    public static let sent = PaymentProviderStatus(rawValue: "sent")
 }
 
 /// Payment type for payout
-public enum PaymentType: String, Codable, Sendable {
-  case wire = "wire"
-  case ach = "ach"
-  case pix = "pix"
-  case pixSafe = "pix_safe"
-  case speiBitso = "spei_bitso"
-  case transfersBitso = "transfers_bitso"
-  case achCopBitso = "ach_cop_bitso"
-  case internationalSwift = "international_swift"
-  case rtp = "rtp"
-  case ted = "ted"
+public struct PaymentType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let wire = PaymentType(rawValue: "wire")
+    public static let ach = PaymentType(rawValue: "ach")
+    public static let pix = PaymentType(rawValue: "pix")
+    public static let pixSafe = PaymentType(rawValue: "pix_safe")
+    public static let speiBitso = PaymentType(rawValue: "spei_bitso")
+    public static let transfersBitso = PaymentType(rawValue: "transfers_bitso")
+    public static let achCopBitso = PaymentType(rawValue: "ach_cop_bitso")
+    public static let internationalSwift = PaymentType(rawValue: "international_swift")
+    public static let rtp = PaymentType(rawValue: "rtp")
+    public static let ted = PaymentType(rawValue: "ted")
 }
 
 /// Account type
-public enum AccountType: String, Codable, Sendable {
-  case checking = "checking"
-  case saving = "saving"
+public struct AccountType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let checking = AccountType(rawValue: "checking")
+    public static let saving = AccountType(rawValue: "saving")
 }
 
 
 /// ACH COP document type
-public enum AchCopDocumentType: String, Codable, Sendable {
-  case cc = "CC"
-  case ce = "CE"
-  case nit = "NIT"
-  case pass = "PASS"
-  case pep = "PEP"
+public struct AchCopDocumentType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let cc = AchCopDocumentType(rawValue: "CC")
+    public static let ce = AchCopDocumentType(rawValue: "CE")
+    public static let nit = AchCopDocumentType(rawValue: "NIT")
+    public static let pass = AchCopDocumentType(rawValue: "PASS")
+    public static let pep = AchCopDocumentType(rawValue: "PEP")
 }
 
 /// Estimated time of arrival
-public enum EstimatedTimeOfArrival: String, Codable, Sendable {
-  case fiveMin = "5_min"
-  case thirtyMin = "30_min"
-  case twoHours = "2_hours"
-  case oneBusinessDay = "1_business_day"
-  case twoBusinessDays = "2_business_days"
-  case fiveBusinessDays = "5_business_days"
+public struct EstimatedTimeOfArrival: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let fiveMin = EstimatedTimeOfArrival(rawValue: "5_min")
+    public static let thirtyMin = EstimatedTimeOfArrival(rawValue: "30_min")
+    public static let twoHours = EstimatedTimeOfArrival(rawValue: "2_hours")
+    public static let oneBusinessDay = EstimatedTimeOfArrival(rawValue: "1_business_day")
+    public static let twoBusinessDays = EstimatedTimeOfArrival(rawValue: "2_business_days")
+    public static let fiveBusinessDays = EstimatedTimeOfArrival(rawValue: "5_business_days")
 }
 
 /// Tracking complete status
-public enum TrackingCompleteStatus: String, Codable, Sendable {
-  case tokensRefunded = "tokens_refunded"
-  case paid = "paid"
+public struct TrackingCompleteStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let tokensRefunded = TrackingCompleteStatus(rawValue: "tokens_refunded")
+    public static let paid = TrackingCompleteStatus(rawValue: "paid")
 }
 
 /// Tracking transaction status
-public enum TrackingTransactionStatus: String, Codable, Sendable {
-  case failed = "failed"
-  case found = "found"
+public struct TrackingTransactionStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let failed = TrackingTransactionStatus(rawValue: "failed")
+    public static let found = TrackingTransactionStatus(rawValue: "found")
 }
 
 /// SPEI protocol
-public enum SpeiProtocol: String, Codable, Sendable {
-  case clabe = "clabe"
-  case debitcard = "debitcard"
-  case phonenum = "phonenum"
+public struct SpeiProtocol: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let clabe = SpeiProtocol(rawValue: "clabe")
+    public static let debitcard = SpeiProtocol(rawValue: "debitcard")
+    public static let phonenum = SpeiProtocol(rawValue: "phonenum")
 }
 
 /// Transfers type
-public enum TransfersType: String, Codable, Sendable {
-  case cvu = "CVU"
-  case cbu = "CBU"
-  case alias = "ALIAS"
+public struct TransfersType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let cvu = TransfersType(rawValue: "CVU")
+    public static let cbu = TransfersType(rawValue: "CBU")
+    public static let alias = TransfersType(rawValue: "ALIAS")
 }
 
 // MARK: - Tracking Types

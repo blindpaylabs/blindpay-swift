@@ -10,22 +10,28 @@ import Foundation
 // MARK: - Supporting Document Type
 
 /// Type of supporting document for limit increase requests
-public enum SupportingDocumentType: String, Codable, Sendable {
-    case individualBankStatement = "individual_bank_statement"
-    case individualTaxReturn = "individual_tax_return"
-    case individualProofOfIncome = "individual_proof_of_income"
-    case businessBankStatement = "business_bank_statement"
-    case businessFinancialStatements = "business_financial_statements"
-    case businessTaxReturn = "business_tax_return"
+public struct SupportingDocumentType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let individualBankStatement = SupportingDocumentType(rawValue: "individual_bank_statement")
+    public static let individualTaxReturn = SupportingDocumentType(rawValue: "individual_tax_return")
+    public static let individualProofOfIncome = SupportingDocumentType(rawValue: "individual_proof_of_income")
+    public static let businessBankStatement = SupportingDocumentType(rawValue: "business_bank_statement")
+    public static let businessFinancialStatements = SupportingDocumentType(rawValue: "business_financial_statements")
+    public static let businessTaxReturn = SupportingDocumentType(rawValue: "business_tax_return")
 }
 
 // MARK: - Limit Increase Request Status
 
 /// Status of a limit increase request
-public enum LimitIncreaseRequestStatus: String, Codable, Sendable {
-    case inReview = "in_review"
-    case approved = "approved"
-    case rejected = "rejected"
+public struct LimitIncreaseRequestStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let inReview = LimitIncreaseRequestStatus(rawValue: "in_review")
+    public static let approved = LimitIncreaseRequestStatus(rawValue: "approved")
+    public static let rejected = LimitIncreaseRequestStatus(rawValue: "rejected")
 }
 
 // MARK: - Payin Limits

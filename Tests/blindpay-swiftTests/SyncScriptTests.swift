@@ -412,6 +412,54 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(apply2.stdout.contains("no changes"))
 }
 
+/// The SDK's enums are open (`struct X: OpenEnum`, plan C7). A new spec
+/// value becomes a new `public static let`, and --check reads those values.
+@Test func openEnumValueIsInsertedAndCheckGoesGreen() throws {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var schemas = spec["components"] as! [String: Any]
+    var thingOut = (schemas["schemas"] as! [String: Any])["ThingOut"] as! [String: Any]
+    var props = thingOut["properties"] as! [String: Any]
+    props["status"] = ["type": "string", "enum": ["active", "inactive", "pending_review"]]
+    thingOut["properties"] = props
+    var innerSchemas = schemas["schemas"] as! [String: Any]
+    innerSchemas["ThingOut"] = thingOut
+    schemas["schemas"] = innerSchemas
+    spec["components"] = schemas
+
+    setupBaseline(dir, spec: baseSpec())
+    let openSource = readSource(dir, "Models/Thing.swift").replacingOccurrences(of: """
+    public enum FixtureStatus: String, Codable, Sendable {
+        case active = "active"
+        case inactive = "inactive"
+    }
+    """, with: """
+    public struct FixtureStatus: OpenEnum {
+        public let rawValue: String
+        public init(rawValue: String) { self.rawValue = rawValue }
+
+        public static let active = FixtureStatus(rawValue: "active")
+        public static let inactive = FixtureStatus(rawValue: "inactive")
+    }
+    """)
+    #expect(openSource.contains("OpenEnum"))
+    try openSource.write(toFile: dir + "/Models/Thing.swift", atomically: true, encoding: .utf8)
+    writeJSON(dir + "/spec-current.json", spec)
+
+    #expect(runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir)).exitCode == 0)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(apply.stdout.contains("applied 1"))
+    let source = readSource(dir, "Models/Thing.swift")
+    #expect(source.contains("    public static let pendingReview = FixtureStatus(rawValue: \"pending_review\")\n}"))
+    #expect(!source.contains("case pendingReview"))
+
+    #expect(runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir)).exitCode == 0)
+    let again = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(again.stdout.contains("no changes"))
+}
+
 // MARK: - Applicable: field insertion, with and without CodingKeys
 
 @Test func fieldInsertionWithCodingKeys() {
