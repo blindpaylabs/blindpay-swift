@@ -26,7 +26,7 @@ internal final class APIClient: Sendable {
         self.apiKey = apiKey
         self.instanceId = instanceId
         self.configuration = configuration
-        self.userAgent = "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")"
+        self.userAgent = "blindpay-swift/\(BlindPaySDK.version)"
     }
 
     /// Sends a JSON request (or a body-less one).

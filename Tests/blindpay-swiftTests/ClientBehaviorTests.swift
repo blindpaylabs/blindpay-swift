@@ -31,7 +31,8 @@ struct RequestHeaderTests {
 
         let request = try #require(server.requests.first)
         #expect(request.header("Authorization") == "Bearer test_key")
-        #expect(request.header("User-Agent")?.hasPrefix("blindpay-swift/") == true)
+        #expect(request.header("User-Agent") == "blindpay-swift/\(BlindPaySDK.version)")
+        #expect(BlindPaySDK.version == "5.0.0")
         #expect(request.header("Accept") == "application/json")
         #expect(request.header("Content-Type") == "application/json")
         let key = try #require(request.header("Idempotency-Key"))

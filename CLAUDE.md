@@ -508,10 +508,11 @@ something the sync should actually fix.
 
 ## 9. Versioning
 
-- Versioning is git-tag-based. There is no version string in the code.
-- The SDK reports its version via the User-Agent header in `APIClient.swift` using `CFBundleShortVersionString`, which resolves at runtime from the host app's bundle.
-- SPM resolves the version from git tags when consumers add the package dependency.
-- Do NOT add version constants to the source code.
+- `BlindPaySDK.version` in `Sources/BlindPay/Core/Version.swift` is the single source of the release version. The User-Agent sends `blindpay-swift/<version>`.
+- `release.yml` runs on every push to `main`: it reads the constant and, if tag `v<version>` doesn't exist on the remote yet, creates the tag and a GitHub release. Merging a PR that changes the constant is what releases.
+- The API-sync workflow bumps the constant itself: `sync.swift --apply` bumps the patch (or the minor, when its report says `minor`) and writes the new version to its report.
+- A hand-written release-bearing PR bumps the constant in the same PR (major for breaking changes, minor for additive ones, patch for fixes).
+- SPM consumers resolve versions from the git tags.
 
 ---
 
