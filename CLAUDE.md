@@ -73,7 +73,7 @@ IMPORTANT: every operation lives on a service. `BlindPay.swift` (the facade) has
 - **Service classes**: `{Resource}Service` (e.g., `PartnerFeesService`, `BlockchainWalletsService`). Plural nouns.
 - **Model structs**: Match the API resource name. PascalCase. (e.g., `BlockchainWallet`, `PartnerFee`).
 - **Input structs**: `Create{Resource}Input`, `Update{Resource}Input`, `List{Resource}Input`, `Delete{Resource}Input`.
-- **Response types**: `Create{Resource}Response`, `{Resource}Response`, `List{Resource}Response`. For list responses returning raw arrays, use `typealias {Resource}sResponse = [{Resource}]`.
+- **Response types**: `Create{Resource}Response`, `{Resource}Response`. Lists: a paginated list (payouts, payins, customers, transfers, payables, wallet deposits) is `typealias List{Resource}sResponse = ListResult<{Resource}>`; a list the API always returns as a bare array (bank accounts, blockchain/managed/offramp wallets, virtual accounts, limit increases, partner fees, members, webhook endpoints, available/*) is `typealias {Resource}sResponse = [{Resource}]`.
 - **Enums**: PascalCase type name, camelCase cases. Raw values are the snake_case API string values.
 - **Properties**: camelCase in Swift. `CodingKeys` maps to snake_case API field names.
 - **Service method names**: `list()`, `get(id:)`, `create(data:)`, `delete(id:)`, `update(id:data:)`. For non-CRUD methods, use descriptive verbs (e.g., `getSignMessage()`, `getFxRate(data:)`, `getTrack(payinId:)`).
@@ -479,7 +479,7 @@ only) that verifies the SDK doesn't lie about the wire contract:
 - **Direction A (hard failure)**: every wire key the SDK declares -- `CodingKeys` string
   values and `params["..."]` query-parameter literals -- must exist as a property name or
   a parameter name somewhere in the snapshot, unless listed in `.api-sync/allow-list.json`.
-- **Direction B (hard failure)**: mapped enums (currently `WebhookEvent` and
+- **Direction B (hard failure)**: mapped enums (currently `WebhookEventType` and
   `CurrencyType`) must cover every enum member the spec declares for them. Extend the
   `mappedEnums` array in the script to add more.
 
@@ -553,7 +553,7 @@ All API responses are wrapped in `APIResponse<T>` which has `data: T?` and `erro
 
 ### Paginated list responses
 
-Every GET list returns `ListResult<Element>` (alias `List{Resource}sResponse`): `data` plus optional `pagination`. It decodes both the bare array (no cursor sent) and the `{data, pagination}` envelope.
+Lists whose endpoint accepts cursors (payouts, payins, customers, transfers, payables, wallet deposits) return `ListResult<Element>` (alias `List{Resource}sResponse`, or `WalletDepositsResponse`): `data` plus optional `pagination`. It decodes both the bare array (no cursor sent) and the `{data, pagination}` envelope. Each has an auto-pager named after its list method: `listAutoPaging(params:)`, or `getDepositsAutoPaging(id:params:)` for `getDeposits(id:params:)`. Every other list is always a bare array: `[{Resource}]`.
 
 ### Amount fields
 
