@@ -6,94 +6,62 @@ This document is optimized for an AI agent modifying this codebase. It describes
 
 ```
 blindpay-swift/
-  Package.swift                         # SPM manifest. swift-tools-version: 5.7. Platforms: iOS 15+, macOS 12+, tvOS 15+, watchOS 8+.
+  Package.swift                         # swift-tools-version 6.0 (Swift 6 language mode). iOS 15+, macOS 12+, tvOS 15+, watchOS 8+, Linux. Only dependency: apple/swift-crypto, Linux only.
   Sources/BlindPay/
-    blindpay_swift.swift                # Empty entry point (ASCII art only).
     Core/
-      BlindPay.swift                    # Main client class. Facade that duplicates every service method as a flat convenience method AND exposes service objects.
-      Configuration.swift               # Configuration struct (baseURL only).
-      Amount.swift                      # Internal Amount.cents(fromMajorUnits:) and KeyedEncodingContainer.encodeCents(_:forKey:): dollars -> rounded integer cents.
+      BlindPay.swift                    # Client + flat facade. Every facade method delegates to a service; never an endpoint literal here.
+      Configuration.swift               # baseURL, timeout (60 s per attempt), maxRetries (2), transport; internal sleep/jitter test seams.
+      RequestOptions.swift              # Per-call idempotencyKey, timeout, headers.
+      OpenEnum.swift                    # Protocol every SDK enum conforms to (forward-compatible string enums).
+      Amount.swift                      # Public Amount.cents(fromMajorUnits:): major units -> rounded integer cents.
+      Version.swift                     # BlindPaySDK.version: single source of the release version and User-Agent.
     API/
-      APIClient.swift                   # Internal HTTP client. Generic request<T: Codable>() (JSON) and requestMultipart<T>() (multipart/form-data) methods. Handles APIResponse<T> envelope and error decoding. Internal `protocolClasses` init parameter is a test-only seam.
-      MultipartFormData.swift           # Internal multipart/form-data body builder used by uploads.
-      Errors.swift                      # BlindPayError enum (invalidURL, invalidResponse, encodingError, decodingError, networkError, httpError).
-    Models/
-      APIResponse.swift                 # APIResponse<T> and APIError. Generic response envelope.
-      Common.swift                      # Country enum (ISO 3166-1 alpha-2), PaginationParams, PaginationMetadata.
-      Upload.swift                      # UploadBucket, UploadInput (file bytes + name + content type; multipart, not Codable), UploadResponse (file_url).
-      Available.swift                   # Rail, BankAccountType, AccountClass, RecipientRelationship, NaicsCode, RailResponse, BankDetailKey, BankDetailItem, BankDetailField, SwiftCodeResponse.
-      Instance.swift                    # InstanceMemberRole, InstanceMember, UpdateInstanceInput, UpdateMemberRoleInput, VoidResponse.
-      Customer.swift                    # KYCType, CustomerType, IDDocType, ProofOfAddressDocType, SourceOfFundsDocType, PurposeOfTransactions, OwnerRole, CustomerOwner, CreateCustomerInput, Customer (full model), UpdateCustomerInput, response types, ListCustomersResponse.
-      BankAccount.swift                 # BankAccount, CreateBankAccountInput, CreateBankAccountResponse, SpeiProtocol, TransfersType + related enums.
-      BlockchainWallet.swift            # BlockchainWallet, CreateBlockchainWalletInput, BlockchainWalletSignMessageResponse, asset trustline types, mint USDB types, Solana delegate types.
-      CustodialWallet.swift             # CustodialWallet, CreateCustodialWalletInput, WalletTokenBalance, CustodialWalletBalanceResponse.
-      Fee.swift                         # FeeOptions, FeesResponse (per-rail fee structure).
-      OfframpWallet.swift               # OfframpWallet, CreateOfframpWalletInput, CreateOfframpWalletResponse.
-      PartnerFee.swift                  # PartnerFee, CreatePartnerFeeInput, CreatePartnerFeeResponse.
-      Payin.swift                       # PayinStatus, PaymentMethod, PayinType, PayinTrackingTransaction, Payin, CreatePayinInput, ListPayinsInput, response types.
-      PayinQuote.swift                  # PayinQuotePayerRules, PayinQuote, CreatePayinQuoteInput, ListPayinQuotesInput, response types.
-      Payout.swift                      # PayoutStatus, TrackingStep, ProviderStatus, PaymentType, Payout, CreatePayoutEvmInput, CreatePayoutStellarInput, CreatePayoutSolanaInput, AuthorizeStellarInput/Response, ListPayoutsInput, response types.
-      Quote.swift                       # CurrencyType, Network, StablecoinToken, TransactionDocumentType, Currency, CreateQuoteInput, QuoteNetwork, QuoteContract, CreateQuoteResponse, GetFxRateInput, GetFxRateResponse, AnyCodable helper.
-      CustomerLimits.swift              # SupportingDocumentType, LimitIncreaseRequestStatus, PayinLimits, PayoutLimits, CustomerLimitsResponse, RequestLimitIncreaseInput/Response, LimitIncreaseRequest.
-      TermsOfService.swift              # InitiateTosInput, InitiateTosResponse.
-      Transaction.swift                 # TransactionStatus, TrackingTransaction, TrackingPayment, TrackingLiquidity, TrackingComplete, TrackingPartnerFee.
-      Transfer.swift                    # TransferTrackingStep, TransferTrackingTransactionMonitoring, Transfer.
-      VirtualAccount.swift              # BankingPartner, BlockchainWalletRef, VirtualAccountAccountType, VirtualAccountACH, VirtualAccount, CreateVirtualAccountInput, UpdateVirtualAccountInput, response types.
-      WebhookEndpoint.swift             # WebhookEvent, WebhookEndpoint, CreateWebhookEndpointInput, CreateWebhookEndpointResponse, WebhookEndpointSecret, WebhookPortalAccess, DeleteWebhookEndpointResponse.
-    Services/
-      AvailableService.swift            # Top-level service. No instanceId. Methods: getRails, getBankDetails, getSwiftCode.
-      InstancesService.swift            # Instance-scoped service. Holds sub-services (partnerFees, quotes, webhookEndpoints, payins, payouts, termsOfService). Direct methods for members, asset trustline, mint, delegate.
-      CustomersService.swift            # Customer-scoped service. Holds sub-services (blockchainWallets, virtualAccounts, bankAccounts, custodialWallets). No direct methods -- purely a sub-service container. Created via the customers(customerId:) factory on the BlindPay client.
-      BankAccountsService.swift         # CRUD for bank accounts. Customer-scoped. Holds sub-service: offrampWallets.
-      BlockchainWalletsService.swift    # CRUD for blockchain wallets + getSignMessage. Customer-scoped.
-      CustodialWalletsService.swift     # CRUD + getBalance for custodial wallets. Customer-scoped.
-      OfframpWalletsService.swift       # List/create/get for offramp wallets. Instance-scoped (takes customerId + bankAccountId as params).
-      PartnerFeesService.swift          # CRUD for partner fees. Instance-scoped.
-      PayinQuotesService.swift          # Create/get/list + getFxRate. Instance-scoped. Nested under PayinsService.
-      PayinsService.swift               # List/get/getTrack/createEvm. Instance-scoped. Holds sub-service: quotes (PayinQuotesService).
-      PayoutsService.swift              # List/get/getTrack/createEvm/createStellar/createSolana/authorizeStellar/authorizeSolana. Instance-scoped.
-      QuotesService.swift               # Create + getFxRate. Instance-scoped.
-      TermsOfServiceService.swift       # Initiate TOS. Instance-scoped.
-      VirtualAccountsService.swift      # CRUD for virtual accounts. Customer-scoped.
-      WebhookEndpointsService.swift     # CRUD + getSecret + getPortalAccessUrl. Instance-scoped.
-      UploadService.swift               # Top-level service. create(data:) sends multipart/form-data to POST /v1/upload?instance_id=<instance>.
-  Examples/
-    GetRails.swift                      # Executable example target.
+      APIClient.swift                   # request()/requestMultipart(): serialise once, attempt loop, per-attempt timeout, idempotency keys, error mapping. Internal.
+      HTTPTransport.swift               # Public HTTPTransport protocol, URLSessionTransport (delegate-based), HTTPTransportError.
+      RetryPolicy.swift                 # The retry decision table shared by every BlindPay SDK.
+      Endpoint.swift                    # Path type: interpolated values are percent-encoded path segments.
+      QueryParameters.swift             # Ordered query items; nil/empty values are never sent.
+      AutoPager.swift                   # CursorPaginatedInput + the AsyncThrowingStream behind listAutoPaging.
+      MultipartFormData.swift           # multipart/form-data body builder (uploads).
+      Errors.swift                      # BlindPayError.
+    Models/                             # One file per resource: OpenEnum enums, response structs, inputs. Rfi, Payable, WebhookPayloads, ...
+    Services/                           # One service per resource (see the hierarchy below).
+    Webhooks/
+      Webhooks.swift                    # Standalone Svix verifier: verify(...) -> Bool, constructEvent(...) -> WebhookEvent.
+      WebhookEvent.swift                # Typed webhook union, one case per event, plus unknown(type:payload:).
+  Examples/GetRails.swift               # Example target (`swift run GetRails`); not a product.
   Tests/blindpay-swiftTests/
-    BlindPayTests.swift                 # Initialization test.
-    BlindPayErrorTests.swift            # Error description tests.
-    ConfigurationTests.swift            # Configuration tests.
-    FixtureDecodingTests.swift          # Decode-safety tests over the shared spec fixtures (full / required_only / nullables_null).
-    DecodeSafetyClientTests.swift       # The same fixtures through the real service methods.
-    *RequestTests.swift, AmountTests.swift  # Request-shape tests against the mock (method, path, query, headers, body).
+    OpCoverageTests.swift               # All 94 operations: method + path, and every fixture variant decodes.
+    ClientBehaviorTests.swift           # Headers, idempotency keys, one test per retry-table row, errors, incomplete responses.
+    PaginationTests.swift, WebhookTests.swift, OpenEnumTests.swift, RedactionTests.swift, PathEncodingTests.swift, ...
+    RequestOptionsGuardTests.swift      # Source scan: every public API method takes and forwards `options`.
     SyncScriptTests.swift               # Tests for .api-sync/sync.swift.
-    Support/MockServer.swift            # URLProtocol mock: one unique host per MockServer, records every request.
-    Support/Fixtures.swift              # Loader for Fixtures/ by "METHOD /v1/path" and variant name.
-    Fixtures/                           # Verbatim copy of the SDK-parity reference fixtures (generated from the public spec). Don't hand-edit; re-copy.
+    Support/MockServer.swift            # URLProtocol mock: one host per MockServer; records requests and sleeps.
+    Support/Fixtures.swift              # Loader for Fixtures/ by "METHOD /v1/path" and variant.
+    Fixtures/                           # Verbatim copy of the shared spec fixtures. Don't hand-edit; re-copy.
+    Vectors/webhook-vectors.json        # The 14 shared Svix vectors.
 ```
 
 ### Service hierarchy (access path from client)
 
 ```
 BlindPay
-  .available                         -> AvailableService
-  .instances                         -> InstancesService
-    .partnerFees                       -> PartnerFeesService
-    .quotes                            -> QuotesService
-    .webhookEndpoints                  -> WebhookEndpointsService
-    .payins                            -> PayinsService
-      .quotes                            -> PayinQuotesService
-    .payouts                           -> PayoutsService
-    .termsOfService                    -> TermsOfServiceService
-  .customers(customerId:)            -> CustomersService
-    .blockchainWallets                 -> BlockchainWalletsService
-    .virtualAccounts                   -> VirtualAccountsService
+  .available                         -> AvailableService (rails, bank details, swift, NAICS)
+  .upload                            -> UploadService (create, analyze, presign)
+  .instances                         -> InstancesService (get, update, delete, members, fees, Solana/Stellar helpers)
+    .customers                         -> InstanceCustomersService (list, listAutoPaging, create)
+    .partnerFees / .quotes / .webhookEndpoints / .termsOfService
+    .payins (.quotes) / .payouts / .transfers / .transferQuotes / .payables
+    .onboarding                        -> OnboardingService
+    .rfi                               -> InstanceRfiService
+  .customers(customerId:)            -> CustomersService (get, update, delete, getLimits, requestLimitIncrease, listLimitIncreases)
+    .rfi                               -> CustomerRfiService
+    .blockchainWallets / .virtualAccounts / .custodialWallets
     .bankAccounts                      -> BankAccountsService
       .offrampWallets                    -> OfframpWalletsService
-    .custodialWallets                  -> CustodialWalletsService
 ```
 
-IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a flat convenience method on the root `BlindPay` class. When you add or modify a service method, you MUST also add or update the corresponding convenience method in `BlindPay.swift`. New or changed facade methods delegate to the service (`return try await upload.create(data: data)`) instead of repeating the endpoint literal, so the two can't drift.
+IMPORTANT: every operation lives on a service. `BlindPay.swift` (the facade) has a flat method for every instance-level operation (and the customer get/update/delete/limits/RFI ones), and each facade method only delegates (`return try await instances.payables.get(id: id, options: options)`). Never put an endpoint literal in the facade. Customer-scoped sub-resources (bank accounts, wallets, virtual accounts) are reached through `customers(customerId:)` and have no flat methods.
 
 ---
 
@@ -105,7 +73,7 @@ IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a fl
 - **Service classes**: `{Resource}Service` (e.g., `PartnerFeesService`, `BlockchainWalletsService`). Plural nouns.
 - **Model structs**: Match the API resource name. PascalCase. (e.g., `BlockchainWallet`, `PartnerFee`).
 - **Input structs**: `Create{Resource}Input`, `Update{Resource}Input`, `List{Resource}Input`, `Delete{Resource}Input`.
-- **Response types**: `Create{Resource}Response`, `{Resource}Response`, `List{Resource}Response`. For list responses returning raw arrays, use `typealias {Resource}sResponse = [{Resource}]`.
+- **Response types**: `Create{Resource}Response`, `{Resource}Response`. Lists: a paginated list (payouts, payins, customers, transfers, payables, wallet deposits) is `typealias List{Resource}sResponse = ListResult<{Resource}>`; a list the API always returns as a bare array (bank accounts, blockchain/managed/offramp wallets, virtual accounts, limit increases, partner fees, members, webhook endpoints, available/*) is `typealias {Resource}sResponse = [{Resource}]`.
 - **Enums**: PascalCase type name, camelCase cases. Raw values are the snake_case API string values.
 - **Properties**: camelCase in Swift. `CodingKeys` maps to snake_case API field names.
 - **Service method names**: `list()`, `get(id:)`, `create(data:)`, `delete(id:)`, `update(id:data:)`. For non-CRUD methods, use descriptive verbs (e.g., `getSignMessage()`, `getFxRate(data:)`, `getTrack(payinId:)`).
@@ -117,7 +85,13 @@ IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a fl
 - All service classes: `@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) public final class ... : Sendable`.
 - Service classes hold `private let apiClient: APIClient` (and `instanceId`, `customerId`, etc. as needed).
 - Initializers are `internal` on service classes, `public` on model structs.
-- All API methods are `public func ... async throws -> APIResponse<T>`.
+- All API methods are `public func ... async throws -> APIResponse<T>` and take a trailing `options: RequestOptions? = nil` that they forward as `options: options`. RequestOptionsGuardTests fails otherwise.
+- Endpoints are `Endpoint` string interpolations: interpolated values are percent-encoded as one path segment, so pass raw ids.
+- Enums are `public struct X: OpenEnum` with `public static let` values (see "Adding an enum case"). Never add a closed `enum X: String` for API values: an unknown value would fail the whole response.
+- Amount inputs are integer cents (`Int`). Don't take `Double` dollars; point callers at `Amount.cents(fromMajorUnits:)`.
+- Request-side "exactly one of" pairs (quote `bankAccountId`/`payableId`, payout `senderWalletAddress`/`walletId`) are both optional; no client-side check.
+- Lists return `ListResult<T>` (decodes both the bare array and `{data, pagination}`). Every op whose spec accepts `starting_after` gets a `listAutoPaging` returning `AsyncThrowingStream` via `AutoPager.stream`, and its input conforms to `CursorPaginatedInput`.
+- Provider-named spec fields (`aiprise_*`, `checkbook_*`, `onemoney_*`, `circle_wallet_id`, ...) are not modelled; record them in `unmodeled.json`.
 - Optional fields on model structs use `T?` and have default `nil` in init.
 - Types that contain `AnyCodable` or similar non-Sendable values use `@unchecked Sendable` instead of plain `Sendable`.
 
@@ -138,15 +112,15 @@ If ALL properties match their JSON keys exactly (no snake_case conversion needed
 
 ### Custom encode(to:) Pattern
 
-Some Input types implement custom `encode(to:)` to:
-- Convert amounts from Double dollars to Int cents with `container.encodeCents(_:forKey:)` (Core/Amount.swift). Never write `Int(x * 100)`: it truncates, so 19.99 becomes 1998.
-- Skip nil optional fields with `encodeIfPresent`
+Add a custom `encode(to:)` only when the wire shape differs from the synthesized one:
+- a required key that accepts `null` (encode the optional with `encode`, not `encodeIfPresent`; see `RequestLimitIncreaseInput`);
+- a tri-state field (unchanged / set / clear; see `UpdateOfframpWalletInput`).
 
-Only add custom encoding when the API expects a different type than the Swift property stores (e.g., amount conversion). Do not add it merely to skip nils -- Codable already skips nils with optional properties.
+Codable already skips nil optionals; don't add custom encoding just for that.
 
 ### Query Parameters Pattern
 
-For `list()` methods with filters, define a dedicated input type with a `toQueryParameters() -> [String: String]` method, or build the dictionary inline in the service method. Query parameter keys use snake_case (matching the API).
+For `list()` methods with filters, define a `List{Resource}Input` with every filter the spec declares and a `toQueryParameters() -> QueryParameters` that assigns each one (`params["customer_id"] = customerId`; `limit.map(String.init)`; `status?.rawValue`). `QueryParameters` keeps insertion order and drops nil/empty values. `limit` is `Int?`; `offset` stays only as a deprecated property (the API ignores it).
 
 ---
 
@@ -168,10 +142,13 @@ import Foundation
 
 // MARK: - Enums (if any)
 
-public enum InvoiceStatus: String, Codable, Sendable {
-    case draft = "draft"
-    case sent = "sent"
-    case paid = "paid"
+public struct InvoiceStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let draft = InvoiceStatus(rawValue: "draft")
+    public static let sent = InvoiceStatus(rawValue: "sent")
+    public static let paid = InvoiceStatus(rawValue: "paid")
 }
 
 // MARK: - Invoice
@@ -179,10 +156,11 @@ public enum InvoiceStatus: String, Codable, Sendable {
 public struct Invoice: Codable, Sendable, Equatable {
     public let id: String
     public let status: InvoiceStatus
-    public let amount: Double
+    /// Amount in cents.
+    public let amount: Int
     public let createdAt: String
 
-    public init(id: String, status: InvoiceStatus, amount: Double, createdAt: String) {
+    public init(id: String, status: InvoiceStatus, amount: Int, createdAt: String) {
         self.id = id
         self.status = status
         self.amount = amount
@@ -205,9 +183,10 @@ public typealias InvoiceResponse = Invoice
 // MARK: - Input Types
 
 public struct CreateInvoiceInput: Codable, Sendable {
-    public let amount: Double
+    /// Amount in cents.
+    public let amount: Int
 
-    public init(amount: Double) {
+    public init(amount: Int) {
         self.amount = amount
     }
 }
@@ -243,32 +222,36 @@ public final class InvoicesService: Sendable {
         self.instanceId = instanceId
     }
 
-    public func list() async throws -> APIResponse<InvoicesResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<InvoicesResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/invoices",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
-    public func get(id: String) async throws -> APIResponse<InvoiceResponse> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<InvoiceResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/invoices/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
-    public func create(data: CreateInvoiceInput) async throws -> APIResponse<CreateInvoiceResponse> {
+    public func create(data: CreateInvoiceInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateInvoiceResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/invoices",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
-    public func delete(id: String) async throws -> APIResponse<VoidResponse> {
+    public func delete(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/invoices/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
 }
@@ -285,8 +268,8 @@ In `InstancesService.swift`:
 In `BlindPay.swift`, add flat convenience methods that delegate to the service. Each method has full doc comments with examples, matches the service method signature, and uses a descriptive verb name (e.g., `listInvoices`, `getInvoice`, `createInvoice`, `deleteInvoice`). Never repeat the endpoint literal in the facade:
 
 ```swift
-public func createInvoice(data: CreateInvoiceInput) async throws -> APIResponse<CreateInvoiceResponse> {
-    return try await instances.invoices.create(data: data)
+public func createInvoice(data: CreateInvoiceInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateInvoiceResponse> {
+    return try await instances.invoices.create(data: data, options: options)
 }
 ```
 
@@ -308,19 +291,20 @@ In `PartnerFee.swift`, add `UpdatePartnerFeeInput` and `UpdatePartnerFeeResponse
 
 In `PartnerFeesService.swift`:
 ```swift
-public func update(id: String, data: UpdatePartnerFeeInput) async throws -> APIResponse<UpdatePartnerFeeResponse> {
+public func update(id: String, data: UpdatePartnerFeeInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdatePartnerFeeResponse> {
     return try await apiClient.request(
         endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
         method: .put,
-        body: data
+        body: data,
+        options: options
     )
 }
 ```
 
 In `BlindPay.swift`, add a method that delegates to the service:
 ```swift
-public func updatePartnerFee(id: String, data: UpdatePartnerFeeInput) async throws -> APIResponse<UpdatePartnerFeeResponse> {
-    return try await instances.partnerFees.update(id: id, data: data)
+public func updatePartnerFee(id: String, data: UpdatePartnerFeeInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdatePartnerFeeResponse> {
+    return try await instances.partnerFees.update(id: id, data: data, options: options)
 }
 ```
 
@@ -348,16 +332,20 @@ public func updatePartnerFee(id: String, data: UpdatePartnerFeeInput) async thro
 
 ### Adding an enum case
 
-Add the new case to the enum. The raw value must match the API's string exactly.
+Add a `public static let` to the `OpenEnum` struct. The raw value must match the API's string exactly. `sync.swift --apply` does this itself for mapped enums.
 
 ```swift
-public enum InvoiceStatus: String, Codable, Sendable {
-    case draft = "draft"
-    case sent = "sent"
-    case paid = "paid"
-    case cancelled = "cancelled"  // new case
+public struct InvoiceStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let draft = InvoiceStatus(rawValue: "draft")
+    public static let paid = InvoiceStatus(rawValue: "paid")
+    public static let cancelled = InvoiceStatus(rawValue: "cancelled")  // new value
 }
 ```
+
+Register a new enum in `.api-sync/spec-map.json` `enums[]` so sync keeps it in step with the spec.
 
 ### Changing a field type
 
@@ -449,7 +437,9 @@ The test target is `blindpay-swiftTests` defined in `Package.swift`, located at 
 
 ### Current test coverage
 
-- **Decode safety:** every response type you add or change must decode the `full`, `required_only` and `nullables_null` variants of its operation's fixture in `Tests/blindpay-swiftTests/Fixtures/` (add a row to `FixtureDecodingTests`). A non-optional field that is absent in `required_only` or `null` in `nullables_null` is a bug. List operations have `.b0` (envelope) and `.b1` (bare array) variants.
+- **Operation coverage:** `OpCoverageTests` has one call per operation of the SDK surface (keyed as in `Fixtures/index.json`). It checks method and path and decodes every variant (`full`, `required_only`, `nullables_null`, `unknown_enum`, `decimals`; lists `.b0` envelope and `.b1` bare array). A new operation needs a row there. A non-optional field absent in `required_only` or `null` in `nullables_null` is a bug; a cent amount stays `Int` (only genuinely decimal fields get `1234.56` in `decimals`).
+- **Transport contract:** `ClientBehaviorTests` covers headers, idempotency keys, one test per retry-table row (no test sleeps: `MockServer` records backoffs) and incomplete responses. A mutation must never be resent after any response arrived.
+- **Webhooks:** `WebhookTests` runs the 14 shared vectors at each vector's clock and decodes every webhook fixture into its typed case.
 - **Request shape:** use `MockServer` (no network). It gives you a `BlindPay` client wired to a `URLProtocol` mock and records each request:
 
 ```swift
@@ -489,7 +479,7 @@ only) that verifies the SDK doesn't lie about the wire contract:
 - **Direction A (hard failure)**: every wire key the SDK declares -- `CodingKeys` string
   values and `params["..."]` query-parameter literals -- must exist as a property name or
   a parameter name somewhere in the snapshot, unless listed in `.api-sync/allow-list.json`.
-- **Direction B (hard failure)**: mapped enums (currently `WebhookEvent` and
+- **Direction B (hard failure)**: mapped enums (currently `WebhookEventType` and
   `CurrencyType`) must cover every enum member the spec declares for them. Extend the
   `mappedEnums` array in the script to add more.
 
@@ -499,8 +489,12 @@ Run it locally:
 swift .api-sync/check-contract.swift
 ```
 
-When the spec changes (a sync PR), replace `.api-sync/spec-snapshot.json` with the new
-spec. If a genuinely pre-existing divergence can't be fixed in that PR, add an entry to
+When the spec changes (a sync PR), `sync.swift --apply` replaces `.api-sync/spec-snapshot.json`
+with the new spec byte for byte, inserts the optional fields and enum values it can, and bumps
+`BlindPaySDK.version`. It drops operations marked `x-sdk: false`. Anything it can't decide is
+"needs-human": fix the code or record it in a ledger (`unmodeled.json`, `enum-exclusions.json`,
+`nested-omissions.json`, `known-divergences.json`, spec-map `ignore`) with a reason and the
+`sdk-maintainers` owner. If a genuinely pre-existing divergence can't be fixed in that PR, add an entry to
 `.api-sync/allow-list.json` with a `reason` and `owner` -- never use it to silence
 something the sync should actually fix.
 
@@ -508,10 +502,11 @@ something the sync should actually fix.
 
 ## 9. Versioning
 
-- Versioning is git-tag-based. There is no version string in the code.
-- The SDK reports its version via the User-Agent header in `APIClient.swift` using `CFBundleShortVersionString`, which resolves at runtime from the host app's bundle.
-- SPM resolves the version from git tags when consumers add the package dependency.
-- Do NOT add version constants to the source code.
+- `BlindPaySDK.version` in `Sources/BlindPay/Core/Version.swift` is the single source of the release version. The User-Agent sends `blindpay-swift/<version>`.
+- `release.yml` runs on every push to `main`: it reads the constant and, if tag `v<version>` doesn't exist on the remote yet, creates the tag and a GitHub release. Merging a PR that changes the constant is what releases.
+- The API-sync workflow bumps the constant itself: `sync.swift --apply` bumps the patch (or the minor, when its report says `minor`) and writes the new version to its report.
+- A hand-written release-bearing PR bumps the constant in the same PR (major for breaking changes, minor for additive ones, patch for fixes).
+- SPM consumers resolve versions from the git tags.
 
 ---
 
@@ -535,7 +530,7 @@ something the sync should actually fix.
 | OpenAPI Type       | Swift Type                                |
 |--------------------|-------------------------------------------|
 | `string`           | `String`                                  |
-| `string` (enum)    | `enum: String, Codable, Sendable`         |
+| `string` (enum)    | `struct X: OpenEnum` (open; see §5)       |
 | `integer`          | `Int`                                     |
 | `number`           | `Double`                                  |
 | `boolean`          | `Bool`                                    |
@@ -558,24 +553,11 @@ All API responses are wrapped in `APIResponse<T>` which has `data: T?` and `erro
 
 ### Paginated list responses
 
-Paginated endpoints return a wrapper struct:
-
-```swift
-public struct List{Resource}Response: Codable, Sendable, Equatable {
-    public let data: [{Resource}]
-    public let pagination: PaginationMetadata  // or Pagination
-}
-```
-
-Non-paginated list endpoints use `typealias {Resource}sResponse = [{Resource}]`.
+Lists whose endpoint accepts cursors (payouts, payins, customers, transfers, payables, wallet deposits) return `ListResult<Element>` (alias `List{Resource}sResponse`, or `WalletDepositsResponse`): `data` plus optional `pagination`. It decodes both the bare array (no cursor sent) and the `{data, pagination}` envelope. Each has an auto-pager named after its list method: `listAutoPaging(params:)`, or `getDepositsAutoPaging(id:params:)` for `getDeposits(id:params:)`. Every other list is always a bare array: `[{Resource}]`.
 
 ### Amount fields
 
-The API uses integer amounts in smallest currency unit (e.g., 100 = $1.00). Some Input types accept `Double` in Swift and convert to `Int` in custom `encode(to:)` through the shared rounding helper (19.99 -> 1999):
-
-```swift
-try container.encodeCents(requestAmount, forKey: .requestAmount)
-```
+Payout, payin, quote, limit and payable amounts are integer cents (`Int`); partner percentage fees are basis points; wallet balances are whole tokens (`Double`). The spec types cent amounts as `number`, but keep them `Int`. Genuinely decimal fields (quotations, scores, latitude/longitude, `total_fee_amount`, token amounts) are `Double`.
 
 ### HTTP methods
 

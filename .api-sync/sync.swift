@@ -49,6 +49,7 @@ var enumExclusionsPath = ".api-sync/enum-exclusions.json"
 var nestedOmissionsPath = ".api-sync/nested-omissions.json"
 var operationExclusionsPath = ".api-sync/operation-exclusions.json"
 var reportPath: String? = nil
+var versionFilePath = "Sources/BlindPay/Core/Version.swift"
 
 do {
     let args = CommandLine.arguments
@@ -71,6 +72,7 @@ do {
         case "--nested-omissions": i += 1; if i < args.count { nestedOmissionsPath = args[i] }
         case "--operation-exclusions": i += 1; if i < args.count { operationExclusionsPath = args[i] }
         case "--report": i += 1; if i < args.count { reportPath = args[i] }
+        case "--version-file": i += 1; if i < args.count { versionFilePath = args[i] }
         default: break
         }
         i += 1
@@ -117,8 +119,36 @@ func schemas(of spec: [String: Any]) -> [String: Any] {
     return (spec.dict("components")?.dict("schemas")) ?? [:]
 }
 
+/// The component name of a `#/components/schemas/Name` reference, or nil
+/// for any other reference.
+func schemaRefName(_ ref: String?) -> String? {
+    let prefix = "#/components/schemas/"
+    guard let ref = ref, ref.hasPrefix(prefix) else { return nil }
+    return String(ref.dropFirst(prefix.count))
+}
+
 func paths(of spec: [String: Any]) -> [String: Any] {
     return (spec["paths"] as? [String: Any]) ?? [:]
+}
+
+/// The SDK surface of a spec: every operation marked `"x-sdk": false` is
+/// dropped (yield, card payment, ToS passthrough, upload extract, the VA
+/// deposit simulators), along with paths left empty. Schemas
+/// reachable only from those operations then count as unreachable, so they
+/// need no spec-map entry. Specs without the flag are returned unchanged.
+func sdkSurface(_ spec: [String: Any]) -> [String: Any] {
+    var filtered = spec
+    var kept: [String: Any] = [:]
+    for (path, item) in paths(of: spec) {
+        guard var ops = item as? [String: Any] else { kept[path] = item; continue }
+        for (method, op) in ops {
+            if let opDict = op as? [String: Any], (opDict["x-sdk"] as? Bool) == false { ops[method] = nil }
+        }
+        let hasOperation = ops.keys.contains { ["get", "post", "put", "delete", "patch", "head", "options"].contains($0) }
+        if hasOperation { kept[path] = ops }
+    }
+    filtered["paths"] = kept
+    return filtered
 }
 
 /// Returns the properties dictionary of a resolved node, auto-unwrapping a
@@ -310,6 +340,15 @@ let letDeclRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+let\s+(\w+
 let codingKeyEqRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+(\w+)\s*=\s*"([^"]*)""#)
 let codingKeyBareRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+((?:\w+\s*,\s*)*\w+)\s*$"#)
 let enumCaseEqRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+`?(\w+)`?\s*=\s*"([^"]*)""#)
+/// A value of an open enum (`public struct X: OpenEnum`), the SDK's
+/// forward-compatible enum pattern:
+/// `public static let base = Network(rawValue: "base")`.
+let openEnumValueRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+static\s+let\s+`?(\w+)`?\s*=\s*\w+\(rawValue:\s*"([^"]*)"\)"#)
+
+/// Whether a type declaration line declares an open enum.
+func declaresOpenEnum(_ line: String) -> Bool {
+    line.range(of: #"\bstruct\s+\w+\s*:[^{]*\bOpenEnum\b"#, options: .regularExpression) != nil
+}
 let initDeclRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+init\s*\("#)
 
 func matchGroups(_ regex: NSRegularExpression, _ line: String) -> [String]? {
@@ -363,7 +402,8 @@ func scanSources(under path: String) -> [String: ScannedType] {
         for (idx, line) in lines.enumerated() {
             if let g = matchGroups(typeDeclRegex, line) {
                 let indent = g[1]
-                let kind = g[2]
+                // Open enums are structs in Swift but enums to the spec.
+                let kind = declaresOpenEnum(line) ? "enum" : g[2]
                 let name = g[3]
                 var scanned: ScannedType? = nil
                 if stack.isEmpty {
@@ -383,7 +423,7 @@ func scanSources(under path: String) -> [String: ScannedType] {
                 if let g = matchGroups(letDeclRegex, line) {
                     owner.properties.append(ScannedProperty(name: g[2], wireKey: g[2], declLineIndex: idx, typeText: g[3].trimmingCharacters(in: .whitespaces)))
                 }
-                if owner.kind == "enum", let g = matchGroups(enumCaseEqRegex, line) {
+                if owner.kind == "enum", let g = matchGroups(enumCaseEqRegex, line) ?? matchGroups(openEnumValueRegex, line) {
                     owner.rawValues.append((name: g[2], value: g[3], lineIndex: idx))
                 }
             } else if stack.count >= 2, stack.last!.name == "CodingKeys" {
@@ -493,7 +533,7 @@ let swiftKeywords: Set<String> = ["as", "do", "is", "in", "for", "case", "self",
 
 /// Derives a lowerCamelCase Swift identifier from a wire-format enum raw value
 /// (snake_case or dotted.camelCase), matching this repo's existing convention
-/// (e.g. WebhookEvent's "customer.new" -> customerNew; BusinessIndustry's bare
+/// (e.g. WebhookEventType's "customer.new" -> customerNew; BusinessIndustry's bare
 /// numeric NAICS codes get an "n" prefix, e.g. "446120" -> n446120).
 func deriveCaseName(from value: String) -> String {
     let parts = value.split(whereSeparator: { $0 == "_" || $0 == "." || $0 == " " || $0 == "-" })
@@ -547,6 +587,27 @@ func swiftType(for node: [String: Any]) -> String {
     case "object": return "[String: AnyCodable]?"
     default: return "String?"
     }
+}
+
+/// The Swift type for a new optional field. A `$ref` to a mapped schema
+/// reuses the mapped SDK type; other objects decode as AnyCodable; arrays keep
+/// their element type instead of defaulting to strings.
+func fieldSwiftType(_ nodeIn: [String: Any], spec: [String: Any]) -> String {
+    guard let node = effectiveSchemaNode(inlineEnumRef(nodeIn, spec: spec)) else { return "AnyCodable?" }
+    if let name = schemaRefName(node.str("$ref")) {
+        if let mapped = specMapTypes.first(where: { $0.str("spec") == name }),
+           let symbol = (mapped["sdk"] as? [[String: Any]])?.first?.str("symbol") {
+            return symbol + "?"
+        }
+        guard let target = schemas(of: spec)[name] as? [String: Any] else { return "AnyCodable?" }
+        return fieldSwiftType(target, spec: spec)
+    }
+    if (node["type"] as? String) == "array", let items = node.dict("items") {
+        let element = fieldSwiftType(items, spec: spec)
+        return "[\(element.hasSuffix("?") ? String(element.dropLast()) : element)]?"
+    }
+    if node["properties"] != nil && node["type"] == nil { return "[String: AnyCodable]?" }
+    return swiftType(for: node)
 }
 
 // MARK: - Findings
@@ -773,6 +834,18 @@ func swiftBaseType(_ typeText: String) -> String {
 ///     reported, for full visibility into where the SDK's current type
 ///     surface disagrees with the spec at all, regardless of which side is
 ///     "stricter".
+/// A property that is just `{"$ref": X}` to a named scalar enum schema (e.g.
+/// `YieldStatus`) is that enum, not an object: inline it so type checks see
+/// the enum.
+func inlineEnumRef(_ node: [String: Any], spec: [String: Any]) -> [String: Any] {
+    guard let name = schemaRefName(node.str("$ref")),
+          let target = schemas(of: spec)[name] as? [String: Any],
+          target["enum"] != nil, target["properties"] == nil else { return node }
+    var merged = target
+    for (key, value) in node where key != "$ref" { merged[key] = value }
+    return merged
+}
+
 func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText: String, strictNullability: Bool) -> String? {
     let (specBase, specNullable) = specTypeInfo(propNode)
     let swiftOptional = isSwiftOptional(swiftTypeText)
@@ -860,6 +933,8 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
             let missing = specVals.subtracting(sdkVals)
             for value in missing.sorted() {
                 if isKnownDivergence(enumName: symbol, value: value) { continue }
+                // An enum mapped at several locators is inserted into once.
+                if applicable.contains(where: { $0.enumSymbol == symbol && $0.enumValue == value }) { continue }
                 applicable.append(Finding(kind: .applicableEnumCase,
                                            message: "enum \(symbol) is missing member \"\(value)\" (spec: \(locator))",
                                            enumSymbol: symbol, enumValue: value))
@@ -898,7 +973,7 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
                 if let modeled = propertyByWireKey[propName] {
                     guard let propNodeDict = propNode as? [String: Any] else { continue }
                     if isKnownTypeDivergence(locator: locator, field: propName) { continue }
-                    if let reason = typeMismatchReason(propName: propName, propNode: propNodeDict, swiftTypeText: modeled.typeText, strictNullability: false) {
+                    if let reason = typeMismatchReason(propName: propName, propNode: inlineEnumRef(propNodeDict, spec: spec), swiftTypeText: modeled.typeText, strictNullability: false) {
                         needsHuman.append(Finding(kind: .needsHuman,
                             message: "\(symbol).\(modeled.name) (spec property \"\(propName)\" on \(locator)) type mismatch: \(reason)"))
                     }
@@ -911,7 +986,16 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
                     continue
                 }
                 let camelName = deriveCamelName(from: propName)
-                let typeText = swiftType(for: propNode as? [String: Any] ?? [:])
+                let typeText = fieldSwiftType(propNode as? [String: Any] ?? [:], spec: spec)
+                // A struct mapped at several locators gets each field once.
+                if applicable.contains(where: { $0.fieldSymbol == symbol && $0.fieldWireKey == propName }) { continue }
+                // Without CodingKeys the property name is the wire key, so a
+                // snake_case key can't be added mechanically.
+                if !scannedType.hasCodingKeys && camelName != propName {
+                    needsHuman.append(Finding(kind: .needsHuman,
+                        message: "\(symbol) is missing optional spec property \"\(propName)\" (spec: \(locator)), but it has no CodingKeys to map the snake_case key -- add a CodingKeys block first"))
+                    continue
+                }
                 if amountConvertingEncoders.contains(symbol) && looksAmountShaped(name: camelName, typeText: typeText) {
                     needsHuman.append(Finding(kind: .needsHuman,
                         message: "\(symbol).\(camelName) (spec property \"\(propName)\") looks amount-shaped on a cents-converting hand-rolled encoder; needs a human decision on unit conversion, not a mechanical add"))
@@ -954,8 +1038,8 @@ func reconcile(spec: [String: Any], scanned: [String: ScannedType]) -> (applicab
 /// additionalProperties, or any other nesting) into `set`.
 func collectSchemaRefs(_ node: Any, into set: inout Set<String>) {
     if let dict = node as? [String: Any] {
-        if let ref = dict["$ref"] as? String, ref.hasPrefix("#/components/schemas/") {
-            set.insert(String(ref.dropFirst("#/components/schemas/".count)))
+        if let name = schemaRefName(dict["$ref"] as? String) {
+            set.insert(name)
         }
         for (_, v) in dict { collectSchemaRefs(v, into: &set) }
     } else if let arr = node as? [Any] {
@@ -1033,6 +1117,14 @@ func specOperations(_ spec: [String: Any]) -> [(method: String, path: String, op
 /// isn't a composition at all; returns nil for genuine multi-branch
 /// polymorphism, which the generator cannot express.
 func effectiveSchemaNode(_ node: [String: Any]) -> [String: Any]? {
+    // OpenAPI 3.1 nullable: `"type": ["string", "null"]` is a nullable string.
+    if let types = node["type"] as? [Any] {
+        let concrete = types.compactMap { $0 as? String }.filter { $0 != "null" }
+        guard concrete.count == 1 else { return nil }
+        var single = node
+        single["type"] = concrete[0]
+        return effectiveSchemaNode(single)
+    }
     guard let branches = (node["allOf"] as? [Any]) ?? (node["anyOf"] as? [Any]) ?? (node["oneOf"] as? [Any]) else {
         return node
     }
@@ -1062,10 +1154,9 @@ func checkSchemaExpressible(_ nodeIn: [String: Any], spec: [String: Any], visite
         return "is an array of an enum-constrained item; enum naming/placement requires a human decision"
     }
     if let ref = node.str("$ref") {
-        guard ref.hasPrefix("#/components/schemas/") else {
+        guard let name = schemaRefName(ref) else {
             return "uses a $ref outside #/components/schemas, not supported by the generator"
         }
-        let name = String(ref.dropFirst("#/components/schemas/".count))
         if visited.contains(name) { return nil } // recursive/self-referencing schema already in progress
         // Already hand-mapped to an existing SDK type (spec-map.json types[]):
         // swiftTypeForSchema reuses that symbol outright rather than
@@ -1381,8 +1472,7 @@ func swiftStructName(for schemaName: String) -> String {
 func swiftTypeForSchema(_ nodeIn: [String: Any], spec: [String: Any], scanned: [String: ScannedType], isInputContext: Bool, generated: inout [GeneratedStruct], generatedNames: inout Set<String>) -> String? {
     guard let node = effectiveSchemaNode(nodeIn) else { return nil }
 
-    if let ref = node.str("$ref"), ref.hasPrefix("#/components/schemas/") {
-        let refName = String(ref.dropFirst("#/components/schemas/".count))
+    if let refName = schemaRefName(node.str("$ref")) {
         if let existing = specMapTypes.first(where: { $0.str("spec") == refName }),
            let sdkSites = existing["sdk"] as? [[String: Any]], let symbol = sdkSites.first?.str("symbol") {
             return symbol
@@ -1492,15 +1582,19 @@ func renderServiceMethod(name: String, extraParams: [String], hasBody: Bool, bod
     if hasBody, let inputTypeName = inputTypeName {
         sigParams.append(bodyRequired ? "data: \(inputTypeName)" : "data: \(inputTypeName)? = nil")
     }
+    // Every SDK method takes per-request options (idempotency key, timeout,
+    // headers) and forwards them; RequestOptionsGuardTests enforces this.
+    sigParams.append("options: RequestOptions? = nil")
     var lines: [String] = []
     lines.append("    /// Auto-generated by sync.swift (operation-insert) for \(opMethod.uppercased()) \(opPath).")
     lines.append("    public func \(name)(\(sigParams.joined(separator: ", "))) async throws -> APIResponse<\(outputTypeName)> {")
     lines.append("        return try await apiClient.request(")
     lines.append("            endpoint: \"\(endpointTemplate)\",")
-    lines.append("            method: .\(httpMethod)\(hasBody ? "," : "")")
+    lines.append("            method: .\(httpMethod),")
     if hasBody {
-        lines.append("            body: data")
+        lines.append("            body: data,")
     }
+    lines.append("            options: options")
     lines.append("        )")
     lines.append("    }")
     return lines.joined(separator: "\n")
@@ -1796,6 +1890,27 @@ func detectStructuralChanges(old: [String: Any], new: [String: Any]) -> [Finding
 
 enum Bump: String { case none, patch, minor }
 
+/// Applies `bump` to the SDK version constant (`BlindPaySDK.version` in
+/// `versionFilePath`), the single source of the release version: release.yml
+/// tags `v<version>` once the sync PR merges. Returns the new version, or nil
+/// when there is nothing to bump or no version file (test fixtures).
+func bumpSDKVersion(_ bump: Bump) -> String? {
+    guard bump != .none, let source = try? String(contentsOfFile: versionFilePath, encoding: .utf8) else { return nil }
+    let regex = try! NSRegularExpression(pattern: #"public static let version = "(\d+)\.(\d+)\.(\d+)""#)
+    let range = NSRange(source.startIndex..<source.endIndex, in: source)
+    guard let match = regex.firstMatch(in: source, range: range),
+          let all = Range(match.range, in: source),
+          let major = Int(source[Range(match.range(at: 1), in: source)!]),
+          let minor = Int(source[Range(match.range(at: 2), in: source)!]),
+          let patch = Int(source[Range(match.range(at: 3), in: source)!]) else {
+        fail("could not find `public static let version = \"X.Y.Z\"` in \(versionFilePath)")
+    }
+    let next = bump == .minor ? "\(major).\(minor + 1).0" : "\(major).\(minor).\(patch + 1)"
+    let updated = source.replacingCharacters(in: all, with: "public static let version = \"\(next)\"")
+    try! updated.write(toFile: versionFilePath, atomically: true, encoding: .utf8)
+    return next
+}
+
 func classifyBump(old: [String: Any], new: [String: Any]) -> Bump {
     if old.count == new.count, NSDictionary(dictionary: old).isEqual(to: new) { return .none }
 
@@ -1857,18 +1972,22 @@ func applyFindings(_ findings: [Finding]) {
         guard let symbol = finding.enumSymbol, let value = finding.enumValue, let file = fileOfSymbol[symbol] else { continue }
         var lines = linesFor(file)
         guard let declIdx = lines.firstIndex(where: { matchGroups(typeDeclRegex, $0)?[3] == symbol }) else { continue }
+        let isOpen = declaresOpenEnum(lines[declIdx])
         var depth = 0
         var closeIdx = -1
         var lastCaseIdx = declIdx
         for i in declIdx..<lines.count {
             depth += braceDelta(lines[i])
-            if i > declIdx, lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("case ") { lastCaseIdx = i }
+            let isValueLine = isOpen ? matchGroups(openEnumValueRegex, lines[i]) != nil : lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("case ")
+            if i > declIdx, isValueLine { lastCaseIdx = i }
             if depth == 0 && i > declIdx { closeIdx = i; break }
         }
         guard closeIdx != -1 else { continue }
-        let indent = indentOf(lines[lastCaseIdx])
+        let indent = lastCaseIdx == declIdx ? indentOf(lines[declIdx]) + "    " : indentOf(lines[lastCaseIdx])
         let caseName = deriveCaseName(from: value)
-        let newLine = "\(indent)case \(caseName) = \"\(value)\""
+        let newLine = isOpen
+            ? "\(indent)public static let \(caseName) = \(symbol)(rawValue: \"\(value)\")"
+            : "\(indent)case \(caseName) = \"\(value)\""
         lines.insert(newLine, at: lastCaseIdx + 1)
         fileLines[file] = lines
     }
@@ -2096,7 +2215,7 @@ func auditTypes(spec: [String: Any], scanned: [String: ScannedType]) -> [TypeAud
             }
             for (propName, propNode) in specProps.sorted(by: { $0.key < $1.key }) {
                 guard let modeled = propertyByWireKey[propName], let propNodeDict = propNode as? [String: Any] else { continue }
-                if let reason = typeMismatchReason(propName: propName, propNode: propNodeDict, swiftTypeText: modeled.typeText, strictNullability: true) {
+                if let reason = typeMismatchReason(propName: propName, propNode: inlineEnumRef(propNodeDict, spec: spec), swiftTypeText: modeled.typeText, strictNullability: true) {
                     findings.append(TypeAuditFinding(locator: locator, symbol: symbol, field: propName, propertyName: modeled.name, reason: reason))
                 }
             }
@@ -2323,7 +2442,7 @@ func validateMap(spec: [String: Any], scanned: [String: ScannedType]) -> [String
 
 // MARK: - Main
 
-let snapshot = loadJSONRequired(snapshotPath) as! [String: Any]
+let snapshot = sdkSurface(loadJSONRequired(snapshotPath) as! [String: Any])
 
 switch mode {
 case .coverageReport:
@@ -2358,7 +2477,7 @@ case .check:
     exit(1)
 
 case .apply:
-    let newSpec = loadJSONRequired(specPath) as! [String: Any]
+    let newSpec = sdkSurface(loadJSONRequired(specPath) as! [String: Any])
     let scanned = scanSources(under: sourcesPath)
 
     let structuralFindings = detectStructuralChanges(old: snapshot, new: newSpec)
@@ -2400,6 +2519,10 @@ case .apply:
         report["applied"] = applicable.map { $0.message }
         report["needsHuman"] = []
         report["bump"] = bump.rawValue
+        if let version = bumpSDKVersion(bump) {
+            report["version"] = version
+            print("  version bump: \(bump.rawValue) -> \(version)")
+        }
     }
 
     // Refresh the snapshot by copying the source spec file's bytes verbatim

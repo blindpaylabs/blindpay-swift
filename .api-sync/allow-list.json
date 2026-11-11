@@ -3,126 +3,84 @@
     "schema": "PartnerFee",
     "field": "evm_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PartnerFee",
     "field": "stellar_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeInput",
     "field": "evm_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeInput",
     "field": "stellar_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeResponse",
     "field": "evm_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeResponse",
     "field": "stellar_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Payin",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Payin",
     "field": "billing_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayinResponse",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayinResponse",
     "field": "billing_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
-  },
-  {
-    "schema": "PayinQuote",
-    "field": "billing_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Payout",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayoutResponse",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Transfer",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Customer",
     "field": "aiprise_validation_key",
     "reason": "Absent from the public spec snapshot; only appeared alongside internal-only surface in the unfiltered spec. Pre-existing SDK field, unrelated to the customers rename; needs its own investigation.",
-    "owner": "eric@blindpay.com"
-  },
-  {
-    "schema": "CreatePayinQuoteInput",
-    "field": "funding_bank_account_id",
-    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePayinQuoteResponse",
-    "field": "card_instruction",
-    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "PayinQuoteCardInstruction",
-    "field": "tokenization_key",
-    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "PayinQuoteCardInstruction",
-    "field": "checkout_public_key",
-    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "PayinQuoteCardInstruction",
-    "field": "checkout_token",
-    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "PayinQuoteCardInstruction",
-    "field": "checkout_url",
-    "reason": "temporary; removed with the snapshot refresh in PR 2 (M3). Field is in the public spec at blindpay-v2@66144f3b2 but not in this stale snapshot.",
     "owner": "sdk-maintainers"
   }
 ]

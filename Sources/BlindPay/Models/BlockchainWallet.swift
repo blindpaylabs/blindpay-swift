@@ -30,6 +30,8 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
     /// Signature transaction hash (optional)
     public let signatureTxHash: String?
     
+    public let isSelfCustody: Bool?
+
     public init(
         id: String,
         name: String? = nil,
@@ -37,7 +39,8 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         customerId: String,
         address: String? = nil,
         isAccountAbstraction: Bool? = nil,
-        signatureTxHash: String? = nil
+        signatureTxHash: String? = nil,
+        isSelfCustody: Bool? = nil
     ) {
         self.id = id
         self.name = name
@@ -46,6 +49,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         self.address = address
         self.isAccountAbstraction = isAccountAbstraction
         self.signatureTxHash = signatureTxHash
+        self.isSelfCustody = isSelfCustody
     }
     
     enum CodingKeys: String, CodingKey {
@@ -56,6 +60,7 @@ public struct BlockchainWallet: Codable, Sendable, Equatable {
         case address
         case isAccountAbstraction = "is_account_abstraction"
         case signatureTxHash = "signature_tx_hash"
+        case isSelfCustody = "is_self_custody"
     }
 }
 
@@ -99,18 +104,22 @@ public struct CreateBlockchainWalletInput: Codable, Sendable {
     /// Signature transaction hash (optional)
     public let signatureTxHash: String?
     
+    public let isSelfCustody: Bool?
+
     public init(
         name: String,
         network: Network,
         address: String? = nil,
         isAccountAbstraction: Bool? = nil,
-        signatureTxHash: String? = nil
+        signatureTxHash: String? = nil,
+        isSelfCustody: Bool? = nil
     ) {
         self.name = name
         self.network = network
         self.address = address
         self.isAccountAbstraction = isAccountAbstraction
         self.signatureTxHash = signatureTxHash
+        self.isSelfCustody = isSelfCustody
     }
     
     enum CodingKeys: String, CodingKey {
@@ -119,6 +128,7 @@ public struct CreateBlockchainWalletInput: Codable, Sendable {
         case address
         case isAccountAbstraction = "is_account_abstraction"
         case signatureTxHash = "signature_tx_hash"
+        case isSelfCustody = "is_self_custody"
     }
 }
 
@@ -217,24 +227,29 @@ public struct MintUsdbSolanaResponse: Codable, Sendable, Equatable {
 /// Input for preparing a Solana delegate transaction
 public struct PrepareDelegateSolanaInput: Codable, Sendable {
     /// Amount to delegate
-    public let amount: String
+    public let amount: String?
     
     /// Owner address
     public let ownerAddress: String
     
     /// Token address
-    public let tokenAddress: String
+    public let tokenAddress: String?
     
-    public init(amount: String, ownerAddress: String, tokenAddress: String) {
+    /// The payout quote the delegation is for.
+    public let quoteId: String?
+
+    public init(ownerAddress: String, amount: String? = nil, tokenAddress: String? = nil, quoteId: String? = nil) {
         self.amount = amount
         self.ownerAddress = ownerAddress
         self.tokenAddress = tokenAddress
+        self.quoteId = quoteId
     }
     
     enum CodingKeys: String, CodingKey {
         case amount
         case ownerAddress = "owner_address"
         case tokenAddress = "token_address"
+        case quoteId = "quote_id"
     }
 }
 
@@ -247,11 +262,23 @@ public struct PrepareDelegateSolanaResponse: Codable, Sendable, Equatable {
     public let transaction: String?
     
     /// Debug information (optional)
-    public let debug: String?
+    public let debug: [String: AnyCodable]?
     
-    public init(success: Bool, transaction: String? = nil, debug: String? = nil) {
+    public init(success: Bool, transaction: String? = nil, debug: [String: AnyCodable]? = nil) {
         self.success = success
         self.transaction = transaction
         self.debug = debug
+    }
+}
+
+// MARK: - Self-custody
+
+/// Body of `PATCH .../blockchain-wallets/{id}`: declares whether the customer
+/// holds the wallet's keys. It can be set once, while it is still `null`.
+struct UpdateBlockchainWalletInput: Codable, Sendable {
+    let isSelfCustody: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case isSelfCustody = "is_self_custody"
     }
 }

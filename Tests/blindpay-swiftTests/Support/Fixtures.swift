@@ -17,9 +17,9 @@ enum Fixtures {
         Bundle.module.url(forResource: "Fixtures", withExtension: nil)!
     }
 
-    /// The variants every touched response type must decode. `unknown_enum`
-    /// joins once enums are forward-compatible (C7).
-    static let decodeSafetyVariants = ["full", "required_only", "nullables_null", "decimals"]
+    /// The variants every response type must decode. `unknown_enum` replaces
+    /// every enum value with one no SDK knows.
+    static let decodeSafetyVariants = ["full", "required_only", "nullables_null", "unknown_enum", "decimals"]
 
     /// Returns the raw JSON bytes of one response variant for an operation
     /// keyed as in index.json, e.g. `"GET /v1/available/naics"`.

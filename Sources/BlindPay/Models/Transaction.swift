@@ -10,13 +10,16 @@ import Foundation
 // MARK: - Enums
 
 /// Transaction status
-public enum TransactionStatus: String, Codable, Sendable {
-    case refunded = "refunded"
-    case processing = "processing"
-    case completed = "completed"
-    case failed = "failed"
-    case onHold = "on_hold"
-    case pendingReview = "pending_review"
+public struct TransactionStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let refunded = TransactionStatus(rawValue: "refunded")
+    public static let processing = TransactionStatus(rawValue: "processing")
+    public static let completed = TransactionStatus(rawValue: "completed")
+    public static let failed = TransactionStatus(rawValue: "failed")
+    public static let onHold = TransactionStatus(rawValue: "on_hold")
+    public static let pendingReview = TransactionStatus(rawValue: "pending_review")
 }
 
 // MARK: - Tracking Types

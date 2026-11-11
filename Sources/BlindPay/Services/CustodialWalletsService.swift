@@ -24,10 +24,11 @@ public final class CustodialWalletsService: Sendable {
     ///
     /// - Returns: An `APIResponse` containing an array of `CustodialWallet` objects
     /// - Throws: `BlindPayError` if the request fails
-    public func list() async throws -> APIResponse<CustodialWalletsResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<CustodialWalletsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -36,10 +37,11 @@ public final class CustodialWalletsService: Sendable {
     /// - Parameter id: The unique identifier of the custodial wallet
     /// - Returns: An `APIResponse` containing the `CustodialWallet` object
     /// - Throws: `BlindPayError` if the request fails
-    public func get(id: String) async throws -> APIResponse<CustodialWalletResponse> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<CustodialWalletResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -48,11 +50,12 @@ public final class CustodialWalletsService: Sendable {
     /// - Parameter data: The input data containing wallet configuration
     /// - Returns: An `APIResponse` containing the created custodial wallet
     /// - Throws: `BlindPayError` if the request fails
-    public func create(data: CreateCustodialWalletInput) async throws -> APIResponse<CreateCustodialWalletResponse> {
+    public func create(data: CreateCustodialWalletInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateCustodialWalletResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -61,10 +64,11 @@ public final class CustodialWalletsService: Sendable {
     /// - Parameter id: The unique identifier of the custodial wallet
     /// - Returns: An `APIResponse` containing the wallet balance
     /// - Throws: `BlindPayError` if the request fails
-    public func getBalance(id: String) async throws -> APIResponse<CustodialWalletBalanceResponse> {
+    public func getBalance(id: String, options: RequestOptions? = nil) async throws -> APIResponse<CustodialWalletBalanceResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)/balance",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -73,10 +77,29 @@ public final class CustodialWalletsService: Sendable {
     /// - Parameter id: The unique identifier of the custodial wallet to delete
     /// - Returns: An `APIResponse` with a void response indicating success
     /// - Throws: `BlindPayError` if the request fails
-    public func delete(id: String) async throws -> APIResponse<VoidResponse> {
+    public func delete(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
+    }
+
+    /// Lists one page of deposits into a managed wallet. The API always
+    /// paginates this list (default page size 10).
+    public func getDeposits(id: String, params: ListWalletDepositsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<WalletDepositsResponse> {
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/wallets/\(id)/deposits",
+            method: .get,
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
+        )
+    }
+
+    /// Iterates every deposit into a managed wallet, fetching pages of 100 (or
+    /// `params.limit`) on demand. `endingBefore` is not supported.
+    public func getDepositsAutoPaging(id: String, params: ListWalletDepositsInput = ListWalletDepositsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<WalletDeposit, Error> {
+        AutoPager.stream(params: params) { [self] page in try await self.getDeposits(id: id, params: page, options: options) }
     }
 }

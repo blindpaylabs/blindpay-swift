@@ -34,10 +34,11 @@ public final class PartnerFeesService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list() async throws -> APIResponse<PartnerFeesResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<PartnerFeesResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -64,11 +65,12 @@ public final class PartnerFeesService: Sendable {
     ///     print("Created fee: \(created.id)")
     /// }
     /// ```
-    public func create(data: CreatePartnerFeeInput) async throws -> APIResponse<CreatePartnerFeeResponse> {
+    public func create(data: CreatePartnerFeeInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePartnerFeeResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -87,10 +89,11 @@ public final class PartnerFeesService: Sendable {
     ///     print("Fee: \(fee.name)")
     /// }
     /// ```
-    public func get(id: String) async throws -> APIResponse<PartnerFee> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<PartnerFee> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -111,10 +114,11 @@ public final class PartnerFeesService: Sendable {
     ///     print("Partner fee deleted successfully")
     /// }
     /// ```
-    public func delete(id: String) async throws -> APIResponse<VoidResponse> {
+    public func delete(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
 }

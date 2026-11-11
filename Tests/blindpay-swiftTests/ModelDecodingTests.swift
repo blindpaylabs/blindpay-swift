@@ -29,9 +29,9 @@ struct ModelDecodingTests {
         """
         let response = try JSONDecoder().decode(ListTransfersResponse.self, from: Data(json.utf8))
         #expect(response.data.count == 1)
-        #expect(response.pagination.hasMore == true)
-        #expect(response.pagination.nextPage == "tr_456")
-        #expect(response.pagination.prevPage == nil)
+        #expect(response.pagination?.hasMore == true)
+        #expect(response.pagination?.nextPage == "tr_456")
+        #expect(response.pagination?.prevPage == nil)
     }
 
     @Test func payinDecodesNumericBillingFeeAmount() throws {

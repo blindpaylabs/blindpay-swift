@@ -10,114 +10,129 @@ import Foundation
 // MARK: - Enums
 
 /// Type of currency (sender or receiver)
-public enum CurrencyType: String, Codable, Sendable {
-    case sender = "sender"
-    case receiver = "receiver"
+public struct CurrencyType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let sender = CurrencyType(rawValue: "sender")
+    public static let receiver = CurrencyType(rawValue: "receiver")
 }
 
 /// Blockchain network
-public enum Network: String, Codable, Sendable {
-    case base = "base"
-    case sepolia = "sepolia"
-    case arbitrumSepolia = "arbitrum_sepolia"
-    case baseSepolia = "base_sepolia"
-    case arbitrum = "arbitrum"
-    case polygon = "polygon"
-    case polygonAmoy = "polygon_amoy"
-    case ethereum = "ethereum"
-    case stellar = "stellar"
-    case stellarTestnet = "stellar_testnet"
-    case tron = "tron"
-    case solana = "solana"
-    case solanaDevnet = "solana_devnet"
+public struct Network: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let base = Network(rawValue: "base")
+    public static let sepolia = Network(rawValue: "sepolia")
+    public static let arbitrumSepolia = Network(rawValue: "arbitrum_sepolia")
+    public static let baseSepolia = Network(rawValue: "base_sepolia")
+    public static let arbitrum = Network(rawValue: "arbitrum")
+    public static let polygon = Network(rawValue: "polygon")
+    public static let polygonAmoy = Network(rawValue: "polygon_amoy")
+    public static let ethereum = Network(rawValue: "ethereum")
+    public static let stellar = Network(rawValue: "stellar")
+    public static let stellarTestnet = Network(rawValue: "stellar_testnet")
+    public static let tron = Network(rawValue: "tron")
+    public static let solana = Network(rawValue: "solana")
+    public static let solanaDevnet = Network(rawValue: "solana_devnet")
+    public static let arc = Network(rawValue: "arc")
+    public static let arcTestnet = Network(rawValue: "arc_testnet")
+    public static let tempo = Network(rawValue: "tempo")
+    public static let tempoTestnet = Network(rawValue: "tempo_testnet")
 }
 
 /// Stablecoin token
-public enum StablecoinToken: String, Codable, Sendable {
-    case usdc = "USDC"
-    case usdt = "USDT"
-    case usdb = "USDB"
+public struct StablecoinToken: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let usdc = StablecoinToken(rawValue: "USDC")
+    public static let usdt = StablecoinToken(rawValue: "USDT")
+    public static let usdb = StablecoinToken(rawValue: "USDB")
 }
 
 /// Transaction document type
-public enum TransactionDocumentType: String, Codable, Sendable {
-    case invoice = "invoice"
-    case purchaseOrder = "purchase_order"
-    case deliverySlip = "delivery_slip"
-    case contract = "contract"
-    case customsDeclaration = "customs_declaration"
-    case billOfLading = "bill_of_lading"
-    case others = "others"
+public struct TransactionDocumentType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let invoice = TransactionDocumentType(rawValue: "invoice")
+    public static let purchaseOrder = TransactionDocumentType(rawValue: "purchase_order")
+    public static let deliverySlip = TransactionDocumentType(rawValue: "delivery_slip")
+    public static let contract = TransactionDocumentType(rawValue: "contract")
+    public static let customsDeclaration = TransactionDocumentType(rawValue: "customs_declaration")
+    public static let billOfLading = TransactionDocumentType(rawValue: "bill_of_lading")
+    public static let others = TransactionDocumentType(rawValue: "others")
 }
 
 /// Currency type
-public enum Currency: String, Codable, Sendable {
-    case usdc = "USDC"
-    case usdt = "USDT"
-    case usdb = "USDB"
-    case brl = "BRL"
-    case usd = "USD"
-    case mxn = "MXN"
-    case cop = "COP"
-    case ars = "ARS"
+public struct Currency: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let usdc = Currency(rawValue: "USDC")
+    public static let usdt = Currency(rawValue: "USDT")
+    public static let usdb = Currency(rawValue: "USDB")
+    public static let brl = Currency(rawValue: "BRL")
+    public static let usd = Currency(rawValue: "USD")
+    public static let mxn = Currency(rawValue: "MXN")
+    public static let cop = Currency(rawValue: "COP")
+    public static let ars = Currency(rawValue: "ARS")
+    public static let gbp = Currency(rawValue: "GBP")
 }
 
 // MARK: - Create Quote
 
-/// Input for creating a quote
+/// Input for creating a payout quote (`QuoteIn`).
+///
+/// Set exactly one of `bankAccountId` (pay a bank account) or `payableId`
+/// (pay a payable); the API rejects both or neither with a 400. Bank account
+/// quotes also need `currencyType` and `requestAmount`; payable quotes take
+/// the amount from the payable and always cover fees.
 public struct CreateQuoteInput: Codable, Sendable {
-    /// Bank account ID
-    public let bankAccountId: String
-    
-    /// Currency type (sender or receiver)
-    public let currencyType: CurrencyType
-    
-    /// Network (optional)
-    public let network: Network?
-    
-    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
-    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
-    /// enforces a per-currency minimum and returns 400 below it.
-    public let requestAmount: Double
-    
-    /// Token (optional)
-    public let token: StablecoinToken?
-    
-    /// Whether to cover fees
+    /// The bank account to pay. Exactly one of this or `payableId`.
+    public let bankAccountId: String?
+
+    /// The payable to pay. Exactly one of this or `bankAccountId`.
+    public let payableId: String?
+
+    /// Whether `requestAmount` is what the sender sends or the receiver gets.
+    public let currencyType: CurrencyType?
+
+    /// The network the stablecoins are sent from.
+    public let network: Network
+
+    /// Amount in integer cents (`1999` = 19.99). See ``Amount/cents(fromMajorUnits:)``.
+    public let requestAmount: Int?
+
+    /// The token the stablecoins are sent in.
+    public let token: StablecoinToken
+
+    /// Whether the sender covers the fees. Defaults to false on bank account quotes.
     public let coverFees: Bool?
-    
-    /// Description (optional)
+
     public let description: String?
-    
-    /// Partner fee ID (optional)
+
     public let partnerFeeId: String?
-    
-    /// Transaction document file (optional)
-    public let transactionDocumentFile: String?
-    
-    /// Transaction document ID (optional)
-    public let transactionDocumentId: String?
-    
-    /// Transaction document type
-    public let transactionDocumentType: TransactionDocumentType
-    
+
+    /// Where refunds go if the payout fails after funding.
     public let refundWalletAddress: String?
 
     public init(
-        bankAccountId: String,
-        currencyType: CurrencyType,
-        network: Network? = nil,
-        requestAmount: Double,
-        token: StablecoinToken? = nil,
+        bankAccountId: String? = nil,
+        payableId: String? = nil,
+        currencyType: CurrencyType? = nil,
+        network: Network,
+        requestAmount: Int? = nil,
+        token: StablecoinToken,
         coverFees: Bool? = nil,
         description: String? = nil,
         partnerFeeId: String? = nil,
-        transactionDocumentFile: String? = nil,
-        transactionDocumentId: String? = nil,
-        transactionDocumentType: TransactionDocumentType,
         refundWalletAddress: String? = nil
     ) {
         self.bankAccountId = bankAccountId
+        self.payableId = payableId
         self.currencyType = currencyType
         self.network = network
         self.requestAmount = requestAmount
@@ -125,14 +140,12 @@ public struct CreateQuoteInput: Codable, Sendable {
         self.coverFees = coverFees
         self.description = description
         self.partnerFeeId = partnerFeeId
-        self.transactionDocumentFile = transactionDocumentFile
-        self.transactionDocumentId = transactionDocumentId
-        self.transactionDocumentType = transactionDocumentType
         self.refundWalletAddress = refundWalletAddress
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case bankAccountId = "bank_account_id"
+        case payableId = "payable_id"
         case currencyType = "currency_type"
         case network
         case requestAmount = "request_amount"
@@ -140,27 +153,7 @@ public struct CreateQuoteInput: Codable, Sendable {
         case coverFees = "cover_fees"
         case description
         case partnerFeeId = "partner_fee_id"
-        case transactionDocumentFile = "transaction_document_file"
-        case transactionDocumentId = "transaction_document_id"
-        case transactionDocumentType = "transaction_document_type"
         case refundWalletAddress = "refund_wallet_address"
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(bankAccountId, forKey: .bankAccountId)
-        try container.encode(currencyType, forKey: .currencyType)
-        try container.encodeIfPresent(network, forKey: .network)
-        // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encodeCents(requestAmount, forKey: .requestAmount)
-        try container.encodeIfPresent(token, forKey: .token)
-        try container.encodeIfPresent(coverFees, forKey: .coverFees)
-        try container.encodeIfPresent(description, forKey: .description)
-        try container.encodeIfPresent(partnerFeeId, forKey: .partnerFeeId)
-        try container.encodeIfPresent(transactionDocumentFile, forKey: .transactionDocumentFile)
-        try container.encodeIfPresent(transactionDocumentId, forKey: .transactionDocumentId)
-        try container.encode(transactionDocumentType, forKey: .transactionDocumentType)
-        try container.encodeIfPresent(refundWalletAddress, forKey: .refundWalletAddress)
     }
 }
 
@@ -244,13 +237,13 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     public let blindpayQuotation: Double?
     
     /// Receiver amount
-    public let receiverAmount: Double?
+    public let receiverAmount: Int?
     
     /// Sender amount
-    public let senderAmount: Double?
+    public let senderAmount: Int?
     
     /// Partner fee amount
-    public let partnerFeeAmount: Double?
+    public let partnerFeeAmount: Int?
     
     /// Flat fee
     public let flatFee: Double?
@@ -259,7 +252,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     public let contract: QuoteContract?
 
     /// Customer local amount
-    public let customerLocalAmount: Double?
+    public let customerLocalAmount: Int?
 
     /// Description
     public let description: String?
@@ -269,12 +262,12 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         expiresAt: Int? = nil,
         commercialQuotation: Double? = nil,
         blindpayQuotation: Double? = nil,
-        receiverAmount: Double? = nil,
-        senderAmount: Double? = nil,
-        partnerFeeAmount: Double? = nil,
+        receiverAmount: Int? = nil,
+        senderAmount: Int? = nil,
+        partnerFeeAmount: Int? = nil,
         flatFee: Double? = nil,
         contract: QuoteContract? = nil,
-        customerLocalAmount: Double? = nil,
+        customerLocalAmount: Int? = nil,
         description: String? = nil
     ) {
         self.id = id
@@ -318,16 +311,17 @@ public struct GetFxRateInput: Codable, Sendable {
     /// To currency
     public let to: Currency
     
-    /// Request amount in major units (e.g. 19.99 dollars or reais). Sent as
-    /// integer cents, rounded half away from zero (19.99 -> 1999). The API
+    /// Amount in integer cents (`1999` = 19.99); convert with
+    /// ``Amount/cents(fromMajorUnits:)``. For a currency without minor units
+    /// and `currencyType: .sender`, it must be a multiple of 100. The API
     /// enforces a per-currency minimum and returns 400 below it.
-    public let requestAmount: Double
+    public let requestAmount: Int
     
     public init(
         currencyType: CurrencyType,
         from: Currency,
         to: Currency,
-        requestAmount: Double
+        requestAmount: Int
     ) {
         self.currencyType = currencyType
         self.from = from
@@ -340,15 +334,6 @@ public struct GetFxRateInput: Codable, Sendable {
         case from
         case to
         case requestAmount = "request_amount"
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(currencyType, forKey: .currencyType)
-        try container.encode(from, forKey: .from)
-        try container.encode(to, forKey: .to)
-        // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encodeCents(requestAmount, forKey: .requestAmount)
     }
 }
 

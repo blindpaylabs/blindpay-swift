@@ -24,13 +24,12 @@ public final class VirtualAccountsService: Sendable {
     ///
     /// This method fetches a list of all virtual accounts associated with the customer.
     ///
-    /// - Parameter customerId: The unique identifier of the customer
     /// - Returns: An `APIResponse` containing an array of virtual accounts
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.list(customerId: "re_123")
+    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.list()
     /// if let virtualAccounts = response.data {
     ///     for virtualAccount in virtualAccounts {
     ///         print("Virtual Account ID: \(virtualAccount.id)")
@@ -39,10 +38,11 @@ public final class VirtualAccountsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list(customerId: String) async throws -> APIResponse<VirtualAccountsResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<VirtualAccountsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -51,14 +51,13 @@ public final class VirtualAccountsService: Sendable {
     /// This method fetches a specific virtual account by its ID. Returns `nil` in the response data if not found.
     ///
     /// - Parameters:
-    ///   - customerId: The unique identifier of the customer
     ///   - id: The unique identifier of the virtual account
     /// - Returns: An `APIResponse` containing the virtual account, or `nil` if not found
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.get(customerId: "re_123", id: "va_123")
+    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.get(id: "va_123")
     /// if let virtualAccount = response.data {
     ///     print("Virtual Account ID: \(virtualAccount.id)")
     ///     print("Token: \(virtualAccount.token.rawValue)")
@@ -67,10 +66,11 @@ public final class VirtualAccountsService: Sendable {
     ///     print("Virtual account not found")
     /// }
     /// ```
-    public func get(customerId: String, id: String) async throws -> APIResponse<VirtualAccountResponse> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VirtualAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -79,7 +79,6 @@ public final class VirtualAccountsService: Sendable {
     /// This method creates a new virtual account with the specified banking partner, blockchain wallet, and token.
     ///
     /// - Parameters:
-    ///   - customerId: The unique identifier of the customer
     ///   - data: The input data containing the banking partner, blockchain wallet ID, and token
     /// - Returns: An `APIResponse` containing the created virtual account
     /// - Throws: `BlindPayError` if the request fails
@@ -91,18 +90,19 @@ public final class VirtualAccountsService: Sendable {
     ///     token: .usdc,
     ///     blockchainWalletId: "bw_123"
     /// )
-    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.create(customerId: "re_123", data: input)
+    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.create(data: input)
     /// if let virtualAccount = response.data {
     ///     print("Created virtual account: \(virtualAccount.id)")
     ///     print("Banking Partner: \(virtualAccount.bankingPartner.rawValue)")
     ///     print("ACH Routing: \(virtualAccount.us.ach.routingNumber)")
     /// }
     /// ```
-    public func create(customerId: String, data: CreateVirtualAccountInput) async throws -> APIResponse<CreateVirtualAccountResponse> {
+    public func create(data: CreateVirtualAccountInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateVirtualAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -111,7 +111,6 @@ public final class VirtualAccountsService: Sendable {
     /// This method updates the virtual account with new blockchain wallet and token information.
     ///
     /// - Parameters:
-    ///   - customerId: The unique identifier of the customer
     ///   - id: The unique identifier of the virtual account to update
     ///   - data: The input data containing the blockchain wallet ID and token
     /// - Returns: An `APIResponse` containing the update result
@@ -123,16 +122,17 @@ public final class VirtualAccountsService: Sendable {
     ///     blockchainWalletId: "bw_456",
     ///     token: .usdt
     /// )
-    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.update(customerId: "re_123", id: "va_123", data: input)
+    /// let response = try await blindPay.customers(customerId: "re_123").virtualAccounts.update(id: "va_123", data: input)
     /// if let result = response.data {
     ///     print("Update successful: \(result.success)")
     /// }
     /// ```
-    public func update(customerId: String, id: String, data: UpdateVirtualAccountInput) async throws -> APIResponse<UpdateVirtualAccountResponse> {
+    public func update(id: String, data: UpdateVirtualAccountInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdateVirtualAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts/\(id)",
             method: .put,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

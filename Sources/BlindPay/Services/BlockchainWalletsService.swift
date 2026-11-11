@@ -34,10 +34,11 @@ public final class BlockchainWalletsService: Sendable {
     ///     print("Message to sign: \(signMessage.message)")
     /// }
     /// ```
-    public func getSignMessage() async throws -> APIResponse<BlockchainWalletSignMessageResponse> {
+    public func getSignMessage(options: RequestOptions? = nil) async throws -> APIResponse<BlockchainWalletSignMessageResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/sign-message",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -60,10 +61,11 @@ public final class BlockchainWalletsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list() async throws -> APIResponse<BlockchainWalletsResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<BlockchainWalletsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -90,11 +92,12 @@ public final class BlockchainWalletsService: Sendable {
     ///     print("Network: \(wallet.network.rawValue)")
     /// }
     /// ```
-    public func create(data: CreateBlockchainWalletInput) async throws -> APIResponse<CreateBlockchainWalletResponse> {
+    public func create(data: CreateBlockchainWalletInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateBlockchainWalletResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -117,10 +120,11 @@ public final class BlockchainWalletsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func get(id: String) async throws -> APIResponse<BlockchainWalletResponse> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<BlockchainWalletResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -141,11 +145,23 @@ public final class BlockchainWalletsService: Sendable {
     ///     print("Wallet deleted successfully")
     /// }
     /// ```
-    public func delete(id: String) async throws -> APIResponse<VoidResponse> {
+    public func delete(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
+        )
+    }
+
+    /// Declares whether the customer holds the wallet's keys (self-custody).
+    /// Required for Brazilian customers. It can be set once, while it is still
+    /// `null`; a second call returns `409 WALLETS_SELF_CUSTODY_ALREADY_SET`.
+    public func setSelfCustody(id: String, isSelfCustody: Bool, options: RequestOptions? = nil) async throws -> APIResponse<BlockchainWallet> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/blockchain-wallets/\(id)",
+            method: .patch,
+            body: UpdateBlockchainWalletInput(isSelfCustody: isSelfCustody),
+            options: options
         )
     }
 }
-

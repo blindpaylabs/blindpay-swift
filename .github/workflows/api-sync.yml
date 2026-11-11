@@ -101,8 +101,19 @@ jobs:
           fi
           applied=$(jq -r '.appliedCount' /tmp/sync-report.json)
           bump=$(jq -r '.bump' /tmp/sync-report.json)
-          echo "applied=$applied" >> "$GITHUB_OUTPUT"
-          echo "bump=$bump" >> "$GITHUB_OUTPUT"
+          # --apply bumps BlindPaySDK.version (patch, or minor when the report
+          # says so) and reports the new version; release.yml tags it once
+          # this PR merges.
+          version=$(jq -r '.version // empty' /tmp/sync-report.json)
+          if [ "$applied" != "0" ] && [ -z "$version" ]; then
+            echo "::error::sync.swift applied changes but did not bump BlindPaySDK.version"
+            exit 1
+          fi
+          {
+            echo "applied=$applied"
+            echo "bump=$bump"
+            echo "version=$version"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build and test the patched SDK
         if: steps.sync.outputs.applied != '0'
@@ -127,7 +138,8 @@ jobs:
           echo "has_changes=true" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "feat: sync SDK with API changes"
+          if [ "${{ steps.sync.outputs.bump }}" = "minor" ]; then type=feat; else type=fix; fi
+          git commit -m "$type: sync SDK with API changes (v${{ steps.sync.outputs.version }})"
           git push --force-with-lease origin api-sync
 
       - name: Create or update PR
@@ -137,6 +149,7 @@ jobs:
         run: |
           EXISTING_PR="${{ steps.check-pr.outputs.existing_pr }}"
           BUMP="${{ steps.sync.outputs.bump }}"
+          VERSION="${{ steps.sync.outputs.version }}"
 
           if [ -n "$EXISTING_PR" ]; then
             echo "Updating existing PR #$EXISTING_PR"
@@ -144,17 +157,14 @@ jobs:
             PR_NUMBER="$EXISTING_PR"
           else
             gh pr create \
-              --title "feat: sync SDK with API changes" \
-              --body "Automated SDK update from API changes (deterministic sync patcher). Bump: $BUMP." \
+              --title "sync SDK with API changes (v$VERSION)" \
+              --body "Automated SDK update from API changes (deterministic sync patcher). Bump: $BUMP. BlindPaySDK.version -> $VERSION; merging this PR releases v$VERSION." \
               --base main \
               --head api-sync \
               --label api-sync
             PR_NUMBER=$(gh pr list --head api-sync --json number --jq '.[0].number')
           fi
 
-          gh pr edit "$PR_NUMBER" --add-label release
-          if [ "$BUMP" = "minor" ]; then
-            gh pr edit "$PR_NUMBER" --add-label minor
-          fi
+          gh pr edit "$PR_NUMBER" --title "sync SDK with API changes (v$VERSION)"
 
           gh pr merge "$PR_NUMBER" --auto --squash

@@ -24,29 +24,41 @@ public final class PayoutsService: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse` with payouts and pagination metadata
+    /// Without `limit` or a cursor the API returns every payout in one array
+    /// (`pagination` is `nil`); with one it returns a page (default size 10).
+    ///
+    /// - Returns: An `APIResponse` containing a `ListPayoutsResponse`
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayoutsInput(
-    ///     limit: "50",
-    ///     status: .processing,
-    ///     customerId: "re_123"
-    /// )
+    /// let params = ListPayoutsInput(limit: 50, customerId: "cu_123", status: .processing)
     /// let response = try await blindPay.instances.payouts.list(params: params)
     /// if let result = response.data {
     ///     print("Found \(result.data.count) payouts")
-    ///     print("Has more: \(result.pagination.hasMore)")
+    ///     print("Has more: \(result.pagination?.hasMore ?? false)")
     /// }
     /// ```
-    public func list(params: ListPayoutsInput? = nil) async throws -> APIResponse<ListPayoutsResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+    public func list(params: ListPayoutsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayoutsResponse> {
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
+    }
+
+    /// Iterates every payout matching `params`, fetching pages of 100 (or
+    /// `params.limit`) on demand. `endingBefore` is not supported.
+    ///
+    /// ```swift
+    /// for try await payout in blindPay.instances.payouts.listAutoPaging(params: ListPayoutsInput(status: .completed)) {
+    ///     print(payout.id)
+    /// }
+    /// ```
+    public func listAutoPaging(params: ListPayoutsInput = ListPayoutsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payout, Error> {
+        AutoPager.stream(params: params) { [self] page in try await self.list(params: page, options: options) }
     }
     
     /// Retrieves a specific payout by ID
@@ -65,10 +77,11 @@ public final class PayoutsService: Sendable {
     ///     print("Receiver amount: \(payout.receiverAmount)")
     /// }
     /// ```
-    public func get(payoutId: String) async throws -> APIResponse<PayoutResponse> {
+    public func get(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -80,6 +93,9 @@ public final class PayoutsService: Sendable {
     /// - Returns: An `APIResponse` containing the `Payout` object with tracking information
     /// - Throws: `BlindPayError` if the request fails
     ///
+    /// Public tracking endpoint for BlindPay's web and iOS apps; server-side
+    /// calls get 401 in production. Use ``get(payoutId:options:)`` instead.
+    ///
     /// Example:
     /// ```swift
     /// let response = try await blindPay.instances.payouts.getTrack(payoutId: "pa_123")
@@ -88,10 +104,11 @@ public final class PayoutsService: Sendable {
     ///     print("Tracking payment step: \(payout.trackingPayment?.step.rawValue ?? "N/A")")
     /// }
     /// ```
-    public func getTrack(payoutId: String) async throws -> APIResponse<PayoutResponse> {
+    public func getTrack(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/payouts/\(payoutId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -116,11 +133,12 @@ public final class PayoutsService: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createEvm(data: CreatePayoutEvmInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createEvm(data: CreatePayoutEvmInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/evm",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -146,11 +164,12 @@ public final class PayoutsService: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createStellar(data: CreatePayoutStellarInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createStellar(data: CreatePayoutStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -176,11 +195,12 @@ public final class PayoutsService: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createSolana(data: CreatePayoutSolanaInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createSolana(data: CreatePayoutSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -203,12 +223,23 @@ public final class PayoutsService: Sendable {
     ///     print("Transaction hash: \(result.transactionHash)")
     /// }
     /// ```
-    public func authorizeStellar(data: AuthorizeStellarInput) async throws -> APIResponse<AuthorizeStellarResponse> {
+    public func authorizeStellar(data: AuthorizeStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<AuthorizeStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar/authorize",
             method: .post,
-            body: data
+            body: data,
+            options: options
+        )
+    }
+
+    /// Submits supporting documents for a payout that is waiting for them
+    /// (see ``Payout/trackingDocuments``).
+    public func submitDocuments(payoutId: String, data: SubmitPayoutDocumentsInput, options: RequestOptions? = nil) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)/documents",
+            method: .post,
+            body: data,
+            options: options
         )
     }
 }
-

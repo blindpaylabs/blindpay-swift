@@ -206,6 +206,28 @@ public struct BankAccount: Codable, Sendable, Equatable {
     /// Timestamp when the bank account was created
     public let createdAt: String?
     
+    public let fasterPaymentsAccountNumber: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine1: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine2: String?
+
+    public let fasterPaymentsBeneficiaryCity: String?
+
+    public let fasterPaymentsBeneficiaryCountry: Country?
+
+    public let fasterPaymentsBeneficiaryLegalName: String?
+
+    public let fasterPaymentsBeneficiaryPostalCode: String?
+
+    public let fasterPaymentsBeneficiaryStateProvinceRegion: String?
+
+    public let fasterPaymentsSortCode: String?
+
+    public let plaidConnectedAt: String?
+
+    public let swiftIntermediaryBankRoutingNumber: String?
+
     public init(
         id: String,
         name: String,
@@ -271,7 +293,18 @@ public struct BankAccount: Codable, Sendable, Equatable {
         tedCpfCnpj: String? = nil,
         tronWalletHash: String? = nil,
         offrampWallets: [OfframpWallet]? = nil,
-        createdAt: String? = nil
+        createdAt: String? = nil,
+        fasterPaymentsAccountNumber: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine1: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine2: String? = nil,
+        fasterPaymentsBeneficiaryCity: String? = nil,
+        fasterPaymentsBeneficiaryCountry: Country? = nil,
+        fasterPaymentsBeneficiaryLegalName: String? = nil,
+        fasterPaymentsBeneficiaryPostalCode: String? = nil,
+        fasterPaymentsBeneficiaryStateProvinceRegion: String? = nil,
+        fasterPaymentsSortCode: String? = nil,
+        plaidConnectedAt: String? = nil,
+        swiftIntermediaryBankRoutingNumber: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -338,6 +371,17 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.tronWalletHash = tronWalletHash
         self.offrampWallets = offrampWallets
         self.createdAt = createdAt
+        self.fasterPaymentsAccountNumber = fasterPaymentsAccountNumber
+        self.fasterPaymentsBeneficiaryAddressLine1 = fasterPaymentsBeneficiaryAddressLine1
+        self.fasterPaymentsBeneficiaryAddressLine2 = fasterPaymentsBeneficiaryAddressLine2
+        self.fasterPaymentsBeneficiaryCity = fasterPaymentsBeneficiaryCity
+        self.fasterPaymentsBeneficiaryCountry = fasterPaymentsBeneficiaryCountry
+        self.fasterPaymentsBeneficiaryLegalName = fasterPaymentsBeneficiaryLegalName
+        self.fasterPaymentsBeneficiaryPostalCode = fasterPaymentsBeneficiaryPostalCode
+        self.fasterPaymentsBeneficiaryStateProvinceRegion = fasterPaymentsBeneficiaryStateProvinceRegion
+        self.fasterPaymentsSortCode = fasterPaymentsSortCode
+        self.plaidConnectedAt = plaidConnectedAt
+        self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
     }
     
     enum CodingKeys: String, CodingKey {
@@ -406,6 +450,17 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case tronWalletHash = "tron_wallet_hash"
         case offrampWallets = "offramp_wallets"
         case createdAt = "created_at"
+        case fasterPaymentsAccountNumber = "faster_payments_account_number"
+        case fasterPaymentsBeneficiaryAddressLine1 = "faster_payments_beneficiary_address_line_1"
+        case fasterPaymentsBeneficiaryAddressLine2 = "faster_payments_beneficiary_address_line_2"
+        case fasterPaymentsBeneficiaryCity = "faster_payments_beneficiary_city"
+        case fasterPaymentsBeneficiaryCountry = "faster_payments_beneficiary_country"
+        case fasterPaymentsBeneficiaryLegalName = "faster_payments_beneficiary_legal_name"
+        case fasterPaymentsBeneficiaryPostalCode = "faster_payments_beneficiary_postal_code"
+        case fasterPaymentsBeneficiaryStateProvinceRegion = "faster_payments_beneficiary_state_province_region"
+        case fasterPaymentsSortCode = "faster_payments_sort_code"
+        case plaidConnectedAt = "plaid_connected_at"
+        case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
     }
 }
 
@@ -419,6 +474,60 @@ public typealias BankAccountResponse = BankAccount
 
 /// Response type for creating a bank account
 public typealias CreateBankAccountResponse = BankAccount
+
+
+/// Review status of a bank account.
+public struct BankAccountStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let verifying = BankAccountStatus(rawValue: "verifying")
+    public static let approved = BankAccountStatus(rawValue: "approved")
+    public static let rejected = BankAccountStatus(rawValue: "rejected")
+    public static let deprecated = BankAccountStatus(rawValue: "deprecated")
+}
+
+/// Filters for listing a customer's bank accounts. Every value is optional; unset ones are not sent.
+public struct ListBankAccountsInput: Sendable {
+    /// Only this status.
+    public var status: BankAccountStatus?
+
+    /// Only this rail.
+    public var type: Rail?
+
+    /// Name contains this text.
+    public var name: String?
+
+    /// Only this bank account.
+    public var bankAccountId: String?
+
+    /// Only this country.
+    public var country: Country?
+
+    public init(
+        status: BankAccountStatus? = nil,
+        type: Rail? = nil,
+        name: String? = nil,
+        bankAccountId: String? = nil,
+        country: Country? = nil
+    ) {
+        self.status = status
+        self.type = type
+        self.name = name
+        self.bankAccountId = bankAccountId
+        self.country = country
+    }
+
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
+        params["status"] = status?.rawValue
+        params["type"] = type?.rawValue
+        params["name"] = name
+        params["bank_account_id"] = bankAccountId
+        params["country"] = country?.rawValue
+        return params
+    }
+}
 
 // MARK: - Input Types
 
@@ -625,6 +734,26 @@ public struct CreateBankAccountInput: Codable, Sendable {
     /// TED CPF/CNPJ
     public let tedCpfCnpj: String?
 
+    public let fasterPaymentsAccountNumber: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine1: String?
+
+    public let fasterPaymentsBeneficiaryAddressLine2: String?
+
+    public let fasterPaymentsBeneficiaryCity: String?
+
+    public let fasterPaymentsBeneficiaryCountry: Country?
+
+    public let fasterPaymentsBeneficiaryLegalName: String?
+
+    public let fasterPaymentsBeneficiaryPostalCode: String?
+
+    public let fasterPaymentsBeneficiaryStateProvinceRegion: String?
+
+    public let fasterPaymentsSortCode: String?
+
+    public let swiftIntermediaryBankRoutingNumber: String?
+
     public init(
         name: String,
         type: Rail,
@@ -692,7 +821,17 @@ public struct CreateBankAccountInput: Codable, Sendable {
         dateOfBirth: String? = nil,
         tedBankCode: String? = nil,
         tedBranchCode: String? = nil,
-        tedCpfCnpj: String? = nil
+        tedCpfCnpj: String? = nil,
+        fasterPaymentsAccountNumber: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine1: String? = nil,
+        fasterPaymentsBeneficiaryAddressLine2: String? = nil,
+        fasterPaymentsBeneficiaryCity: String? = nil,
+        fasterPaymentsBeneficiaryCountry: Country? = nil,
+        fasterPaymentsBeneficiaryLegalName: String? = nil,
+        fasterPaymentsBeneficiaryPostalCode: String? = nil,
+        fasterPaymentsBeneficiaryStateProvinceRegion: String? = nil,
+        fasterPaymentsSortCode: String? = nil,
+        swiftIntermediaryBankRoutingNumber: String? = nil
     ) {
         self.name = name
         self.type = type
@@ -761,6 +900,16 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.tedBankCode = tedBankCode
         self.tedBranchCode = tedBranchCode
         self.tedCpfCnpj = tedCpfCnpj
+        self.fasterPaymentsAccountNumber = fasterPaymentsAccountNumber
+        self.fasterPaymentsBeneficiaryAddressLine1 = fasterPaymentsBeneficiaryAddressLine1
+        self.fasterPaymentsBeneficiaryAddressLine2 = fasterPaymentsBeneficiaryAddressLine2
+        self.fasterPaymentsBeneficiaryCity = fasterPaymentsBeneficiaryCity
+        self.fasterPaymentsBeneficiaryCountry = fasterPaymentsBeneficiaryCountry
+        self.fasterPaymentsBeneficiaryLegalName = fasterPaymentsBeneficiaryLegalName
+        self.fasterPaymentsBeneficiaryPostalCode = fasterPaymentsBeneficiaryPostalCode
+        self.fasterPaymentsBeneficiaryStateProvinceRegion = fasterPaymentsBeneficiaryStateProvinceRegion
+        self.fasterPaymentsSortCode = fasterPaymentsSortCode
+        self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
     }
 
     enum CodingKeys: String, CodingKey {
@@ -831,206 +980,40 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case tedBankCode = "ted_bank_code"
         case tedBranchCode = "ted_branch_code"
         case tedCpfCnpj = "ted_cpf_cnpj"
+        case fasterPaymentsAccountNumber = "faster_payments_account_number"
+        case fasterPaymentsBeneficiaryAddressLine1 = "faster_payments_beneficiary_address_line_1"
+        case fasterPaymentsBeneficiaryAddressLine2 = "faster_payments_beneficiary_address_line_2"
+        case fasterPaymentsBeneficiaryCity = "faster_payments_beneficiary_city"
+        case fasterPaymentsBeneficiaryCountry = "faster_payments_beneficiary_country"
+        case fasterPaymentsBeneficiaryLegalName = "faster_payments_beneficiary_legal_name"
+        case fasterPaymentsBeneficiaryPostalCode = "faster_payments_beneficiary_postal_code"
+        case fasterPaymentsBeneficiaryStateProvinceRegion = "faster_payments_beneficiary_state_province_region"
+        case fasterPaymentsSortCode = "faster_payments_sort_code"
+        case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
     }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(name, forKey: .name)
-        try container.encode(type, forKey: .type)
-        if let accountClass = accountClass {
-            try container.encode(accountClass, forKey: .accountClass)
-        }
-        if let recipientRelationship = recipientRelationship {
-            try container.encode(recipientRelationship, forKey: .recipientRelationship)
-        }
-        if let accountNumber = accountNumber {
-            try container.encode(accountNumber, forKey: .accountNumber)
-        }
-        if let accountType = accountType {
-            try container.encode(accountType, forKey: .accountType)
-        }
-        if let achCopBankAccount = achCopBankAccount {
-            try container.encode(achCopBankAccount, forKey: .achCopBankAccount)
-        }
-        if let achCopBankCode = achCopBankCode {
-            try container.encode(achCopBankCode, forKey: .achCopBankCode)
-        }
-        if let achCopBeneficiaryFirstName = achCopBeneficiaryFirstName {
-            try container.encode(achCopBeneficiaryFirstName, forKey: .achCopBeneficiaryFirstName)
-        }
-        if let achCopBeneficiaryLastName = achCopBeneficiaryLastName {
-            try container.encode(achCopBeneficiaryLastName, forKey: .achCopBeneficiaryLastName)
-        }
-        if let achCopDocumentId = achCopDocumentId {
-            try container.encode(achCopDocumentId, forKey: .achCopDocumentId)
-        }
-        if let achCopDocumentType = achCopDocumentType {
-            try container.encode(achCopDocumentType, forKey: .achCopDocumentType)
-        }
-        if let achCopEmail = achCopEmail {
-            try container.encode(achCopEmail, forKey: .achCopEmail)
-        }
-        if let addressLine1 = addressLine1 {
-            try container.encode(addressLine1, forKey: .addressLine1)
-        }
-        if let addressLine2 = addressLine2 {
-            try container.encode(addressLine2, forKey: .addressLine2)
-        }
-        if let beneficiaryName = beneficiaryName {
-            try container.encode(beneficiaryName, forKey: .beneficiaryName)
-        }
-        if let city = city {
-            try container.encode(city, forKey: .city)
-        }
-        if let country = country {
-            try container.encode(country, forKey: .country)
-        }
-        if let postalCode = postalCode {
-            try container.encode(postalCode, forKey: .postalCode)
-        }
-        if let pixKey = pixKey {
-            try container.encode(pixKey, forKey: .pixKey)
-        }
-        if let pixSafeBankCode = pixSafeBankCode {
-            try container.encode(pixSafeBankCode, forKey: .pixSafeBankCode)
-        }
-        if let pixSafeBranchCode = pixSafeBranchCode {
-            try container.encode(pixSafeBranchCode, forKey: .pixSafeBranchCode)
-        }
-        if let pixSafeCpfCnpj = pixSafeCpfCnpj {
-            try container.encode(pixSafeCpfCnpj, forKey: .pixSafeCpfCnpj)
-        }
-        if let routingNumber = routingNumber {
-            try container.encode(routingNumber, forKey: .routingNumber)
-        }
-        if let speiClabe = speiClabe {
-            try container.encode(speiClabe, forKey: .speiClabe)
-        }
-        if let speiInstitutionCode = speiInstitutionCode {
-            try container.encode(speiInstitutionCode, forKey: .speiInstitutionCode)
-        }
-        if let speiProtocol = speiProtocol {
-            try container.encode(speiProtocol, forKey: .speiProtocol)
-        }
-        if let stateProvinceRegion = stateProvinceRegion {
-            try container.encode(stateProvinceRegion, forKey: .stateProvinceRegion)
-        }
-        if let swiftAccountHolderName = swiftAccountHolderName {
-            try container.encode(swiftAccountHolderName, forKey: .swiftAccountHolderName)
-        }
-        if let swiftAccountNumberIban = swiftAccountNumberIban {
-            try container.encode(swiftAccountNumberIban, forKey: .swiftAccountNumberIban)
-        }
-        if let swiftBankAddressLine1 = swiftBankAddressLine1 {
-            try container.encode(swiftBankAddressLine1, forKey: .swiftBankAddressLine1)
-        }
-        if let swiftBankAddressLine2 = swiftBankAddressLine2 {
-            try container.encode(swiftBankAddressLine2, forKey: .swiftBankAddressLine2)
-        }
-        if let swiftBankCity = swiftBankCity {
-            try container.encode(swiftBankCity, forKey: .swiftBankCity)
-        }
-        if let swiftBankCountry = swiftBankCountry {
-            try container.encode(swiftBankCountry, forKey: .swiftBankCountry)
-        }
-        if let swiftBankName = swiftBankName {
-            try container.encode(swiftBankName, forKey: .swiftBankName)
-        }
-        if let swiftBankPostalCode = swiftBankPostalCode {
-            try container.encode(swiftBankPostalCode, forKey: .swiftBankPostalCode)
-        }
-        if let swiftBankStateProvinceRegion = swiftBankStateProvinceRegion {
-            try container.encode(swiftBankStateProvinceRegion, forKey: .swiftBankStateProvinceRegion)
-        }
-        if let swiftBeneficiaryAddressLine1 = swiftBeneficiaryAddressLine1 {
-            try container.encode(swiftBeneficiaryAddressLine1, forKey: .swiftBeneficiaryAddressLine1)
-        }
-        if let swiftBeneficiaryAddressLine2 = swiftBeneficiaryAddressLine2 {
-            try container.encode(swiftBeneficiaryAddressLine2, forKey: .swiftBeneficiaryAddressLine2)
-        }
-        if let swiftBeneficiaryCity = swiftBeneficiaryCity {
-            try container.encode(swiftBeneficiaryCity, forKey: .swiftBeneficiaryCity)
-        }
-        if let swiftBeneficiaryCountry = swiftBeneficiaryCountry {
-            try container.encode(swiftBeneficiaryCountry, forKey: .swiftBeneficiaryCountry)
-        }
-        if let swiftBeneficiaryPostalCode = swiftBeneficiaryPostalCode {
-            try container.encode(swiftBeneficiaryPostalCode, forKey: .swiftBeneficiaryPostalCode)
-        }
-        if let swiftBeneficiaryStateProvinceRegion = swiftBeneficiaryStateProvinceRegion {
-            try container.encode(swiftBeneficiaryStateProvinceRegion, forKey: .swiftBeneficiaryStateProvinceRegion)
-        }
-        if let swiftCodeBic = swiftCodeBic {
-            try container.encode(swiftCodeBic, forKey: .swiftCodeBic)
-        }
-        if let sepaBeneficiaryBic = sepaBeneficiaryBic {
-            try container.encode(sepaBeneficiaryBic, forKey: .sepaBeneficiaryBic)
-        }
-        if let sepaIban = sepaIban {
-            try container.encode(sepaIban, forKey: .sepaIban)
-        }
-        if let sepaBeneficiaryLegalName = sepaBeneficiaryLegalName {
-            try container.encode(sepaBeneficiaryLegalName, forKey: .sepaBeneficiaryLegalName)
-        }
-        if let sepaBeneficiaryAddressLine1 = sepaBeneficiaryAddressLine1 {
-            try container.encode(sepaBeneficiaryAddressLine1, forKey: .sepaBeneficiaryAddressLine1)
-        }
-        if let sepaBeneficiaryAddressLine2 = sepaBeneficiaryAddressLine2 {
-            try container.encode(sepaBeneficiaryAddressLine2, forKey: .sepaBeneficiaryAddressLine2)
-        }
-        if let sepaBeneficiaryCity = sepaBeneficiaryCity {
-            try container.encode(sepaBeneficiaryCity, forKey: .sepaBeneficiaryCity)
-        }
-        if let sepaBeneficiaryStateProvinceRegion = sepaBeneficiaryStateProvinceRegion {
-            try container.encode(sepaBeneficiaryStateProvinceRegion, forKey: .sepaBeneficiaryStateProvinceRegion)
-        }
-        if let sepaBeneficiaryPostalCode = sepaBeneficiaryPostalCode {
-            try container.encode(sepaBeneficiaryPostalCode, forKey: .sepaBeneficiaryPostalCode)
-        }
-        if let sepaBeneficiaryCountry = sepaBeneficiaryCountry {
-            try container.encode(sepaBeneficiaryCountry, forKey: .sepaBeneficiaryCountry)
-        }
-        if let swiftIntermediaryBankAccountNumberIban = swiftIntermediaryBankAccountNumberIban {
-            try container.encode(swiftIntermediaryBankAccountNumberIban, forKey: .swiftIntermediaryBankAccountNumberIban)
-        }
-        if let swiftIntermediaryBankCountry = swiftIntermediaryBankCountry {
-            try container.encode(swiftIntermediaryBankCountry, forKey: .swiftIntermediaryBankCountry)
-        }
-        if let swiftIntermediaryBankName = swiftIntermediaryBankName {
-            try container.encode(swiftIntermediaryBankName, forKey: .swiftIntermediaryBankName)
-        }
-        if let swiftPaymentCode = swiftPaymentCode {
-            try container.encode(swiftPaymentCode, forKey: .swiftPaymentCode)
-        }
-        if let swiftIntermediaryBankSwiftCodeBic = swiftIntermediaryBankSwiftCodeBic {
-            try container.encode(swiftIntermediaryBankSwiftCodeBic, forKey: .swiftIntermediaryBankSwiftCodeBic)
-        }
-        if let transfersAccount = transfersAccount {
-            try container.encode(transfersAccount, forKey: .transfersAccount)
-        }
-        if let transfersType = transfersType {
-            try container.encode(transfersType, forKey: .transfersType)
-        }
-        if let businessIndustry = businessIndustry {
-            try container.encode(businessIndustry, forKey: .businessIndustry)
-        }
-        if let phoneNumber = phoneNumber {
-            try container.encode(phoneNumber, forKey: .phoneNumber)
-        }
-        if let taxId = taxId {
-            try container.encode(taxId, forKey: .taxId)
-        }
-        if let dateOfBirth = dateOfBirth {
-            try container.encode(dateOfBirth, forKey: .dateOfBirth)
-        }
-        if let tedBankCode = tedBankCode {
-            try container.encode(tedBankCode, forKey: .tedBankCode)
-        }
-        if let tedBranchCode = tedBranchCode {
-            try container.encode(tedBranchCode, forKey: .tedBranchCode)
-        }
-        if let tedCpfCnpj = tedCpfCnpj {
-            try container.encode(tedCpfCnpj, forKey: .tedCpfCnpj)
-        }
+}
+
+// MARK: - Plaid
+
+/// Input for creating a Plaid Link session for a customer's bank account.
+public struct CreatePlaidLinkInput: Codable, Sendable {
+    /// Where Plaid sends the customer when they finish.
+    public let redirectUrl: String?
+
+    public init(redirectUrl: String? = nil) {
+        self.redirectUrl = redirectUrl
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case redirectUrl = "redirect_url"
+    }
+}
+
+/// A Plaid Link session: send the customer to `url`.
+public struct PlaidLinkResponse: Codable, Sendable, Equatable {
+    public let url: String
+
+    public init(url: String) {
+        self.url = url
     }
 }

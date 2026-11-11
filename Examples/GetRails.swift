@@ -21,7 +21,7 @@ struct GetRails {
             print("\n   Example:")
             print("   export BLINDPAY_API_KEY='your-api-key'")
             print("   export BLINDPAY_INSTANCE_ID='your-instance-id'")
-            print("   swift run TestGetRails")
+            print("   swift run GetRails")
             exit(1)
         }
         

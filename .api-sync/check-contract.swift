@@ -6,7 +6,7 @@
 //
 // Verifies that every wire key this SDK declares (CodingKeys string values and
 // query-parameter dictionary literals) actually exists somewhere in the committed
-// API spec snapshot, and that mapped SDK enums (WebhookEvent, CurrencyType) cover
+// API spec snapshot, and that mapped SDK enums (WebhookEventType, CurrencyType) cover
 // every enum member the spec declares for them.
 //
 // Usage:
@@ -238,13 +238,14 @@ struct MappedEnum {
 }
 
 let mappedEnums: [MappedEnum] = [
-    MappedEnum(sdkEnumName: "WebhookEvent", specKey: "events"),
+    MappedEnum(sdkEnumName: "WebhookEventType", specKey: "events"),
     MappedEnum(sdkEnumName: "CurrencyType", specKey: "currency_type"),
 ]
 
 func sdkEnumRawValues(named enumName: String, under path: String) -> Set<String>? {
-    let declRegex = try! NSRegularExpression(pattern: #"^\s*(?:public\s+)?enum\s+\#(enumName)\b"#)
-    let caseRegex = try! NSRegularExpression(pattern: #"^\s*case\s+\w+\s*=\s*"([^"]+)""#)
+    // Closed `enum X: String` or open `struct X: OpenEnum`.
+    let declRegex = try! NSRegularExpression(pattern: #"^\s*(?:public\s+)?(?:enum\s+\#(enumName)\b|struct\s+\#(enumName)\s*:[^{]*\bOpenEnum\b)"#)
+    let caseRegex = try! NSRegularExpression(pattern: #"^\s*(?:case\s+`?\w+`?\s*=\s*|public\s+static\s+let\s+`?\w+`?\s*=\s*\w+\(rawValue:\s*)"([^"]+)""#)
 
     for file in swiftFiles(under: path) {
         guard let content = try? String(contentsOfFile: file, encoding: .utf8) else { continue }

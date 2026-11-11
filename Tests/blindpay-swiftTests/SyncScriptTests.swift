@@ -304,7 +304,7 @@ private func baseSpec(extraSchemas: [String: Any] = [:], extraPaths: [String: An
     return spec
 }
 
-private let baseSpecMap: [String: Any] = [
+nonisolated(unsafe) private let baseSpecMap: [String: Any] = [
     "enums": [
         ["spec": ["schema": "ThingOut", "property": "status"], "sdk": ["file": "Models/Thing.swift", "symbol": "FixtureStatus"]],
     ],
@@ -410,6 +410,140 @@ private func commonArgs(_ dir: String) -> [String] {
     let apply2 = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
     #expect(apply2.exitCode == 0)
     #expect(apply2.stdout.contains("no changes"))
+}
+
+/// The SDK's enums are open (`struct X: OpenEnum`). A new spec
+/// value becomes a new `public static let`, and --check reads those values.
+@Test func openEnumValueIsInsertedAndCheckGoesGreen() throws {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var schemas = spec["components"] as! [String: Any]
+    var thingOut = (schemas["schemas"] as! [String: Any])["ThingOut"] as! [String: Any]
+    var props = thingOut["properties"] as! [String: Any]
+    props["status"] = ["type": "string", "enum": ["active", "inactive", "pending_review"]]
+    thingOut["properties"] = props
+    var innerSchemas = schemas["schemas"] as! [String: Any]
+    innerSchemas["ThingOut"] = thingOut
+    schemas["schemas"] = innerSchemas
+    spec["components"] = schemas
+
+    setupBaseline(dir, spec: baseSpec())
+    let openSource = readSource(dir, "Models/Thing.swift").replacingOccurrences(of: """
+    public enum FixtureStatus: String, Codable, Sendable {
+        case active = "active"
+        case inactive = "inactive"
+    }
+    """, with: """
+    public struct FixtureStatus: OpenEnum {
+        public let rawValue: String
+        public init(rawValue: String) { self.rawValue = rawValue }
+
+        public static let active = FixtureStatus(rawValue: "active")
+        public static let inactive = FixtureStatus(rawValue: "inactive")
+    }
+    """)
+    #expect(openSource.contains("OpenEnum"))
+    try openSource.write(toFile: dir + "/Models/Thing.swift", atomically: true, encoding: .utf8)
+    writeJSON(dir + "/spec-current.json", spec)
+
+    #expect(runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir)).exitCode == 0)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(apply.stdout.contains("applied 1"))
+    let source = readSource(dir, "Models/Thing.swift")
+    #expect(source.contains("    public static let pendingReview = FixtureStatus(rawValue: \"pending_review\")\n}"))
+    #expect(!source.contains("case pendingReview"))
+
+    #expect(runSync(in: dir, ["--check", "--snapshot", "spec-snapshot.json"] + commonArgs(dir)).exitCode == 0)
+    let again = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(again.stdout.contains("no changes"))
+}
+
+/// --apply bumps BlindPaySDK.version by the computed bump and reports the new
+/// version, which the api-sync workflow puts in the PR; release.yml tags it.
+@Test func applyBumpsTheSDKVersionConstant() throws {
+    let dir = makeFixtureDir()
+    var spec = baseSpec()
+    var schemas = spec["components"] as! [String: Any]
+    var thingOut = (schemas["schemas"] as! [String: Any])["ThingOut"] as! [String: Any]
+    var props = thingOut["properties"] as! [String: Any]
+    props["status"] = ["type": "string", "enum": ["active", "inactive", "pending"]]
+    thingOut["properties"] = props
+    var innerSchemas = schemas["schemas"] as! [String: Any]
+    innerSchemas["ThingOut"] = thingOut
+    schemas["schemas"] = innerSchemas
+    spec["components"] = schemas
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+    try "public enum BlindPaySDK {\n    public static let version = \"5.0.9\"\n}\n".write(toFile: dir + "/Version.swift", atomically: true, encoding: .utf8)
+
+    let args = ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json", "--version-file", "Version.swift"] + commonArgs(dir)
+    let apply = runSync(in: dir, args)
+    #expect(apply.exitCode == 0)
+    let bump = try #require(readReportBump(dir))
+    let expected = bump == "minor" ? "5.1.0" : "5.0.10"
+    let report = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: dir + "/report.json"))) as? [String: Any]
+    #expect(report?["version"] as? String == expected)
+    #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains("public static let version = \"\(expected)\""))
+
+    // Nothing left to apply: no further bump.
+    let again = runSync(in: dir, args)
+    #expect(again.stdout.contains("no changes"))
+    #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains(expected))
+}
+
+/// A struct mapped at two locators gets a new field once, not twice.
+@Test func aStructMappedTwiceGetsANewFieldOnce() {
+    let dir = makeFixtureDir()
+    let fields: [String: Any] = ["id": ["type": "string"], "name": ["type": "string"],
+                                 "status": ["type": "string", "enum": ["active", "inactive"]], "note_text": ["type": "string"]]
+    let spec = baseSpec(extraSchemas: ["ThingOut": schema(fields), "ThingWebhookOut": schema(fields)])
+    var map = baseSpecMap
+    var types = map["types"] as! [[String: Any]]
+    types.append(["spec": "ThingWebhookOut", "sdk": [["file": "Models/Thing.swift", "symbol": "FixtureThing"]]])
+    map["types"] = types
+    setupBaseline(dir, spec: spec, specMap: map)
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    let source = readSource(dir, "Models/Thing.swift")
+    #expect(source.components(separatedBy: "public let noteText").count == 2)
+    #expect(source.components(separatedBy: "case noteText = \"note_text\"").count == 2)
+}
+
+/// Without CodingKeys a snake_case key can't be added (the property name
+/// would be the wire key), so it is handed to a human.
+@Test func aSnakeCaseFieldOnAStructWithoutCodingKeysIsNeedsHuman() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraSchemas: ["BareThingOut": schema(["status": ["type": "string"], "error_message": ["type": "string"]])])
+    setupBaseline(dir, spec: spec)
+    writeJSON(dir + "/spec-current.json", spec)
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("no CodingKeys"))
+    #expect(!readSource(dir, "Models/Bare.swift").contains("errorMessage"))
+}
+
+/// A new `$ref` field reuses the mapped SDK type; arrays keep their element
+/// type; a `$ref` to a named string enum is that enum, not an object.
+@Test func newFieldTypesFollowRefsAndArrayItems() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraSchemas: [
+        "StatusEnum": ["type": "string", "enum": ["active", "inactive"]],
+        "NumericOut": schema(["count": ["type": "number"], "thing": ["$ref": "#/components/schemas/ThingOut"],
+                              "counts": ["type": "array", "items": ["type": "integer"]]]),
+        "ThingOut": schema(["id": ["type": "string"], "name": ["type": "string"], "status": ["$ref": "#/components/schemas/StatusEnum"]]),
+    ])
+    setupBaseline(dir, spec: spec)
+    writeJSON(dir + "/spec-current.json", spec)
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0, "\(apply.stdout)")
+    let source = readSource(dir, "Models/Numeric.swift")
+    #expect(source.contains("public let thing: FixtureThing?"))
+    #expect(source.contains("public let counts: [Int]?"))
+    #expect(!apply.stdout.contains("no longer enum-valued"))
 }
 
 // MARK: - Applicable: field insertion, with and without CodingKeys
@@ -785,6 +919,52 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(apply.stdout.contains("new operation \"POST /new-thing\""))
 }
 
+/// Operations marked `x-sdk: false` are not part of the SDK surface (plan
+/// D11): neither they nor schemas only they reference need SDK work.
+@Test func xSdkFalseOperationsAndTheirSchemasAreIgnored() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(
+        extraSchemas: ["YieldOnlyOut": schema(["apy": ["type": "number"]])],
+        extraPaths: ["/excluded": ["get": ["x-sdk": false, "responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/YieldOnlyOut"]]]]]]]])
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", spec)
+
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(!apply.stdout.contains("/excluded"))
+    #expect(!apply.stdout.contains("YieldOnlyOut"))
+
+    // The same operation without the flag is new SDK surface.
+    let included = baseSpec(
+        extraSchemas: ["YieldOnlyOut": schema(["apy": ["type": "number"]])],
+        extraPaths: ["/excluded": ["get": ["x-sdk": true, "responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/YieldOnlyOut"]]]]]]]])
+    let dir2 = makeFixtureDir()
+    setupBaseline(dir2, spec: baseSpec())
+    writeJSON(dir2 + "/spec-current.json", included)
+    let apply2 = runSync(in: dir2, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir2))
+    #expect(apply2.stdout.contains("GET /excluded"))
+}
+
+/// OpenAPI 3.1 nullable types (`"type": ["string", "null"]`) are a nullable
+/// scalar, not an unrecognized shape.
+@Test func nullableTypeListIsAScalarForTheGenerator() {
+    let dir = makeFixtureDir()
+    let spec = baseSpec(extraPaths: ["/instances/{id}/things/{thing_id}": ["get": [
+        "parameters": [["name": "id", "in": "path", "required": true, "schema": ["type": "string"]],
+                       ["name": "thing_id", "in": "path", "required": true, "schema": ["type": "string"]]],
+        "responses": ["200": ["content": ["application/json": ["schema": ["$ref": "#/components/schemas/NullableThingOut"]]]]]]]])
+    var comps = spec["components"] as! [String: Any]
+    var schemas = comps["schemas"] as! [String: Any]
+    schemas["NullableThingOut"] = schema(["note": ["type": ["string", "null"]]])
+    comps["schemas"] = schemas
+    var full = spec
+    full["components"] = comps
+    setupBaseline(dir, spec: baseSpec())
+    writeJSON(dir + "/spec-current.json", full)
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json"] + commonArgs(dir))
+    #expect(!apply.stdout.contains("unrecognized schema shape"))
+}
+
 @Test func requiredNessChangeIsNeedsHuman() {
     let dir = makeFixtureDir()
     var spec = baseSpec()
@@ -1144,7 +1324,8 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(readReportBump(dir) == "minor")
 
     let service = readSource(dir, "Services/ThingsService.swift")
-    #expect(service.contains("public func get(id: String) async throws -> APIResponse<FixtureThing>"))
+    #expect(service.contains("public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<FixtureThing>"))
+    #expect(service.contains("options: options"))
     #expect(service.contains("endpoint: \"/things/\\(id)\""))
     #expect(service.contains("method: .get"))
     // No new model needed: the response reuses the already-mapped FixtureThing.
@@ -1181,7 +1362,7 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(readReportBump(dir) == "minor")
 
     let service = readSource(dir, "Services/ThingsService.swift")
-    #expect(service.contains("public func createBulk(data: NewThingInput) async throws -> APIResponse<FixtureThing>"))
+    #expect(service.contains("public func createBulk(data: NewThingInput, options: RequestOptions? = nil) async throws -> APIResponse<FixtureThing>"))
     #expect(service.contains("endpoint: \"/things/bulk\""))
     #expect(service.contains("method: .post,"))
     #expect(service.contains("body: data"))

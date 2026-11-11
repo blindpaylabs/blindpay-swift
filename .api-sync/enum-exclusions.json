@@ -3,108 +3,210 @@
     "schema": "CreateBankAccountIn",
     "field": "business_industry",
     "reason": "NAICS-code enum (hundreds of members, same set as CustomerOut.business_industry's BusinessIndustry). Modeled as a bare optional String on the create-input struct rather than duplicating/reusing the enum type; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreateBankAccountIn",
     "field": "swift_payment_code",
     "reason": "Large country-specific SWIFT payment-code enum. Modeled as a bare optional String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreateVirtualAccountIn",
     "field": "sole_proprietor_doc_type",
     "reason": "Modeled as a bare optional String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinOut",
     "field": "pse_document_type",
     "reason": "Modeled as a bare optional String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinOut.tracking_payment",
     "field": "step",
     "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinOut.tracking_transaction",
     "field": "status",
     "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinOut.tracking_transaction",
     "field": "step",
     "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayinOut.tracking_complete",
     "field": "step",
     "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayoutOut.tracking_payment",
     "field": "provider_name",
     "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PayoutOnEvmOut.tracking_payment",
     "field": "provider_name",
     "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreateTransferQuoteIn",
     "field": "amount_reference",
     "reason": "Two-value (sender/receiver) enum modeled as a bare String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "TransferOut",
     "field": "customer_network",
     "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String (see also known-divergences.json's Transfer.* nullability entries); pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "TransferOut",
     "field": "customer_token",
     "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "TransferOut",
     "field": "network",
     "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "TransferOut",
     "field": "sender_token",
     "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "AvailableRails",
     "field": "country",
     "reason": "Country-code enum (same value set as the existing Country enum used elsewhere), but RailResponse.country is modeled as a bare String; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "AvailableRails",
     "field": "value",
     "reason": "Payment-rail enum modeled as a bare String on RailResponse.value; pre-existing, not part of this coverage-check PR's scope.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayinQuoteIn.payer_rules",
     "field": "pse_document_type",
     "reason": "Two-value request enum (CC, NIT, or null). Modeled as an optional String so a new document type never needs an SDK release; documented on the property.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateCustomerIn",
+    "field": "business_industry",
+    "reason": "NAICS code (hundreds of values; plan C7 types it as String). CustomerOut.business_industry is a plain string in the spec.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "UpdateCustomerIn",
+    "field": "business_industry",
+    "reason": "NAICS code (hundreds of values; plan C7 types it as String). CustomerOut.business_industry is a plain string in the spec.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TosAcceptWebhookOut",
+    "field": "version",
+    "reason": "Terms of service version label (e.g. 1.0.0); a version string, not a closed set.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateVirtualAccountIn.bre_b",
+    "field": "gender",
+    "reason": "Two-value input field (male/female) modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_payment",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "field": "status",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_complete",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateTransferOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountOut",
+    "field": "swift_intermediary_bank_routing_number",
+    "reason": "Routing number value (the spec enum lists sample codes); modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CreateBankAccountIn",
+    "field": "swift_intermediary_bank_routing_number",
+    "reason": "Routing number value (the spec enum lists sample codes); modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutOnEvmOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutNewWebhookOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "UpdateInstanceIn",
+    "field": "partner_tos_terms_accepted",
+    "reason": "Boolean that must be true (enum [true]); modeled as Bool.",
     "owner": "sdk-maintainers"
   }
 ]

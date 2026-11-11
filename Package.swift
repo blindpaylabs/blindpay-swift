@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -16,16 +16,22 @@ let package = Package(
             name: "BlindPay",
             targets: ["BlindPay"]
         ),
-        .executable(
-            name: "GetRails",
-            targets: ["GetRails"]
-        ),
+    ],
+    dependencies: [
+        // HMAC-SHA256 for webhook verification on Linux, where CryptoKit
+        // doesn't exist. Apple platforms use CryptoKit and never link it.
+        .package(url: "https://github.com/apple/swift-crypto.git", "3.0.0"..<"5.0.0"),
     ],
     targets: [
         .target(
             name: "BlindPay",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+            ],
             path: "Sources/BlindPay"
         ),
+        // Example only: buildable with `swift run GetRails`, but not a
+        // product, so packages that depend on BlindPay don't ship it.
         .executableTarget(
             name: "GetRails",
             dependencies: ["BlindPay"],
@@ -39,7 +45,9 @@ let package = Package(
                 // Shared spec-shaped fixtures from the SDK parity effort
                 // (reference/fixtures). Keep the layout so a regeneration is a
                 // plain copy.
-                .copy("Fixtures")
+                .copy("Fixtures"),
+                // Shared Svix webhook vectors (reference/webhook-vectors.json).
+                .copy("Vectors"),
             ]
         ),
     ]

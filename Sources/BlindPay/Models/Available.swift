@@ -10,44 +10,57 @@ import Foundation
 // MARK: - Enums
 
 /// Payment rail type
-public enum Rail: String, Codable, Sendable {
-    case wire = "wire"
-    case ach = "ach"
-    case pix = "pix"
-    case pixSafe = "pix_safe"
-    case speiBitso = "spei_bitso"
-    case transfersBitso = "transfers_bitso"
-    case achCopBitso = "ach_cop_bitso"
-    case internationalSwift = "international_swift"
-    case rtp = "rtp"
-    case ted = "ted"
-    case sepa = "sepa"
+public struct Rail: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let wire = Rail(rawValue: "wire")
+    public static let ach = Rail(rawValue: "ach")
+    public static let pix = Rail(rawValue: "pix")
+    public static let pixSafe = Rail(rawValue: "pix_safe")
+    public static let speiBitso = Rail(rawValue: "spei_bitso")
+    public static let transfersBitso = Rail(rawValue: "transfers_bitso")
+    public static let achCopBitso = Rail(rawValue: "ach_cop_bitso")
+    public static let internationalSwift = Rail(rawValue: "international_swift")
+    public static let rtp = Rail(rawValue: "rtp")
+    public static let ted = Rail(rawValue: "ted")
+    public static let sepa = Rail(rawValue: "sepa")
+    public static let fasterPayments = Rail(rawValue: "faster_payments")
 }
 
 /// Bank account type
-public enum BankAccountType: String, Codable, Sendable {
-    case checking = "checking"
-    case savings = "saving"
+public struct BankAccountType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let checking = BankAccountType(rawValue: "checking")
+    public static let savings = BankAccountType(rawValue: "saving")
 }
 
 /// Account class type
-public enum AccountClass: String, Codable, Sendable {
-    case individual = "individual"
-    case business = "business"
+public struct AccountClass: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let individual = AccountClass(rawValue: "individual")
+    public static let business = AccountClass(rawValue: "business")
 }
 
 /// Recipient relationship type
-public enum RecipientRelationship: String, Codable, Sendable {
-    case firstParty = "first_party"
-    case employee = "employee"
-    case independentContractor = "independent_contractor"
-    case vendorOrSupplier = "vendor_or_supplier"
-    case subsidiaryOrAffiliate = "subsidiary_or_affiliate"
-    case merchantOrPartner = "merchant_or_partner"
-    case customer = "customer"
-    case landlord = "landlord"
-    case family = "family"
-    case other = "other"
+public struct RecipientRelationship: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let firstParty = RecipientRelationship(rawValue: "first_party")
+    public static let employee = RecipientRelationship(rawValue: "employee")
+    public static let independentContractor = RecipientRelationship(rawValue: "independent_contractor")
+    public static let vendorOrSupplier = RecipientRelationship(rawValue: "vendor_or_supplier")
+    public static let subsidiaryOrAffiliate = RecipientRelationship(rawValue: "subsidiary_or_affiliate")
+    public static let merchantOrPartner = RecipientRelationship(rawValue: "merchant_or_partner")
+    public static let customer = RecipientRelationship(rawValue: "customer")
+    public static let landlord = RecipientRelationship(rawValue: "landlord")
+    public static let family = RecipientRelationship(rawValue: "family")
+    public static let other = RecipientRelationship(rawValue: "other")
 }
 
 /// Represents a NAICS business industry code (an `AvailableNaicsList` item)
@@ -85,58 +98,58 @@ public struct RailResponse: Codable, Sendable, Equatable {
 }
 
 /// Represents a bank detail key field identifier
-public enum BankDetailKey: String, Codable, Sendable {
-    case type = "type"
-    case name = "name"
-    case pixKey = "pix_key"
-    case beneficiaryName = "beneficiary_name"
-    case routingNumber = "routing_number"
-    case accountNumber = "account_number"
-    case accountType = "account_type"
-    case accountClass = "account_class"
-    case addressLine1 = "address_line_1"
-    case addressLine2 = "address_line_2"
-    case city = "city"
-    case stateProvinceRegion = "state_province_region"
-    case country = "country"
-    case postalCode = "postal_code"
-    case checkbookAccountId = "checkbook_account_id"
-    case checkbookUserKey = "checkbook_user_key"
-    case speiProtocol = "spei_protocol"
-    case speiInstitutionCode = "spei_institution_code"
-    case speiClabe = "spei_clabe"
-    case transfersType = "transfers_type"
-    case transfersAccount = "transfers_account"
-    case achCopBeneficiaryFirstName = "ach_cop_beneficiary_first_name"
-    case achCopBeneficiaryLastName = "ach_cop_beneficiary_last_name"
-    case achCopDocumentId = "ach_cop_document_id"
-    case achCopDocumentType = "ach_cop_document_type"
-    case achCopEmail = "ach_cop_email"
-    case achCopBankCode = "ach_cop_bank_code"
-    case achCopBankAccount = "ach_cop_bank_account"
-    case swiftCodeBic = "swift_code_bic"
-    case swiftAccountHolderName = "swift_account_holder_name"
-    case swiftAccountNumberIban = "swift_account_number_iban"
-    case swiftBeneficiaryAddressLine1 = "swift_beneficiary_address_line_1"
-    case swiftBeneficiaryAddressLine2 = "swift_beneficiary_address_line_2"
-    case swiftBeneficiaryCountry = "swift_beneficiary_country"
-    case swiftBeneficiaryCity = "swift_beneficiary_city"
-    case swiftBeneficiaryStateProvinceRegion =
-        "swift_beneficiary_state_province_region"
-    case swiftBeneficiaryPostalCode = "swift_beneficiary_postal_code"
-    case swiftBankName = "swift_bank_name"
-    case swiftBankAddressLine1 = "swift_bank_address_line_1"
-    case swiftBankAddressLine2 = "swift_bank_address_line_2"
-    case swiftBankCountry = "swift_bank_country"
-    case swiftBankCity = "swift_bank_city"
-    case swiftBankStateProvinceRegion = "swift_bank_state_province_region"
-    case swiftBankPostalCode = "swift_bank_postal_code"
-    case swiftIntermediaryBankSwiftCodeBic =
-        "swift_intermediary_bank_swift_code_bic"
-    case swiftIntermediaryBankAccountNumberIban =
-        "swift_intermediary_bank_account_number_iban"
-    case swiftIntermediaryBankName = "swift_intermediary_bank_name"
-    case swiftIntermediaryBankCountry = "swift_intermediary_bank_country"
+public struct BankDetailKey: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let type = BankDetailKey(rawValue: "type")
+    public static let name = BankDetailKey(rawValue: "name")
+    public static let pixKey = BankDetailKey(rawValue: "pix_key")
+    public static let beneficiaryName = BankDetailKey(rawValue: "beneficiary_name")
+    public static let routingNumber = BankDetailKey(rawValue: "routing_number")
+    public static let accountNumber = BankDetailKey(rawValue: "account_number")
+    public static let accountType = BankDetailKey(rawValue: "account_type")
+    public static let accountClass = BankDetailKey(rawValue: "account_class")
+    public static let addressLine1 = BankDetailKey(rawValue: "address_line_1")
+    public static let addressLine2 = BankDetailKey(rawValue: "address_line_2")
+    public static let city = BankDetailKey(rawValue: "city")
+    public static let stateProvinceRegion = BankDetailKey(rawValue: "state_province_region")
+    public static let country = BankDetailKey(rawValue: "country")
+    public static let postalCode = BankDetailKey(rawValue: "postal_code")
+    public static let checkbookAccountId = BankDetailKey(rawValue: "checkbook_account_id")
+    public static let checkbookUserKey = BankDetailKey(rawValue: "checkbook_user_key")
+    public static let speiProtocol = BankDetailKey(rawValue: "spei_protocol")
+    public static let speiInstitutionCode = BankDetailKey(rawValue: "spei_institution_code")
+    public static let speiClabe = BankDetailKey(rawValue: "spei_clabe")
+    public static let transfersType = BankDetailKey(rawValue: "transfers_type")
+    public static let transfersAccount = BankDetailKey(rawValue: "transfers_account")
+    public static let achCopBeneficiaryFirstName = BankDetailKey(rawValue: "ach_cop_beneficiary_first_name")
+    public static let achCopBeneficiaryLastName = BankDetailKey(rawValue: "ach_cop_beneficiary_last_name")
+    public static let achCopDocumentId = BankDetailKey(rawValue: "ach_cop_document_id")
+    public static let achCopDocumentType = BankDetailKey(rawValue: "ach_cop_document_type")
+    public static let achCopEmail = BankDetailKey(rawValue: "ach_cop_email")
+    public static let achCopBankCode = BankDetailKey(rawValue: "ach_cop_bank_code")
+    public static let achCopBankAccount = BankDetailKey(rawValue: "ach_cop_bank_account")
+    public static let swiftCodeBic = BankDetailKey(rawValue: "swift_code_bic")
+    public static let swiftAccountHolderName = BankDetailKey(rawValue: "swift_account_holder_name")
+    public static let swiftAccountNumberIban = BankDetailKey(rawValue: "swift_account_number_iban")
+    public static let swiftBeneficiaryAddressLine1 = BankDetailKey(rawValue: "swift_beneficiary_address_line_1")
+    public static let swiftBeneficiaryAddressLine2 = BankDetailKey(rawValue: "swift_beneficiary_address_line_2")
+    public static let swiftBeneficiaryCountry = BankDetailKey(rawValue: "swift_beneficiary_country")
+    public static let swiftBeneficiaryCity = BankDetailKey(rawValue: "swift_beneficiary_city")
+    public static let swiftBeneficiaryStateProvinceRegion = BankDetailKey(rawValue: "swift_beneficiary_state_province_region")
+    public static let swiftBeneficiaryPostalCode = BankDetailKey(rawValue: "swift_beneficiary_postal_code")
+    public static let swiftBankName = BankDetailKey(rawValue: "swift_bank_name")
+    public static let swiftBankAddressLine1 = BankDetailKey(rawValue: "swift_bank_address_line_1")
+    public static let swiftBankAddressLine2 = BankDetailKey(rawValue: "swift_bank_address_line_2")
+    public static let swiftBankCountry = BankDetailKey(rawValue: "swift_bank_country")
+    public static let swiftBankCity = BankDetailKey(rawValue: "swift_bank_city")
+    public static let swiftBankStateProvinceRegion = BankDetailKey(rawValue: "swift_bank_state_province_region")
+    public static let swiftBankPostalCode = BankDetailKey(rawValue: "swift_bank_postal_code")
+    public static let swiftIntermediaryBankSwiftCodeBic = BankDetailKey(rawValue: "swift_intermediary_bank_swift_code_bic")
+    public static let swiftIntermediaryBankAccountNumberIban = BankDetailKey(rawValue: "swift_intermediary_bank_account_number_iban")
+    public static let swiftIntermediaryBankName = BankDetailKey(rawValue: "swift_intermediary_bank_name")
+    public static let swiftIntermediaryBankCountry = BankDetailKey(rawValue: "swift_intermediary_bank_country")
 }
 
 /// Represents an item within a bank detail field

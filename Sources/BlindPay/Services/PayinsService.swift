@@ -28,29 +28,41 @@ public final class PayinsService: Sendable {
     /// with optional filtering and pagination support.
     ///
     /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing a `ListPayinsResponse` with payins and pagination metadata
+    /// Without `limit` or a cursor the API returns every payin in one array
+    /// (`pagination` is `nil`); with one it returns a page (default size 10).
+    ///
+    /// - Returns: An `APIResponse` containing a `ListPayinsResponse`
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let params = ListPayinsInput(
-    ///     limit: "50",
-    ///     status: .processing,
-    ///     customerId: "re_123"
-    /// )
+    /// let params = ListPayinsInput(limit: 50, customerId: "cu_123", status: .processing)
     /// let response = try await blindPay.instances.payins.list(params: params)
     /// if let result = response.data {
     ///     print("Found \(result.data.count) payins")
-    ///     print("Has more: \(result.pagination.hasMore)")
+    ///     print("Has more: \(result.pagination?.hasMore ?? false)")
     /// }
     /// ```
-    public func list(params: ListPayinsInput? = nil) async throws -> APIResponse<ListPayinsResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
+    public func list(params: ListPayinsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayinsResponse> {
+        let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
+    }
+
+    /// Iterates every payin matching `params`, fetching pages of 100 (or
+    /// `params.limit`) on demand. `endingBefore` is not supported.
+    ///
+    /// ```swift
+    /// for try await payin in blindPay.instances.payins.listAutoPaging(params: ListPayinsInput(status: .completed)) {
+    ///     print(payin.id)
+    /// }
+    /// ```
+    public func listAutoPaging(params: ListPayinsInput = ListPayinsInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payin, Error> {
+        AutoPager.stream(params: params) { [self] page in try await self.list(params: page, options: options) }
     }
     
     /// Retrieves a specific payin by ID
@@ -69,10 +81,11 @@ public final class PayinsService: Sendable {
     ///     print("Receiver amount: \(payin.receiverAmount ?? 0)")
     /// }
     /// ```
-    public func get(payinId: String) async throws -> APIResponse<PayinResponse> {
+    public func get(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins/\(payinId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -80,7 +93,12 @@ public final class PayinsService: Sendable {
     ///
     /// This method fetches tracking information for a payin using the public endpoint.
     ///
-    /// - Parameter payinId: The unique identifier of the payin
+    /// Public tracking endpoint for BlindPay's web and iOS apps; server-side
+    /// calls get 401 in production. Use ``get(payinId:options:)`` instead.
+    ///
+    /// - Parameters:
+    ///   - payinId: The unique identifier of the payin
+    ///   - checkoutToken: The card checkout token, for card payins
     /// - Returns: An `APIResponse` containing the `Payin` object with tracking information
     /// - Throws: `BlindPayError` if the request fails
     ///
@@ -92,10 +110,13 @@ public final class PayinsService: Sendable {
     ///     print("Tracking payment step: \(payin.trackingPayment?.step ?? "N/A")")
     /// }
     /// ```
-    public func getTrack(payinId: String) async throws -> APIResponse<PayinResponse> {
+    public func getTrack(payinId: String, checkoutToken: String? = nil, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
+        let queryParams: QueryParameters = ["checkout_token": checkoutToken]
         return try await apiClient.request(
             endpoint: "/v1/e/payins/\(payinId)",
-            method: .get
+            method: .get,
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -120,11 +141,12 @@ public final class PayinsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func createEvm(data: CreatePayinInput) async throws -> APIResponse<CreatePayinResponse> {
+    public func createEvm(data: CreatePayinInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins/evm",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

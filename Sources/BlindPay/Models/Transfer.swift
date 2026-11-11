@@ -14,8 +14,27 @@ public struct TransferTrackingStep: Codable, Sendable, Equatable {
     /// Step name
     public let step: String
 
-    public init(step: String) {
+    public let completedAt: String?
+
+    public let errorMessage: String?
+
+    public let gasFee: String?
+
+    public let transactionHash: String?
+
+    public init(step: String, completedAt: String? = nil, errorMessage: String? = nil, gasFee: String? = nil, transactionHash: String? = nil) {
         self.step = step
+        self.completedAt = completedAt
+        self.errorMessage = errorMessage
+        self.gasFee = gasFee
+        self.transactionHash = transactionHash
+    }
+    enum CodingKeys: String, CodingKey {
+        case step
+        case completedAt = "completed_at"
+        case errorMessage = "error_message"
+        case gasFee = "gas_fee"
+        case transactionHash = "transaction_hash"
     }
 }
 
@@ -81,10 +100,10 @@ public struct Transfer: Codable, Sendable, Equatable {
     public let senderToken: String?
 
     /// Sender amount
-    public let senderAmount: Double?
+    public let senderAmount: Int?
 
     /// Receiver amount
-    public let receiverAmount: Double?
+    public let receiverAmount: Int?
 
     /// Customer network
     public let customerNetwork: String?
@@ -114,7 +133,7 @@ public struct Transfer: Codable, Sendable, Equatable {
     public let network: String?
 
     /// Partner fee amount
-    public let partnerFeeAmount: Double?
+    public let partnerFeeAmount: Int?
 
     /// Image URL
     public let imageUrl: String?
@@ -128,6 +147,10 @@ public struct Transfer: Codable, Sendable, Equatable {
     /// Legal name
     public let legalName: String?
 
+    public let partnerFlatFee: Int?
+
+    public let partnerPercentageFee: Int?
+
     public init(
         id: String,
         status: TransactionStatus,
@@ -140,8 +163,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         trackingPartnerFee: TransferTrackingStep? = nil,
         walletId: String? = nil,
         senderToken: String? = nil,
-        senderAmount: Double? = nil,
-        receiverAmount: Double? = nil,
+        senderAmount: Int? = nil,
+        receiverAmount: Int? = nil,
         customerNetwork: String? = nil,
         customerToken: String? = nil,
         customerWalletAddress: String? = nil,
@@ -151,11 +174,13 @@ public struct Transfer: Codable, Sendable, Equatable {
         customerId: String? = nil,
         address: String? = nil,
         network: String? = nil,
-        partnerFeeAmount: Double? = nil,
+        partnerFeeAmount: Int? = nil,
         imageUrl: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
-        legalName: String? = nil
+        legalName: String? = nil,
+        partnerFlatFee: Int? = nil,
+        partnerPercentageFee: Int? = nil
     ) {
         self.id = id
         self.status = status
@@ -184,6 +209,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         self.firstName = firstName
         self.lastName = lastName
         self.legalName = legalName
+        self.partnerFlatFee = partnerFlatFee
+        self.partnerPercentageFee = partnerPercentageFee
     }
 
     enum CodingKeys: String, CodingKey {
@@ -214,6 +241,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         case firstName = "first_name"
         case lastName = "last_name"
         case legalName = "legal_name"
+        case partnerFlatFee = "partner_flat_fee"
+        case partnerPercentageFee = "partner_percentage_fee"
     }
 }
 
@@ -222,19 +251,8 @@ public struct Transfer: Codable, Sendable, Equatable {
 /// Response type for a single transfer
 public typealias TransferResponse = Transfer
 
-/// Response type for listing transfers
-public struct ListTransfersResponse: Codable, Sendable, Equatable {
-    /// Array of transfers
-    public let data: [Transfer]
-
-    /// Pagination metadata
-    public let pagination: PaginationMetadata
-
-    public init(data: [Transfer], pagination: PaginationMetadata) {
-        self.data = data
-        self.pagination = pagination
-    }
-}
+/// Response type for listing transfers (always paginated).
+public typealias ListTransfersResponse = ListResult<Transfer>
 
 // MARK: - Input Types
 
@@ -255,8 +273,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Customer network
     public let customerNetwork: Network
 
-    /// Request amount
-    public let requestAmount: Double
+    /// Amount in integer cents (`1999` = 19.99). Convert with ``Amount/cents(fromMajorUnits:)``.
+    public let requestAmount: Int
 
     /// Whether to cover fees
     public let coverFees: Bool?
@@ -267,16 +285,22 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Partner fee ID (optional)
     public let partnerFeeId: String?
 
+    public let partnerFlatFee: Int?
+
+    public let partnerPercentageFee: Int?
+
     public init(
         walletId: String,
         senderToken: StablecoinToken,
         customerWalletAddress: String,
         customerToken: StablecoinToken,
         customerNetwork: Network,
-        requestAmount: Double,
+        requestAmount: Int,
         coverFees: Bool? = nil,
         amountReference: String,
-        partnerFeeId: String? = nil
+        partnerFeeId: String? = nil,
+        partnerFlatFee: Int? = nil,
+        partnerPercentageFee: Int? = nil
     ) {
         self.walletId = walletId
         self.senderToken = senderToken
@@ -287,6 +311,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         self.coverFees = coverFees
         self.amountReference = amountReference
         self.partnerFeeId = partnerFeeId
+        self.partnerFlatFee = partnerFlatFee
+        self.partnerPercentageFee = partnerPercentageFee
     }
 
     enum CodingKeys: String, CodingKey {
@@ -299,6 +325,8 @@ public struct CreateTransferQuoteInput: Codable, Sendable {
         case coverFees = "cover_fees"
         case amountReference = "amount_reference"
         case partnerFeeId = "partner_fee_id"
+        case partnerFlatFee = "partner_flat_fee"
+        case partnerPercentageFee = "partner_percentage_fee"
     }
 }
 
@@ -317,26 +345,32 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
     public let blindpayQuotation: Double?
 
     /// Receiver amount
-    public let receiverAmount: Double
+    public let receiverAmount: Int
 
     /// Sender amount
-    public let senderAmount: Double
+    public let senderAmount: Int
 
     /// Partner fee amount
-    public let partnerFeeAmount: Double?
+    public let partnerFeeAmount: Int?
 
     /// Flat fee
     public let flatFee: Double?
+
+    public let partnerFlatFee: Int?
+
+    public let partnerPercentageFee: Int?
 
     public init(
         id: String,
         expiresAt: Double? = nil,
         commercialQuotation: Double? = nil,
         blindpayQuotation: Double? = nil,
-        receiverAmount: Double,
-        senderAmount: Double,
-        partnerFeeAmount: Double? = nil,
-        flatFee: Double? = nil
+        receiverAmount: Int,
+        senderAmount: Int,
+        partnerFeeAmount: Int? = nil,
+        flatFee: Double? = nil,
+        partnerFlatFee: Int? = nil,
+        partnerPercentageFee: Int? = nil
     ) {
         self.id = id
         self.expiresAt = expiresAt
@@ -346,6 +380,8 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
         self.senderAmount = senderAmount
         self.partnerFeeAmount = partnerFeeAmount
         self.flatFee = flatFee
+        self.partnerFlatFee = partnerFlatFee
+        self.partnerPercentageFee = partnerPercentageFee
     }
 
     enum CodingKeys: String, CodingKey {
@@ -357,6 +393,8 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
         case senderAmount = "sender_amount"
         case partnerFeeAmount = "partner_fee_amount"
         case flatFee = "flat_fee"
+        case partnerFlatFee = "partner_flat_fee"
+        case partnerPercentageFee = "partner_percentage_fee"
     }
 }
 
@@ -377,38 +415,71 @@ public struct CreateTransferInput: Codable, Sendable {
 /// Response for creating a transfer
 public typealias CreateTransferResponse = Transfer
 
-/// Input for listing transfers
-public struct ListTransfersInput: Sendable {
-    /// Number of items per page
-    public let limit: String?
+/// Filters and cursors for listing transfers. Every value is optional; unset ones are not sent.
+public struct ListTransfersInput: CursorPaginatedInput {
+    /// Page size (10, 50, 100, 200, 500 or 1000).
+    public var limit: Int?
 
-    /// Offset for pagination
-    public let offset: String?
+    /// Return items after this id (the previous page's `pagination.nextPage`).
+    public var startingAfter: String?
 
-    /// Cursor for pagination (starting after this ID)
-    public let startingAfter: String?
+    /// Return items before this id.
+    public var endingBefore: String?
 
-    /// Cursor for pagination (ending before this ID)
-    public let endingBefore: String?
+    /// Only this customer.
+    public var customerId: String?
+
+    /// Only this wallet.
+    public var walletId: String?
+
+    /// Only this status.
+    public var status: TransactionStatus?
+
+    /// Only this network.
+    public var network: Network?
+
+    /// Only this token.
+    public var token: StablecoinToken?
+
+    /// Deprecated: the API ignores `offset`. Use `startingAfter`.
+    @available(*, deprecated, message: "Ignored by the API; use startingAfter.")
+    public var offset: Int? {
+        get { legacyOffset }
+        set { legacyOffset = newValue }
+    }
+    private var legacyOffset: Int?
 
     public init(
-        limit: String? = nil,
-        offset: String? = nil,
+        limit: Int? = nil,
         startingAfter: String? = nil,
-        endingBefore: String? = nil
+        endingBefore: String? = nil,
+        customerId: String? = nil,
+        walletId: String? = nil,
+        status: TransactionStatus? = nil,
+        network: Network? = nil,
+        token: StablecoinToken? = nil
     ) {
         self.limit = limit
-        self.offset = offset
         self.startingAfter = startingAfter
         self.endingBefore = endingBefore
+        self.customerId = customerId
+        self.walletId = walletId
+        self.status = status
+        self.network = network
+        self.token = token
     }
 
-    func toQueryParameters() -> [String: String] {
-        var params: [String: String] = [:]
-        if let limit = limit { params["limit"] = limit }
-        if let offset = offset { params["offset"] = offset }
-        if let startingAfter = startingAfter { params["starting_after"] = startingAfter }
-        if let endingBefore = endingBefore { params["ending_before"] = endingBefore }
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
+        params["limit"] = limit.map(String.init)
+        params["offset"] = legacyOffset.map(String.init)
+        params["starting_after"] = startingAfter
+        params["ending_before"] = endingBefore
+        params["customer_id"] = customerId
+        params["wallet_id"] = walletId
+        params["status"] = status?.rawValue
+        params["network"] = network?.rawValue
+        params["token"] = token?.rawValue
         return params
     }
 }

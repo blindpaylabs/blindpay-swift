@@ -8,30 +8,38 @@
 import Foundation
 
 /// Represents a webhook event type
-public enum WebhookEvent: String, Codable, Sendable {
-    case customerNew = "customer.new"
-    case customerUpdate = "customer.update"
-    case customerDelete = "customer.delete"
-    case bankAccountNew = "bankAccount.new"
-    case payoutNew = "payout.new"
-    case payoutUpdate = "payout.update"
-    case payoutComplete = "payout.complete"
-    case payoutPartnerFee = "payout.partnerFee"
-    case blockchainWalletNew = "blockchainWallet.new"
-    case payinNew = "payin.new"
-    case payinUpdate = "payin.update"
-    case payinComplete = "payin.complete"
-    case payinPartnerFee = "payin.partnerFee"
-    case tosAccept = "tos.accept"
-    case limitIncreaseNew = "limitIncrease.new"
-    case limitIncreaseUpdate = "limitIncrease.update"
-    case virtualAccountNew = "virtualAccount.new"
-    case virtualAccountComplete = "virtualAccount.complete"
-    case transferNew = "transfer.new"
-    case transferUpdate = "transfer.update"
-    case transferComplete = "transfer.complete"
-    case walletNew = "wallet.new"
-    case walletInbound = "wallet.inbound"
+public struct WebhookEventType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let customerNew = WebhookEventType(rawValue: "customer.new")
+    public static let customerUpdate = WebhookEventType(rawValue: "customer.update")
+    public static let customerDelete = WebhookEventType(rawValue: "customer.delete")
+    public static let bankAccountNew = WebhookEventType(rawValue: "bankAccount.new")
+    public static let payoutNew = WebhookEventType(rawValue: "payout.new")
+    public static let payoutUpdate = WebhookEventType(rawValue: "payout.update")
+    public static let payoutComplete = WebhookEventType(rawValue: "payout.complete")
+    public static let payoutPartnerFee = WebhookEventType(rawValue: "payout.partnerFee")
+    public static let blockchainWalletNew = WebhookEventType(rawValue: "blockchainWallet.new")
+    public static let payinNew = WebhookEventType(rawValue: "payin.new")
+    public static let payinUpdate = WebhookEventType(rawValue: "payin.update")
+    public static let payinComplete = WebhookEventType(rawValue: "payin.complete")
+    public static let payinPartnerFee = WebhookEventType(rawValue: "payin.partnerFee")
+    public static let tosAccept = WebhookEventType(rawValue: "tos.accept")
+    public static let limitIncreaseNew = WebhookEventType(rawValue: "limitIncrease.new")
+    public static let limitIncreaseUpdate = WebhookEventType(rawValue: "limitIncrease.update")
+    public static let virtualAccountNew = WebhookEventType(rawValue: "virtualAccount.new")
+    public static let virtualAccountComplete = WebhookEventType(rawValue: "virtualAccount.complete")
+    public static let transferNew = WebhookEventType(rawValue: "transfer.new")
+    public static let transferUpdate = WebhookEventType(rawValue: "transfer.update")
+    public static let transferComplete = WebhookEventType(rawValue: "transfer.complete")
+    public static let walletNew = WebhookEventType(rawValue: "wallet.new")
+    public static let walletInbound = WebhookEventType(rawValue: "wallet.inbound")
+    public static let walletUpdate = WebhookEventType(rawValue: "wallet.update")
+    public static let blockchainWalletUpdate = WebhookEventType(rawValue: "blockchainWallet.update")
+    public static let payableNew = WebhookEventType(rawValue: "payable.new")
+    public static let payableUpdate = WebhookEventType(rawValue: "payable.update")
+    public static let payableComplete = WebhookEventType(rawValue: "payable.complete")
 }
 
 /// Represents a webhook endpoint
@@ -43,7 +51,7 @@ public struct WebhookEndpoint: Codable, Sendable, Equatable {
     public let url: String
     
     /// List of events this endpoint is subscribed to
-    public let events: [WebhookEvent]
+    public let events: [WebhookEventType]
     
     /// Timestamp of the last event sent to this endpoint (null if no events sent)
     public let lastEventAt: String?
@@ -60,7 +68,7 @@ public struct WebhookEndpoint: Codable, Sendable, Equatable {
     public init(
         id: String,
         url: String,
-        events: [WebhookEvent],
+        events: [WebhookEventType],
         lastEventAt: String? = nil,
         instanceId: String,
         createdAt: String? = nil,
@@ -95,9 +103,9 @@ public struct CreateWebhookEndpointInput: Codable, Sendable {
     public let url: String
     
     /// List of events to subscribe to
-    public let events: [WebhookEvent]
+    public let events: [WebhookEventType]
     
-    public init(url: String, events: [WebhookEvent]) {
+    public init(url: String, events: [WebhookEventType]) {
         self.url = url
         self.events = events
     }

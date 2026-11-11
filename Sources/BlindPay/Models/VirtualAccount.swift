@@ -10,13 +10,19 @@ import Foundation
 // MARK: - Banking Partner
 
 /// Banking partner for virtual accounts
-public enum BankingPartner: String, Codable, Sendable {
-    case jpmorgan = "jpmorgan"
-    case citi = "citi"
-    case hsbc = "hsbc"
-    case cfsb = "cfsb"
-    case portage = "portage"
-    case ssb = "ssb"
+public struct BankingPartner: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let jpmorgan = BankingPartner(rawValue: "jpmorgan")
+    public static let citi = BankingPartner(rawValue: "citi")
+    public static let hsbc = BankingPartner(rawValue: "hsbc")
+    public static let cfsb = BankingPartner(rawValue: "cfsb")
+    public static let portage = BankingPartner(rawValue: "portage")
+    public static let ssb = BankingPartner(rawValue: "ssb")
+    public static let breB = BankingPartner(rawValue: "bre_b")
+    public static let portageG = BankingPartner(rawValue: "portage_g")
+    public static let spei = BankingPartner(rawValue: "spei")
 }
 
 // MARK: - Blockchain Wallet Reference
@@ -38,9 +44,12 @@ public struct BlockchainWalletRef: Codable, Sendable, Equatable {
 // MARK: - Virtual Account Account Type
 
 /// Represents the account type for a virtual account
-public enum VirtualAccountAccountType: String, Codable, Sendable {
-    case personalChecking = "Personal checking"
-    case businessChecking = "Business checking"
+public struct VirtualAccountAccountType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let personalChecking = VirtualAccountAccountType(rawValue: "Personal checking")
+    public static let businessChecking = VirtualAccountAccountType(rawValue: "Business checking")
 }
 
 // MARK: - Virtual Account ACH
@@ -242,6 +251,14 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
     /// Blockchain wallet reference (optional)
     public let blockchainWallet: BlockchainWalletRef?
     
+    /// Colombian (Bre-B) details; `nil` for other countries.
+    public let co: VirtualAccountCO?
+
+    /// Mexican (SPEI) details; `nil` for other countries.
+    public let mx: VirtualAccountMX?
+
+    public let partnerFeeId: String?
+
     public init(
         id: String,
         bankingPartner: BankingPartner? = nil,
@@ -249,7 +266,10 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         us: VirtualAccountUS? = nil,
         token: StablecoinToken,
         blockchainWalletId: String? = nil,
-        blockchainWallet: BlockchainWalletRef? = nil
+        blockchainWallet: BlockchainWalletRef? = nil,
+        co: VirtualAccountCO? = nil,
+        mx: VirtualAccountMX? = nil,
+        partnerFeeId: String? = nil
     ) {
         self.id = id
         self.bankingPartner = bankingPartner
@@ -258,6 +278,9 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         self.token = token
         self.blockchainWalletId = blockchainWalletId
         self.blockchainWallet = blockchainWallet
+        self.co = co
+        self.mx = mx
+        self.partnerFeeId = partnerFeeId
     }
     
     enum CodingKeys: String, CodingKey {
@@ -268,6 +291,9 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         case token
         case blockchainWalletId = "blockchain_wallet_id"
         case blockchainWallet = "blockchain_wallet"
+        case co
+        case mx
+        case partnerFeeId = "partner_fee_id"
     }
 }
 
@@ -311,18 +337,27 @@ public struct CreateVirtualAccountInput: Codable, Sendable {
     /// Sole proprietor document file (optional)
     public let soleProprietorDocFile: String?
 
+    /// Required for Colombian (Bre-B) virtual accounts.
+    public let breB: CreateVirtualAccountBreB?
+
+    public let partnerFeeId: String?
+
     public init(
         bankingPartner: BankingPartner,
         token: StablecoinToken,
         blockchainWalletId: String,
         soleProprietorDocType: String? = nil,
-        soleProprietorDocFile: String? = nil
+        soleProprietorDocFile: String? = nil,
+        breB: CreateVirtualAccountBreB? = nil,
+        partnerFeeId: String? = nil
     ) {
         self.bankingPartner = bankingPartner
         self.token = token
         self.blockchainWalletId = blockchainWalletId
         self.soleProprietorDocType = soleProprietorDocType
         self.soleProprietorDocFile = soleProprietorDocFile
+        self.breB = breB
+        self.partnerFeeId = partnerFeeId
     }
 
     enum CodingKeys: String, CodingKey {
@@ -331,6 +366,8 @@ public struct CreateVirtualAccountInput: Codable, Sendable {
         case blockchainWalletId = "blockchain_wallet_id"
         case soleProprietorDocType = "sole_proprietor_doc_type"
         case soleProprietorDocFile = "sole_proprietor_doc_file"
+        case breB = "bre_b"
+        case partnerFeeId = "partner_fee_id"
     }
 }
 
@@ -342,13 +379,114 @@ public struct UpdateVirtualAccountInput: Codable, Sendable {
     /// Token (USDC, USDT, or USDB)
     public let token: StablecoinToken
     
-    public init(blockchainWalletId: String, token: StablecoinToken) {
+    public let partnerFeeId: String?
+
+    public init(blockchainWalletId: String, token: StablecoinToken, partnerFeeId: String? = nil) {
         self.blockchainWalletId = blockchainWalletId
         self.token = token
+        self.partnerFeeId = partnerFeeId
     }
     
     enum CodingKeys: String, CodingKey {
         case blockchainWalletId = "blockchain_wallet_id"
         case token
+        case partnerFeeId = "partner_fee_id"
+    }
+}
+/// A Bre-B key of a Colombian virtual account.
+public struct VirtualAccountBreB: Codable, Sendable, Equatable {
+    public let key: String
+
+    public init(
+        key: String
+    ) {
+        self.key = key
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case key
+    }
+}
+
+/// The beneficiary name shown to senders (CO and MX accounts).
+public struct VirtualAccountNamedBeneficiary: Codable, Sendable, Equatable {
+    public let name: String
+
+    public init(
+        name: String
+    ) {
+        self.name = name
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name
+    }
+}
+
+/// Colombian (Bre-B) details of a virtual account.
+public struct VirtualAccountCO: Codable, Sendable, Equatable {
+    public let breB: VirtualAccountBreB
+    public let beneficiary: VirtualAccountNamedBeneficiary?
+
+    public init(
+        breB: VirtualAccountBreB,
+        beneficiary: VirtualAccountNamedBeneficiary? = nil
+    ) {
+        self.breB = breB
+        self.beneficiary = beneficiary
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case breB = "bre_b"
+        case beneficiary
+    }
+}
+
+/// SPEI details of a Mexican virtual account.
+public struct VirtualAccountSpei: Codable, Sendable, Equatable {
+    public let clabe: String
+
+    public init(
+        clabe: String
+    ) {
+        self.clabe = clabe
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case clabe
+    }
+}
+
+/// Mexican (SPEI) details of a virtual account.
+public struct VirtualAccountMX: Codable, Sendable, Equatable {
+    public let spei: VirtualAccountSpei
+    public let beneficiary: VirtualAccountNamedBeneficiary?
+
+    public init(
+        spei: VirtualAccountSpei,
+        beneficiary: VirtualAccountNamedBeneficiary? = nil
+    ) {
+        self.spei = spei
+        self.beneficiary = beneficiary
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case spei
+        case beneficiary
+    }
+}
+
+/// Bre-B details required to create a Colombian virtual account.
+public struct CreateVirtualAccountBreB: Codable, Sendable, Equatable {
+    public let gender: String
+
+    public init(
+        gender: String
+    ) {
+        self.gender = gender
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case gender
     }
 }

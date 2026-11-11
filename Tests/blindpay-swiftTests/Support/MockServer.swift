@@ -21,6 +21,11 @@ struct RecordedRequest: Sendable {
 
     var path: String { url.path }
 
+    /// The path exactly as sent, percent-encoding included.
+    var rawPath: String {
+        URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedPath ?? ""
+    }
+
     /// Query items in wire order.
     var queryItems: [URLQueryItem] {
         URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
@@ -39,6 +44,8 @@ struct MockResponse: Sendable {
     var status: Int = 200
     var headers: [String: String] = ["Content-Type": "application/json"]
     var body: Data = Data()
+    /// Send the status line and headers, then fail while "reading" the body.
+    var failsAfterHeaders: Bool = false
 
     static func json(_ data: Data, status: Int = 200) -> MockResponse {
         MockResponse(status: status, body: data)
@@ -57,6 +64,12 @@ final class MockServer: @unchecked Sendable {
         MockRegistry.shared.register(self, for: host)
     }
 
+    /// Answers attempt `n` with `responses[n]` (the last one repeats).
+    convenience init(sequence responses: [MockResponse]) {
+        let counter = Counter()
+        self.init { _ in responses[min(counter.next(), responses.count - 1)] }
+    }
+
     /// Always answers with the same response.
     convenience init(respondWith response: MockResponse) {
         self.init { _ in response }
@@ -66,13 +79,43 @@ final class MockServer: @unchecked Sendable {
         MockRegistry.shared.unregister(host)
     }
 
-    var client: BlindPay {
-        BlindPay(
-            apiKey: "test_key",
-            instanceId: instanceId,
-            configuration: Configuration(baseURL: "https://\(host)"),
-            protocolClasses: [MockURLProtocol.self]
+    /// A client wired to this mock. Retries are on (as in production) but
+    /// never really sleep; recorded sleeps are in ``sleeps``.
+    var client: BlindPay { client() }
+
+    func client(maxRetries: Int = 2, timeout: TimeInterval = 60) -> BlindPay {
+        BlindPay(apiKey: "test_key", instanceId: instanceId, configuration: configuration(maxRetries: maxRetries, timeout: timeout))
+    }
+
+    func configuration(maxRetries: Int = 2, timeout: TimeInterval = 60) -> Configuration {
+        Configuration(
+            baseURL: "https://\(host)",
+            timeout: timeout,
+            maxRetries: maxRetries,
+            transport: MockServer.transport,
+            sleep: { [weak self] seconds in self?.recordSleep(seconds) },
+            jitter: { 1.0 }
         )
+    }
+
+    /// A URLSession transport whose requests go to MockURLProtocol.
+    static let transport: URLSessionTransport = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        return URLSessionTransport(configuration: configuration)
+    }()
+
+    private var recordedSleeps: [TimeInterval] = []
+
+    /// Every backoff the client asked for, in order.
+    var sleeps: [TimeInterval] {
+        lock.lock(); defer { lock.unlock() }
+        return recordedSleeps
+    }
+
+    private func recordSleep(_ seconds: TimeInterval) {
+        lock.lock(); defer { lock.unlock() }
+        recordedSleeps.append(seconds)
     }
 
     var requests: [RecordedRequest] {
@@ -85,6 +128,16 @@ final class MockServer: @unchecked Sendable {
         recorded.append(request)
         lock.unlock()
         return responder(request)
+    }
+}
+
+final class Counter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = 0
+    func next() -> Int {
+        lock.lock(); defer { lock.unlock() }
+        defer { value += 1 }
+        return value
     }
 }
 
@@ -129,6 +182,10 @@ final class MockURLProtocol: URLProtocol, @unchecked Sendable {
         let response = server.handle(recorded)
         let http = HTTPURLResponse(url: url, statusCode: response.status, httpVersion: "HTTP/1.1", headerFields: response.headers)!
         client?.urlProtocol(self, didReceive: http, cacheStoragePolicy: .notAllowed)
+        if response.failsAfterHeaders {
+            client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
+            return
+        }
         client?.urlProtocol(self, didLoad: response.body)
         client?.urlProtocolDidFinishLoading(self)
     }
@@ -147,5 +204,85 @@ final class MockURLProtocol: URLProtocol, @unchecked Sendable {
             data.append(buffer, count: count)
         }
         return data
+    }
+}
+
+extension MockResponse {
+    /// One of the shared error fixtures (Fixtures/errors/<name>.json).
+    static func errorFixture(_ name: String) throws -> MockResponse {
+        let fixture = try Fixtures.json(at: Fixtures.root.appendingPathComponent("errors/\(name).json"))
+        var headers = fixture["headers"] as? [String: String] ?? ["Content-Type": "application/json"]
+        headers["X-Request-Id"] = "req_\(name)"
+        let body: Data
+        if let raw = fixture["raw_body"] as? String {
+            body = Data(raw.utf8)
+        } else if let json = fixture["body"] {
+            body = try JSONSerialization.data(withJSONObject: json)
+        } else {
+            body = Data()
+        }
+        return MockResponse(status: fixture["status"] as? Int ?? 500, headers: headers, body: body)
+    }
+
+    static func status(_ status: Int, retryAfter: String? = nil, body: String = #"{"success":false,"message":"error"}"#) -> MockResponse {
+        var headers = ["Content-Type": "application/json"]
+        if let retryAfter = retryAfter { headers["Retry-After"] = retryAfter }
+        return MockResponse(status: status, headers: headers, body: Data(body.utf8))
+    }
+
+    static let ok = MockResponse(status: 200, body: Data(#"{"success":true}"#.utf8))
+}
+
+/// A transport that runs a scripted step per attempt, then defers to the mock.
+final class ScriptedTransport: HTTPTransport, @unchecked Sendable {
+    enum Step {
+        case fail(URLError.Code)
+        case hang
+        /// Headers arrived (with this status), then the body hangs until the
+        /// attempt is cancelled (for example by the per-attempt timeout).
+        case hangAfterHeaders(Int)
+        case pass
+    }
+
+    private let lock = NSLock()
+    private var steps: [Step]
+    private(set) var attempts = 0
+
+    init(_ steps: [Step]) { self.steps = steps }
+
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        let step: Step = {
+            lock.lock(); defer { lock.unlock() }
+            attempts += 1
+            return steps.isEmpty ? .pass : steps.removeFirst()
+        }()
+        switch step {
+        case .fail(let code):
+            throw URLError(code)
+        case .hang:
+            // Honours cancellation, like URLSession does.
+            try await Task.sleep(nanoseconds: 30_000_000_000)
+            throw URLError(.unknown)
+        case .hangAfterHeaders(let status):
+            let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: [:])!
+            do {
+                try await Task.sleep(nanoseconds: 30_000_000_000)
+                throw URLError(.unknown)
+            } catch {
+                throw HTTPTransportError.incompleteResponse(response, underlying: error)
+            }
+        case .pass:
+            return try await MockServer.transport.send(request)
+        }
+    }
+}
+
+extension MockServer {
+    /// A client whose transport runs `transport`'s script before reaching this mock.
+    func client(transport: ScriptedTransport, maxRetries: Int = 2, timeout: TimeInterval = 60) -> BlindPay {
+        let base = configuration(maxRetries: maxRetries, timeout: timeout)
+        return BlindPay(apiKey: "test_key", instanceId: instanceId, configuration: Configuration(
+            baseURL: base.baseURL, timeout: timeout, maxRetries: maxRetries, transport: transport,
+            sleep: base.sleep, jitter: base.jitter))
     }
 }

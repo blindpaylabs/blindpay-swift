@@ -36,6 +36,8 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
     /// Timestamp when the wallet was last updated (omitted when nested inside a bank account)
     public let updatedAt: String?
 
+    public let partnerFeeId: String?
+
     public init(
         id: String,
         externalId: String? = nil,
@@ -45,7 +47,8 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         instanceId: String? = nil,
         customerId: String? = nil,
         createdAt: String? = nil,
-        updatedAt: String? = nil
+        updatedAt: String? = nil,
+        partnerFeeId: String? = nil
     ) {
         self.id = id
         self.externalId = externalId
@@ -56,6 +59,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         self.customerId = customerId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.partnerFeeId = partnerFeeId
     }
     
     enum CodingKeys: String, CodingKey {
@@ -68,6 +72,7 @@ public struct OfframpWallet: Codable, Sendable, Equatable {
         case customerId = "customer_id"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case partnerFeeId = "partner_fee_id"
     }
 }
 
@@ -118,14 +123,51 @@ public struct CreateOfframpWalletInput: Codable, Sendable {
     /// External ID (optional)
     public let externalId: String?
     
-    public init(network: Network, externalId: String? = nil) {
+    /// Partner fee applied to payouts through this wallet.
+    public let partnerFeeId: String?
+
+    public init(network: Network, externalId: String? = nil, partnerFeeId: String? = nil) {
         self.network = network
         self.externalId = externalId
+        self.partnerFeeId = partnerFeeId
     }
     
     enum CodingKeys: String, CodingKey {
         case network
         case externalId = "external_id"
+        case partnerFeeId = "partner_fee_id"
     }
 }
 
+
+// MARK: - Update
+
+/// Input for updating an offramp wallet. `partner_fee_id` is tri-state:
+/// leave it unchanged, set it, or clear it (sent as `null`).
+public struct UpdateOfframpWalletInput: Encodable, Sendable, Equatable {
+    /// What to do with the wallet's partner fee.
+    public enum PartnerFee: Sendable, Equatable {
+        case unchanged
+        case set(String)
+        case clear
+    }
+
+    public let partnerFee: PartnerFee
+
+    public init(partnerFee: PartnerFee) {
+        self.partnerFee = partnerFee
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case partnerFeeId = "partner_fee_id"
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch partnerFee {
+        case .unchanged: break
+        case .set(let id): try container.encode(id, forKey: .partnerFeeId)
+        case .clear: try container.encodeNil(forKey: .partnerFeeId)
+        }
+    }
+}

@@ -31,6 +31,24 @@ public final class InstancesService: Sendable {
     /// Terms of service management service
     public let termsOfService: TermsOfServiceService
 
+    /// Customer listing and creation
+    public let customers: InstanceCustomersService
+
+    /// Stablecoin transfers
+    public let transfers: TransfersService
+
+    /// Transfer quotes
+    public let transferQuotes: TransferQuotesService
+
+    /// Payables (bills paid out to a beneficiary)
+    public let payables: PayablesService
+
+    /// The instance's onboarding answers
+    public let onboarding: OnboardingService
+
+    /// The instance's open request for information
+    public let rfi: InstanceRfiService
+
     init(apiClient: APIClient, instanceId: String) {
         self.apiClient = apiClient
         self.instanceId = instanceId
@@ -40,6 +58,30 @@ public final class InstancesService: Sendable {
         self.payins = PayinsService(apiClient: apiClient, instanceId: instanceId)
         self.payouts = PayoutsService(apiClient: apiClient, instanceId: instanceId)
         self.termsOfService = TermsOfServiceService(apiClient: apiClient, instanceId: instanceId)
+        self.customers = InstanceCustomersService(apiClient: apiClient, instanceId: instanceId)
+        self.transfers = TransfersService(apiClient: apiClient, instanceId: instanceId)
+        self.transferQuotes = TransferQuotesService(apiClient: apiClient, instanceId: instanceId)
+        self.payables = PayablesService(apiClient: apiClient, instanceId: instanceId)
+        self.onboarding = OnboardingService(apiClient: apiClient, instanceId: instanceId)
+        self.rfi = InstanceRfiService(apiClient: apiClient, instanceId: instanceId)
+    }
+
+    /// Retrieves the instance (name, production or development, onboarding step).
+    public func get(options: RequestOptions? = nil) async throws -> APIResponse<Instance> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)",
+            method: .get,
+            options: options
+        )
+    }
+
+    /// Retrieves the instance's billing fees per rail.
+    public func getFees(options: RequestOptions? = nil) async throws -> APIResponse<FeesResponse> {
+        return try await apiClient.request(
+            endpoint: "/v1/instances/\(instanceId)/billing/fees",
+            method: .get,
+            options: options
+        )
     }
     
     /// Retrieves all members of the instance
@@ -59,10 +101,11 @@ public final class InstancesService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getMembers() async throws -> APIResponse<InstanceMembersResponse> {
+    public func getMembers(options: RequestOptions? = nil) async throws -> APIResponse<InstanceMembersResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -88,11 +131,12 @@ public final class InstancesService: Sendable {
     ///     print("Instance updated successfully")
     /// }
     /// ```
-    public func update(data: UpdateInstanceInput) async throws -> APIResponse<VoidResponse> {
+    public func update(data: UpdateInstanceInput, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)",
             method: .put,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -112,10 +156,11 @@ public final class InstancesService: Sendable {
     ///     print("Instance deleted successfully")
     /// }
     /// ```
-    public func delete() async throws -> APIResponse<VoidResponse> {
+    public func delete(options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -136,10 +181,11 @@ public final class InstancesService: Sendable {
     ///     print("Member deleted successfully")
     /// }
     /// ```
-    public func deleteMember(memberId: String) async throws -> APIResponse<VoidResponse> {
+    public func deleteMember(memberId: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -165,13 +211,14 @@ public final class InstancesService: Sendable {
     ///     print("Member role updated successfully")
     /// }
     /// ```
-    public func updateMemberRole(memberId: String, role: InstanceMemberRole) async throws -> APIResponse<VoidResponse> {
+    public func updateMemberRole(memberId: String, role: InstanceMemberRole, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         let updateInput = UpdateMemberRoleInput(role: role)
 
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
             method: .put,
-            body: updateInput
+            body: updateInput,
+            options: options
         )
     }
 
@@ -192,11 +239,12 @@ public final class InstancesService: Sendable {
     ///     print("Ownership migration successful: \(result.success)")
     /// }
     /// ```
-    public func migrateOwnership(data: MigrateInstanceOwnershipInput) async throws -> APIResponse<MigrateInstanceOwnershipResponse> {
+    public func migrateOwnership(data: MigrateInstanceOwnershipInput, options: RequestOptions? = nil) async throws -> APIResponse<MigrateInstanceOwnershipResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/ownership",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -216,11 +264,12 @@ public final class InstancesService: Sendable {
     ///     print("XDR: \(result.xdr)")
     /// }
     /// ```
-    public func createAssetTrustline(data: CreateAssetTrustlineInput) async throws -> APIResponse<CreateAssetTrustlineResponse> {
+    public func createAssetTrustline(data: CreateAssetTrustlineInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateAssetTrustlineResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/create-asset-trustline",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -244,11 +293,12 @@ public final class InstancesService: Sendable {
     ///     print("Success: \(result.success)")
     /// }
     /// ```
-    public func mintUsdbStellar(data: MintUsdbStellarInput) async throws -> APIResponse<MintUsdbStellarResponse> {
+    public func mintUsdbStellar(data: MintUsdbStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<MintUsdbStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/mint-usdb-stellar",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -274,11 +324,12 @@ public final class InstancesService: Sendable {
     ///     }
     /// }
     /// ```
-    public func mintUsdbSolana(data: MintUsdbSolanaInput) async throws -> APIResponse<MintUsdbSolanaResponse> {
+    public func mintUsdbSolana(data: MintUsdbSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<MintUsdbSolanaResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/mint-usdb-solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -305,11 +356,12 @@ public final class InstancesService: Sendable {
     ///     }
     /// }
     /// ```
-    public func prepareDelegateSolana(data: PrepareDelegateSolanaInput) async throws -> APIResponse<PrepareDelegateSolanaResponse> {
+    public func prepareDelegateSolana(data: PrepareDelegateSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<PrepareDelegateSolanaResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/prepare-delegate-solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

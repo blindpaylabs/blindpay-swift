@@ -47,3 +47,19 @@ jobs:
       - name: API sync type audit (non-blocking)
         continue-on-error: true
         run: swift .api-sync/sync.swift --audit-types
+
+  linux:
+    name: Build and test on Linux (Swift 6.0)
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: swift --version
+        run: swift --version
+
+      - name: swift build
+        run: swift build
+
+      - name: swift test
+        run: swift test

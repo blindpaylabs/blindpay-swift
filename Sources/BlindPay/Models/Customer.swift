@@ -10,296 +10,168 @@ import Foundation
 // MARK: - KYC Type
 
 /// KYC verification type
-public enum KYCType: String, Codable, Sendable {
-    case light = "light"
-    case standard = "standard"
-    case enhanced = "enhanced"
+public struct KYCType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let light = KYCType(rawValue: "light")
+    public static let standard = KYCType(rawValue: "standard")
+    public static let enhanced = KYCType(rawValue: "enhanced")
 }
 
 // MARK: - Customer Type
 
 /// Type of customer
-public enum CustomerType: String, Codable, Sendable {
-    case individual = "individual"
-    case business = "business"
+public struct CustomerType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let individual = CustomerType(rawValue: "individual")
+    public static let business = CustomerType(rawValue: "business")
 }
 
 // MARK: - ID Document Type
 
 /// Type of ID document
-public enum IDDocType: String, Codable, Sendable {
-    case passport = "PASSPORT"
-    case idCard = "ID_CARD"
-    case drivers = "DRIVERS"
-    case driversLicense = "DRIVERS_LICENSE"
-    case nationalId = "NATIONAL_ID"
-    case other = "OTHER"
+public struct IDDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let passport = IDDocType(rawValue: "PASSPORT")
+    public static let idCard = IDDocType(rawValue: "ID_CARD")
+    public static let drivers = IDDocType(rawValue: "DRIVERS")
+    public static let driversLicense = IDDocType(rawValue: "DRIVERS_LICENSE")
+    public static let nationalId = IDDocType(rawValue: "NATIONAL_ID")
+    public static let other = IDDocType(rawValue: "OTHER")
 }
 
 // MARK: - Proof of Address Document Type
 
 /// Type of proof of address document
-public enum ProofOfAddressDocType: String, Codable, Sendable {
-    case utilityBill = "UTILITY_BILL"
-    case bankStatement = "BANK_STATEMENT"
-    case rentalAgreement = "RENTAL_AGREEMENT"
-    case taxDocument = "TAX_DOCUMENT"
-    case governmentCorrespondence = "GOVERNMENT_CORRESPONDENCE"
-    case governmentLetter = "GOVERNMENT_LETTER"
-    case other = "OTHER"
+public struct ProofOfAddressDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let utilityBill = ProofOfAddressDocType(rawValue: "UTILITY_BILL")
+    public static let bankStatement = ProofOfAddressDocType(rawValue: "BANK_STATEMENT")
+    public static let rentalAgreement = ProofOfAddressDocType(rawValue: "RENTAL_AGREEMENT")
+    public static let taxDocument = ProofOfAddressDocType(rawValue: "TAX_DOCUMENT")
+    public static let governmentCorrespondence = ProofOfAddressDocType(rawValue: "GOVERNMENT_CORRESPONDENCE")
+    public static let governmentLetter = ProofOfAddressDocType(rawValue: "GOVERNMENT_LETTER")
+    public static let other = ProofOfAddressDocType(rawValue: "OTHER")
 }
 
 // MARK: - Sole Proprietor Document Type
 
 /// Type of sole proprietor document
-public enum SoleProprietorDocType: String, Codable, Sendable {
-    case bankStatement = "bank_statement"
-    case masterServiceAgreement = "master_service_agreement"
-    case salarySlip = "salary_slip"
+public struct SoleProprietorDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let bankStatement = SoleProprietorDocType(rawValue: "bank_statement")
+    public static let masterServiceAgreement = SoleProprietorDocType(rawValue: "master_service_agreement")
+    public static let salarySlip = SoleProprietorDocType(rawValue: "salary_slip")
 }
 
 // MARK: - Source of Funds Document Type
 
 /// Type of source of funds document
-public enum SourceOfFundsDocType: String, Codable, Sendable {
-    case businessIncome = "business_income"
-    case gamblingProceeds = "gambling_proceeds"
-    case gifts = "gifts"
-    case governmentBenefits = "government_benefits"
-    case inheritance = "inheritance"
-    case salary = "salary"
-    case investment = "investment"
-    case gift = "gift"
-    case other = "other"
-    case investmentLoans = "investment_loans"
-    case pensionRetirement = "pension_retirement"
-    case saleOfAssetsRealEstate = "sale_of_assets_real_estate"
-    case savings = "savings"
-    case esops = "esops"
-    case investmentProceeds = "investment_proceeds"
-    case someoneElseFunds = "someone_else_funds"
+public struct SourceOfFundsDocType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let businessIncome = SourceOfFundsDocType(rawValue: "business_income")
+    public static let gamblingProceeds = SourceOfFundsDocType(rawValue: "gambling_proceeds")
+    public static let gifts = SourceOfFundsDocType(rawValue: "gifts")
+    public static let governmentBenefits = SourceOfFundsDocType(rawValue: "government_benefits")
+    public static let inheritance = SourceOfFundsDocType(rawValue: "inheritance")
+    public static let salary = SourceOfFundsDocType(rawValue: "salary")
+    public static let investment = SourceOfFundsDocType(rawValue: "investment")
+    public static let gift = SourceOfFundsDocType(rawValue: "gift")
+    public static let other = SourceOfFundsDocType(rawValue: "other")
+    public static let investmentLoans = SourceOfFundsDocType(rawValue: "investment_loans")
+    public static let pensionRetirement = SourceOfFundsDocType(rawValue: "pension_retirement")
+    public static let saleOfAssetsRealEstate = SourceOfFundsDocType(rawValue: "sale_of_assets_real_estate")
+    public static let savings = SourceOfFundsDocType(rawValue: "savings")
+    public static let esops = SourceOfFundsDocType(rawValue: "esops")
+    public static let investmentProceeds = SourceOfFundsDocType(rawValue: "investment_proceeds")
+    public static let someoneElseFunds = SourceOfFundsDocType(rawValue: "someone_else_funds")
 }
 
 // MARK: - Purpose of Transactions
 
 /// Purpose of transactions
-public enum PurposeOfTransactions: String, Codable, Sendable {
-    case businessTransactions = "business_transactions"
-    case charitableDonations = "charitable_donations"
-    case investmentPurposes = "investment_purposes"
-    case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
-    case personalOrLivingExpenses = "personal_or_living_expenses"
-    case personalTransactions = "personal_transactions"
-    case investment = "investment"
-    case other = "other"
-    case protectWealth = "protect_wealth"
-    case purchaseGoodAndServices = "purchase_good_and_services"
-    case receivePaymentForFreelancing = "receive_payment_for_freelancing"
-    case receiveSalary = "receive_salary"
+public struct PurposeOfTransactions: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let businessTransactions = PurposeOfTransactions(rawValue: "business_transactions")
+    public static let charitableDonations = PurposeOfTransactions(rawValue: "charitable_donations")
+    public static let investmentPurposes = PurposeOfTransactions(rawValue: "investment_purposes")
+    public static let paymentsToFriendsOrFamilyAbroad = PurposeOfTransactions(rawValue: "payments_to_friends_or_family_abroad")
+    public static let personalOrLivingExpenses = PurposeOfTransactions(rawValue: "personal_or_living_expenses")
+    public static let personalTransactions = PurposeOfTransactions(rawValue: "personal_transactions")
+    public static let investment = PurposeOfTransactions(rawValue: "investment")
+    public static let other = PurposeOfTransactions(rawValue: "other")
+    public static let protectWealth = PurposeOfTransactions(rawValue: "protect_wealth")
+    public static let purchaseGoodAndServices = PurposeOfTransactions(rawValue: "purchase_good_and_services")
+    public static let receivePaymentForFreelancing = PurposeOfTransactions(rawValue: "receive_payment_for_freelancing")
+    public static let receiveSalary = PurposeOfTransactions(rawValue: "receive_salary")
 }
 
 // MARK: - Account Purpose
 
 /// Purpose of the account
-public enum AccountPurpose: String, Codable, Sendable {
-    case charitableDonations = "charitable_donations"
-    case ecommerceRetailPayments = "ecommerce_retail_payments"
-    case investmentPurposes = "investment_purposes"
-    case businessExpenses = "business_expenses"
-    case paymentsToFriendsOrFamilyAbroad = "payments_to_friends_or_family_abroad"
-    case personalOrLivingExpenses = "personal_or_living_expenses"
-    case protectWealth = "protect_wealth"
-    case purchaseGoodsAndServices = "purchase_goods_and_services"
-    case receivePaymentsForGoodsAndServices = "receive_payments_for_goods_and_services"
-    case taxOptimization = "tax_optimization"
-    case thirdPartyMoneyTransmission = "third_party_money_transmission"
-    case payroll = "payroll"
-    case treasuryManagement = "treasury_management"
-    case other = "other"
+public struct AccountPurpose: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let charitableDonations = AccountPurpose(rawValue: "charitable_donations")
+    public static let ecommerceRetailPayments = AccountPurpose(rawValue: "ecommerce_retail_payments")
+    public static let investmentPurposes = AccountPurpose(rawValue: "investment_purposes")
+    public static let businessExpenses = AccountPurpose(rawValue: "business_expenses")
+    public static let paymentsToFriendsOrFamilyAbroad = AccountPurpose(rawValue: "payments_to_friends_or_family_abroad")
+    public static let personalOrLivingExpenses = AccountPurpose(rawValue: "personal_or_living_expenses")
+    public static let protectWealth = AccountPurpose(rawValue: "protect_wealth")
+    public static let purchaseGoodsAndServices = AccountPurpose(rawValue: "purchase_goods_and_services")
+    public static let receivePaymentsForGoodsAndServices = AccountPurpose(rawValue: "receive_payments_for_goods_and_services")
+    public static let taxOptimization = AccountPurpose(rawValue: "tax_optimization")
+    public static let thirdPartyMoneyTransmission = AccountPurpose(rawValue: "third_party_money_transmission")
+    public static let payroll = AccountPurpose(rawValue: "payroll")
+    public static let treasuryManagement = AccountPurpose(rawValue: "treasury_management")
+    public static let other = AccountPurpose(rawValue: "other")
 }
 
 // MARK: - Business Type
 
 /// Type of business entity
-public enum BusinessType: String, Codable, Sendable {
-    case corporation = "corporation"
-    case llc = "llc"
-    case partnership = "partnership"
-    case soleProprietorship = "sole_proprietorship"
-    case trust = "trust"
-    case nonProfit = "non_profit"
+public struct BusinessType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let corporation = BusinessType(rawValue: "corporation")
+    public static let llc = BusinessType(rawValue: "llc")
+    public static let partnership = BusinessType(rawValue: "partnership")
+    public static let soleProprietorship = BusinessType(rawValue: "sole_proprietorship")
+    public static let trust = BusinessType(rawValue: "trust")
+    public static let nonProfit = BusinessType(rawValue: "non_profit")
 }
 
 // MARK: - Business Industry
 
-/// NAICS code for business industry classification
-public enum BusinessIndustry: String, Codable, Sendable {
-    case n111998 = "111998"
-    case n112120 = "112120"
-    case n113310 = "113310"
-    case n115114 = "115114"
-    case n541211 = "541211"
-    case n541810 = "541810"
-    case n541430 = "541430"
-    case n541715 = "541715"
-    case n541930 = "541930"
-    case n561422 = "561422"
-    case n561311 = "561311"
-    case n561612 = "561612"
-    case n561740 = "561740"
-    case n561730 = "561730"
-    case n236115 = "236115"
-    case n236220 = "236220"
-    case n237310 = "237310"
-    case n238210 = "238210"
-    case n811111 = "811111"
-    case n812111 = "812111"
-    case n812112 = "812112"
-    case n532111 = "532111"
-    case n624410 = "624410"
-    case n541922 = "541922"
-    case n811210 = "811210"
-    case n812199 = "812199"
-    case n611110 = "611110"
-    case n611310 = "611310"
-    case n611410 = "611410"
-    case n611710 = "611710"
-    case n211120 = "211120"
-    case n212114 = "212114"
-    case n221310 = "221310"
-    case n562111 = "562111"
-    case n562920 = "562920"
-    case n213112 = "213112"
-    case n522110 = "522110"
-    case n522210 = "522210"
-    case n522320 = "522320"
-    case n523150 = "523150"
-    case n523940 = "523940"
-    case n523999 = "523999"
-    case n524113 = "524113"
-    case n813110 = "813110"
-    case n813211 = "813211"
-    case n813219 = "813219"
-    case n551112 = "551112"
-    case n721110 = "721110"
-    case n722511 = "722511"
-    case n722513 = "722513"
-    case n561510 = "561510"
-    case n713110 = "713110"
-    case n713210 = "713210"
-    case n712110 = "712110"
-    case n711110 = "711110"
-    case n711211 = "711211"
-    case n621111 = "621111"
-    case n621210 = "621210"
-    case n622110 = "622110"
-    case n623110 = "623110"
-    case n621511 = "621511"
-    case n623220 = "623220"
-    case n541940 = "541940"
-    case n621399 = "621399"
-    case n621910 = "621910"
-    case n541110 = "541110"
-    case n311421 = "311421"
-    case n337121 = "337121"
-    case n322220 = "322220"
-    case n339920 = "339920"
-    case n334210 = "334210"
-    case n339930 = "339930"
-    case n312130 = "312130"
-    case n334111 = "334111"
-    case n334118 = "334118"
-    case n325412 = "325412"
-    case n339112 = "339112"
-    case n336110 = "336110"
-    case n336390 = "336390"
-    case n315990 = "315990"
-    case n313110 = "313110"
-    case n339910 = "339910"
-    case n516120 = "516120"
-    case n513130 = "513130"
-    case n512250 = "512250"
-    case n519130 = "519130"
-    case n711410 = "711410"
-    case n711510 = "711510"
-    case n531110 = "531110"
-    case n531120 = "531120"
-    case n531130 = "531130"
-    case n531190 = "531190"
-    case n531210 = "531210"
-    case n531311 = "531311"
-    case n531312 = "531312"
-    case n531320 = "531320"
-    case n531390 = "531390"
-    case n454110 = "454110"
-    case n445110 = "445110"
-    case n455110 = "455110"
-    case n457110 = "457110"
-    case n449210 = "449210"
-    case n444110 = "444110"
-    case n459210 = "459210"
-    case n459120 = "459120"
-    case n445320 = "445320"
-    case n458110 = "458110"
-    case n458210 = "458210"
-    case n458310 = "458310"
-    case n455219 = "455219"
-    case n424210 = "424210"
-    case n456110 = "456110"
-    case n541511 = "541511"
-    case n541512 = "541512"
-    case n541519 = "541519"
-    case n518210 = "518210"
-    case n511210 = "511210"
-    case n517111 = "517111"
-    case n517112 = "517112"
-    case n517410 = "517410"
-    case n481111 = "481111"
-    case n483111 = "483111"
-    case n485210 = "485210"
-    case n488510 = "488510"
-    case n484121 = "484121"
-    case n493110 = "493110"
-    case n423430 = "423430"
-    case n423690 = "423690"
-    case n423110 = "423110"
-    case n423830 = "423830"
-    case n423840 = "423840"
-    case n423510 = "423510"
-    case n424690 = "424690"
-    case n424990 = "424990"
-    case n424410 = "424410"
-    case n424480 = "424480"
-    case n423940 = "423940"
-    case n541611 = "541611"
-    case n541618 = "541618"
-    case n541330 = "541330"
-    case n541990 = "541990"
-    case n541214 = "541214"
-    case n561499 = "561499"
-    case dapp = "dapp"
-    case exchange = "exchange"
-    case gambling = "gambling"
-    case gaming = "gaming"
-    case infra = "infra"
-    case marketplace = "marketplace"
-    case neoBank = "neo_bank"
-    case other = "other"
-    case saas = "saas"
-    case social = "social"
-    case wallet = "wallet"
-}
-
 // MARK: - Estimated Annual Revenue
 
 /// Estimated annual revenue range
-public enum EstimatedAnnualRevenue: String, Codable, Sendable {
-    case zeroTo99999 = "0_99999"
-    case hundredKTo999999 = "100000_999999"
-    case oneMillionTo9999999 = "1000000_9999999"
-    case tenMillionTo49999999 = "10000000_49999999"
-    case fiftyMillionTo249999999 = "50000000_249999999"
-    case twoHundredFiftyMillionPlus = "250000000_plus"
+public struct EstimatedAnnualRevenue: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let zeroTo99999 = EstimatedAnnualRevenue(rawValue: "0_99999")
+    public static let hundredKTo999999 = EstimatedAnnualRevenue(rawValue: "100000_999999")
+    public static let oneMillionTo9999999 = EstimatedAnnualRevenue(rawValue: "1000000_9999999")
+    public static let tenMillionTo49999999 = EstimatedAnnualRevenue(rawValue: "10000000_49999999")
+    public static let fiftyMillionTo249999999 = EstimatedAnnualRevenue(rawValue: "50000000_249999999")
+    public static let twoHundredFiftyMillionPlus = EstimatedAnnualRevenue(rawValue: "250000000_plus")
 
     @available(*, deprecated, renamed: "twoHundredFiftyMillionPlus")
     public static var twoAndAHalfBillionPlus: Self { .twoHundredFiftyMillionPlus }
@@ -308,32 +180,43 @@ public enum EstimatedAnnualRevenue: String, Codable, Sendable {
 // MARK: - Source of Wealth
 
 /// Source of wealth for business customers
-public enum SourceOfWealth: String, Codable, Sendable {
-    case businessDividendsOrProfits = "business_dividends_or_profits"
-    case investments = "investments"
-    case assetSales = "asset_sales"
-    case clientInvestorContributions = "client_investor_contributions"
-    case gambling = "gambling"
-    case charitableContributions = "charitable_contributions"
-    case inheritance = "inheritance"
-    case affiliateOrRoyaltyIncome = "affiliate_or_royalty_income"
+public struct SourceOfWealth: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let businessDividendsOrProfits = SourceOfWealth(rawValue: "business_dividends_or_profits")
+    public static let investments = SourceOfWealth(rawValue: "investments")
+    public static let assetSales = SourceOfWealth(rawValue: "asset_sales")
+    public static let clientInvestorContributions = SourceOfWealth(rawValue: "client_investor_contributions")
+    public static let gambling = SourceOfWealth(rawValue: "gambling")
+    public static let charitableContributions = SourceOfWealth(rawValue: "charitable_contributions")
+    public static let inheritance = SourceOfWealth(rawValue: "inheritance")
+    public static let affiliateOrRoyaltyIncome = SourceOfWealth(rawValue: "affiliate_or_royalty_income")
+    public static let salaryOrWages = SourceOfWealth(rawValue: "salary_or_wages")
+    public static let savings = SourceOfWealth(rawValue: "savings")
 }
 
 // MARK: - AML Status
 
 /// AML screening status
-public enum AmlStatus: String, Codable, Sendable {
-    case clear = "clear"
-    case hit = "hit"
-    case error = "error"
+public struct AmlStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let clear = AmlStatus(rawValue: "clear")
+    public static let hit = AmlStatus(rawValue: "hit")
+    public static let error = AmlStatus(rawValue: "error")
 }
 
 // MARK: - Owner Tax Type
 
 /// Tax identifier type for owner
-public enum OwnerTaxType: String, Codable, Sendable {
-    case ssn = "SSN"
-    case itin = "ITIN"
+public struct OwnerTaxType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let ssn = OwnerTaxType(rawValue: "SSN")
+    public static let itin = OwnerTaxType(rawValue: "ITIN")
 }
 
 // MARK: - AML Hits
@@ -381,12 +264,15 @@ public struct AmlHits: Codable, Sendable, Equatable {
 // MARK: - Owner Role
 
 /// Role of an owner
-public enum OwnerRole: String, Codable, Sendable {
-    case beneficialOwner = "beneficial_owner"
-    case authorizedSigner = "authorized_signer"
-    case other = "other"
-    case beneficialControlling = "beneficial_controlling"
-    case controllingPerson = "controlling_person"
+public struct OwnerRole: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let beneficialOwner = OwnerRole(rawValue: "beneficial_owner")
+    public static let authorizedSigner = OwnerRole(rawValue: "authorized_signer")
+    public static let other = OwnerRole(rawValue: "other")
+    public static let beneficialControlling = OwnerRole(rawValue: "beneficial_controlling")
+    public static let controllingPerson = OwnerRole(rawValue: "controlling_person")
 }
 
 // MARK: - Owner
@@ -648,8 +534,6 @@ public struct CreateCustomerInput: Codable, Sendable {
     /// Purpose of transactions explanation (optional)
     public let purposeOfTransactionsExplanation: String?
     
-    /// Whether this is an FBO account (optional)
-    public let isFbo: Bool?
     
     /// Terms of service ID (optional)
     public let tosId: String?
@@ -667,7 +551,7 @@ public struct CreateCustomerInput: Codable, Sendable {
     public let businessDescription: String?
 
     /// Business industry NAICS code (optional)
-    public let businessIndustry: BusinessIndustry?
+    public let businessIndustry: String?
 
     /// Estimated annual revenue range (optional)
     public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
@@ -717,13 +601,12 @@ public struct CreateCustomerInput: Codable, Sendable {
         selfieFile: String? = nil,
         purposeOfTransactions: PurposeOfTransactions? = nil,
         purposeOfTransactionsExplanation: String? = nil,
-        isFbo: Bool? = nil,
         tosId: String? = nil,
         accountPurpose: AccountPurpose? = nil,
         accountPurposeOther: String? = nil,
         businessType: BusinessType? = nil,
         businessDescription: String? = nil,
-        businessIndustry: BusinessIndustry? = nil,
+        businessIndustry: String? = nil,
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
@@ -764,7 +647,6 @@ public struct CreateCustomerInput: Codable, Sendable {
         self.selfieFile = selfieFile
         self.purposeOfTransactions = purposeOfTransactions
         self.purposeOfTransactionsExplanation = purposeOfTransactionsExplanation
-        self.isFbo = isFbo
         self.tosId = tosId
         self.accountPurpose = accountPurpose
         self.accountPurposeOther = accountPurposeOther
@@ -813,7 +695,6 @@ public struct CreateCustomerInput: Codable, Sendable {
         case selfieFile = "selfie_file"
         case purposeOfTransactions = "purpose_of_transactions"
         case purposeOfTransactionsExplanation = "purpose_of_transactions_explanation"
-        case isFbo = "is_fbo"
         case tosId = "tos_id"
         case accountPurpose = "account_purpose"
         case accountPurposeOther = "account_purpose_other"
@@ -830,15 +711,18 @@ public struct CreateCustomerInput: Codable, Sendable {
 // MARK: - KYC Status
 
 /// KYC verification status
-public enum KYCStatus: String, Codable, Sendable {
-    case verifying = "verifying"
-    case approved = "approved"
-    case rejected = "rejected"
-    case deprecated = "deprecated"
-    case pendingReview = "pending_review"
-    case awaitingContract = "awaiting_contract"
-    case complianceRequest = "compliance_request"
-    case approvedRFI = "approved_rfi"
+public struct KYCStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let verifying = KYCStatus(rawValue: "verifying")
+    public static let approved = KYCStatus(rawValue: "approved")
+    public static let rejected = KYCStatus(rawValue: "rejected")
+    public static let deprecated = KYCStatus(rawValue: "deprecated")
+    public static let pendingReview = KYCStatus(rawValue: "pending_review")
+    public static let awaitingContract = KYCStatus(rawValue: "awaiting_contract")
+    public static let complianceRequest = KYCStatus(rawValue: "compliance_request")
+    public static let approvedRFI = KYCStatus(rawValue: "approved_rfi")
 }
 
 // MARK: - KYC Warning
@@ -886,9 +770,9 @@ public struct FraudWarning: Codable, Sendable, Equatable {
     public let operation: String
     
     /// Score
-    public let score: Int
+    public let score: Double
     
-    public init(id: String, name: String, operation: String, score: Int) {
+    public init(id: String, name: String, operation: String, score: Double) {
         self.id = id
         self.name = name
         self.operation = operation
@@ -901,15 +785,15 @@ public struct FraudWarning: Codable, Sendable, Equatable {
 /// Customer transaction limits
 public struct CustomerLimits: Codable, Sendable, Equatable {
     /// Per transaction limit
-    public let perTransaction: Int
+    public let perTransaction: Int?
     
     /// Daily limit
-    public let daily: Int
+    public let daily: Int?
     
     /// Monthly limit
-    public let monthly: Int
+    public let monthly: Int?
     
-    public init(perTransaction: Int, daily: Int, monthly: Int) {
+    public init(perTransaction: Int?, daily: Int?, monthly: Int?) {
         self.perTransaction = perTransaction
         self.daily = daily
         self.monthly = monthly
@@ -1080,7 +964,7 @@ public struct Customer: Codable, Sendable, Equatable {
     public let businessDescription: String?
 
     /// Business industry NAICS code
-    public let businessIndustry: BusinessIndustry?
+    public let businessIndustry: String?
 
     /// Estimated annual revenue range
     public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
@@ -1099,6 +983,15 @@ public struct Customer: Codable, Sendable, Equatable {
 
     /// AML screening match details
     public let amlHits: AmlHits?
+
+    /// The customer id (same as `id`).
+    public let customerId: String?
+
+    public let cnaeCondition: [String: AnyCodable]?
+
+    public let isNested: Bool?
+
+    public let virtualAccountPreapproval: [String: AnyCodable]?
 
     public init(
         id: String,
@@ -1152,13 +1045,17 @@ public struct Customer: Codable, Sendable, Equatable {
         accountPurposeOther: String? = nil,
         businessType: BusinessType? = nil,
         businessDescription: String? = nil,
-        businessIndustry: BusinessIndustry? = nil,
+        businessIndustry: String? = nil,
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
         occupation: String? = nil,
         amlStatus: AmlStatus? = nil,
-        amlHits: AmlHits? = nil
+        amlHits: AmlHits? = nil,
+        customerId: String? = nil,
+        cnaeCondition: [String: AnyCodable]? = nil,
+        isNested: Bool? = nil,
+        virtualAccountPreapproval: [String: AnyCodable]? = nil
     ) {
         self.id = id
         self.type = type
@@ -1218,6 +1115,10 @@ public struct Customer: Codable, Sendable, Equatable {
         self.occupation = occupation
         self.amlStatus = amlStatus
         self.amlHits = amlHits
+        self.customerId = customerId
+        self.cnaeCondition = cnaeCondition
+        self.isNested = isNested
+        self.virtualAccountPreapproval = virtualAccountPreapproval
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1279,6 +1180,10 @@ public struct Customer: Codable, Sendable, Equatable {
         case occupation
         case amlStatus = "aml_status"
         case amlHits = "aml_hits"
+        case customerId = "customer_id"
+        case cnaeCondition = "cnae_condition"
+        case isNested = "is_nested"
+        case virtualAccountPreapproval = "virtual_account_preapproval"
     }
 }
 
@@ -1337,8 +1242,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
     /// IP address (optional)
     public let ipAddress: String?
     
-    /// Whether this is an FBO account (optional)
-    public let isFbo: Bool?
     
     /// Last name (optional)
     public let lastName: String?
@@ -1404,7 +1307,7 @@ public struct UpdateCustomerInput: Codable, Sendable {
     public let businessDescription: String?
 
     /// Business industry NAICS code (optional)
-    public let businessIndustry: BusinessIndustry?
+    public let businessIndustry: String?
 
     /// Estimated annual revenue range (optional)
     public let estimatedAnnualRevenue: EstimatedAnnualRevenue?
@@ -1436,7 +1339,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
         imageUrl: String? = nil,
         incorporationDocFile: String? = nil,
         ipAddress: String? = nil,
-        isFbo: Bool? = nil,
         lastName: String? = nil,
         legalName: String? = nil,
         owners: [CustomerOwner]? = nil,
@@ -1458,7 +1360,7 @@ public struct UpdateCustomerInput: Codable, Sendable {
         accountPurposeOther: String? = nil,
         businessType: BusinessType? = nil,
         businessDescription: String? = nil,
-        businessIndustry: BusinessIndustry? = nil,
+        businessIndustry: String? = nil,
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
@@ -1481,7 +1383,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
         self.imageUrl = imageUrl
         self.incorporationDocFile = incorporationDocFile
         self.ipAddress = ipAddress
-        self.isFbo = isFbo
         self.lastName = lastName
         self.legalName = legalName
         self.owners = owners
@@ -1528,7 +1429,6 @@ public struct UpdateCustomerInput: Codable, Sendable {
         case imageUrl = "image_url"
         case incorporationDocFile = "incorporation_doc_file"
         case ipAddress = "ip_address"
-        case isFbo = "is_fbo"
         case lastName = "last_name"
         case legalName = "legal_name"
         case owners
@@ -1590,29 +1490,80 @@ public struct DeleteCustomerResponse: Codable, Sendable, Equatable {
     }
 }
 
-/// Pagination information
-public struct Pagination: Codable, Sendable, Equatable {
-    /// Whether there are more items
-    public let hasMore: Bool
-    
-    /// Next page cursor
-    public let nextPage: String?
-    
-    /// Previous page cursor
-    public let prevPage: String?
-    
-    public init(hasMore: Bool, nextPage: String? = nil, prevPage: String? = nil) {
-        self.hasMore = hasMore
-        self.nextPage = nextPage
-        self.prevPage = prevPage
+/// Response type for listing customers — API returns a plain array
+public typealias ListCustomersResponse = ListResult<Customer>
+
+/// Filters and cursors for listing customers. Every value is optional; unset ones are not sent.
+public struct ListCustomersInput: CursorPaginatedInput {
+    /// Page size (10, 50, 100, 200, 500 or 1000).
+    public var limit: Int?
+
+    /// Return items after this id (the previous page's `pagination.nextPage`).
+    public var startingAfter: String?
+
+    /// Return items before this id.
+    public var endingBefore: String?
+
+    /// Full name contains this text.
+    public var fullName: String?
+
+    /// Customer name contains this text.
+    public var customerName: String?
+
+    /// Only this KYC status.
+    public var status: KYCStatus?
+
+    /// Only this customer.
+    public var customerId: String?
+
+    /// Only customers with this bank account.
+    public var bankAccountId: String?
+
+    /// Only this country.
+    public var country: Country?
+
+    /// Deprecated: the API ignores `offset`. Use `startingAfter`.
+    @available(*, deprecated, message: "Ignored by the API; use startingAfter.")
+    public var offset: Int? {
+        get { legacyOffset }
+        set { legacyOffset = newValue }
     }
-    
-    enum CodingKeys: String, CodingKey {
-        case hasMore = "has_more"
-        case nextPage = "next_page"
-        case prevPage = "prev_page"
+    private var legacyOffset: Int?
+
+    public init(
+        limit: Int? = nil,
+        startingAfter: String? = nil,
+        endingBefore: String? = nil,
+        fullName: String? = nil,
+        customerName: String? = nil,
+        status: KYCStatus? = nil,
+        customerId: String? = nil,
+        bankAccountId: String? = nil,
+        country: Country? = nil
+    ) {
+        self.limit = limit
+        self.startingAfter = startingAfter
+        self.endingBefore = endingBefore
+        self.fullName = fullName
+        self.customerName = customerName
+        self.status = status
+        self.customerId = customerId
+        self.bankAccountId = bankAccountId
+        self.country = country
+    }
+
+    func toQueryParameters() -> QueryParameters {
+        var params = QueryParameters()
+        params["limit"] = limit.map(String.init)
+        params["offset"] = legacyOffset.map(String.init)
+        params["starting_after"] = startingAfter
+        params["ending_before"] = endingBefore
+        params["full_name"] = fullName
+        params["customer_name"] = customerName
+        params["status"] = status?.rawValue
+        params["customer_id"] = customerId
+        params["bank_account_id"] = bankAccountId
+        params["country"] = country?.rawValue
+        return params
     }
 }
-
-/// Response type for listing customers — API returns a plain array
-public typealias ListCustomersResponse = [Customer]

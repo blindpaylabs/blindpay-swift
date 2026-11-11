@@ -10,40 +10,53 @@ import Foundation
 // MARK: - Enums
 
 /// Payin status
-public enum PayinStatus: String, Codable, Sendable {
-  case processing = "processing"
-  case onHold = "on_hold"
-  case failed = "failed"
-  case refunded = "refunded"
-  case completed = "completed"
+public struct PayinStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let processing = PayinStatus(rawValue: "processing")
+    public static let onHold = PayinStatus(rawValue: "on_hold")
+    public static let failed = PayinStatus(rawValue: "failed")
+    public static let refunded = PayinStatus(rawValue: "refunded")
+    public static let completed = PayinStatus(rawValue: "completed")
 }
 
 /// Manual execution status for payin
-public enum ManualExecutionStatus: String, Codable, Sendable {
-  case pending = "pending"
-  case concluded = "concluded"
-  case failed = "failed"
+public struct ManualExecutionStatus: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let pending = ManualExecutionStatus(rawValue: "pending")
+    public static let concluded = ManualExecutionStatus(rawValue: "concluded")
+    public static let failed = ManualExecutionStatus(rawValue: "failed")
 }
 
 /// Payment method for payin
-public enum PaymentMethod: String, Codable, Sendable {
-  case ach = "ach"
-  case achPull = "ach_pull"
-  case wire = "wire"
-  case pix = "pix"
-  case card = "card"
-  case spei = "spei"
-  case transfers = "transfers"
-  case pse = "pse"
-  case internationalSwift = "international_swift"
-  case rtp = "rtp"
-  case ted = "ted"
+public struct PaymentMethod: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let ach = PaymentMethod(rawValue: "ach")
+    public static let achPull = PaymentMethod(rawValue: "ach_pull")
+    public static let wire = PaymentMethod(rawValue: "wire")
+    public static let pix = PaymentMethod(rawValue: "pix")
+    public static let card = PaymentMethod(rawValue: "card")
+    public static let spei = PaymentMethod(rawValue: "spei")
+    public static let transfers = PaymentMethod(rawValue: "transfers")
+    public static let pse = PaymentMethod(rawValue: "pse")
+    public static let internationalSwift = PaymentMethod(rawValue: "international_swift")
+    public static let rtp = PaymentMethod(rawValue: "rtp")
+    public static let ted = PaymentMethod(rawValue: "ted")
+    public static let breB = PaymentMethod(rawValue: "bre_b")
 }
 
 /// Payin type
-public enum PayinType: String, Codable, Sendable {
-  case individual = "individual"
-  case business = "business"
+public struct PayinType: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let individual = PayinType(rawValue: "individual")
+    public static let business = PayinType(rawValue: "business")
 }
 
 // MARK: - Tracking Types
@@ -83,6 +96,21 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
   /// Description
   public let description: String?
 
+  /// Card checkout details, for card payins.
+  public let cardInstruction: PayinQuoteCardInstruction?
+
+  public let cardClaimAt: String?
+
+  public let cardEvidence: [String: AnyCodable]?
+
+  public let cardFailedAttempts: Int?
+
+  public let cardGatesFailedAt: String?
+
+
+
+
+
   public init(
     step: String,
     status: String? = nil,
@@ -94,7 +122,12 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     senderAccountNumber: String? = nil,
     traceNumber: String? = nil,
     transactionReference: String? = nil,
-    description: String? = nil
+    description: String? = nil,
+    cardInstruction: PayinQuoteCardInstruction? = nil,
+    cardClaimAt: String? = nil,
+    cardEvidence: [String: AnyCodable]? = nil,
+    cardFailedAttempts: Int? = nil,
+    cardGatesFailedAt: String? = nil
   ) {
     self.step = step
     self.status = status
@@ -107,6 +140,11 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     self.traceNumber = traceNumber
     self.transactionReference = transactionReference
     self.description = description
+    self.cardInstruction = cardInstruction
+    self.cardClaimAt = cardClaimAt
+    self.cardEvidence = cardEvidence
+    self.cardFailedAttempts = cardFailedAttempts
+    self.cardGatesFailedAt = cardGatesFailedAt
   }
 
   enum CodingKeys: String, CodingKey {
@@ -121,6 +159,11 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     case traceNumber = "trace_number"
     case transactionReference = "transaction_reference"
     case description
+    case cardInstruction = "card_instruction"
+    case cardClaimAt = "card_claim_at"
+    case cardEvidence = "card_evidence"
+    case cardFailedAttempts = "card_failed_attempts"
+    case cardGatesFailedAt = "card_gates_failed_at"
   }
 }
 
@@ -636,85 +679,99 @@ public struct Payin: Codable, Sendable, Equatable {
   }
 }
 
-// MARK: - Pagination Response
-
-/// Pagination metadata for payin list responses
 // MARK: - Response Types
 
-/// Response type for listing payins (plain array)
-public typealias ListPayinsResponse = [Payin]
+/// One page of payins (see ``ListResult``).
+public typealias ListPayinsResponse = ListResult<Payin>
 
 /// Response type for single payin
 public typealias PayinResponse = Payin
 
 // MARK: - Input Types
 
-/// Input parameters for listing payins
-public struct ListPayinsInput: Codable, Sendable {
-  /// Number of items to return
-  public let limit: String?
+/// Filters and cursors for listing payins. Every value is optional; unset ones are not sent.
+public struct ListPayinsInput: CursorPaginatedInput {
+  /// Page size (10, 50, 100, 200, 500 or 1000).
+  public var limit: Int?
 
-  /// Number of items to skip
-  public let offset: String?
+  /// Return items after this id (the previous page's `pagination.nextPage`).
+  public var startingAfter: String?
 
-  /// Cursor for pagination (starting after this ID)
-  public let startingAfter: String?
+  /// Return items before this id.
+  public var endingBefore: String?
 
-  /// Cursor for pagination (ending before this ID)
-  public let endingBefore: String?
+  /// Only this customer.
+  public var customerId: String?
 
-  /// Filter by customer ID
-  public let customerId: String?
+  /// Only this status.
+  public var status: PayinStatus?
 
-  /// Filter by status
-  public let status: PayinStatus?
+  /// Customer name contains this text.
+  public var customerName: String?
+
+  /// Only this bank account.
+  public var bankAccountId: String?
+
+  /// Only this country.
+  public var country: Country?
+
+  /// Only this payment method.
+  public var paymentMethod: PaymentMethod?
+
+  /// Only this network.
+  public var network: Network?
+
+  /// Only this token.
+  public var token: StablecoinToken?
+
+  /// Deprecated: the API ignores `offset`. Use `startingAfter`.
+  @available(*, deprecated, message: "Ignored by the API; use startingAfter.")
+  public var offset: Int? {
+    get { legacyOffset }
+    set { legacyOffset = newValue }
+  }
+  private var legacyOffset: Int?
 
   public init(
-    limit: String? = nil,
-    offset: String? = nil,
+    limit: Int? = nil,
     startingAfter: String? = nil,
     endingBefore: String? = nil,
     customerId: String? = nil,
-    status: PayinStatus? = nil
+    status: PayinStatus? = nil,
+    customerName: String? = nil,
+    bankAccountId: String? = nil,
+    country: Country? = nil,
+    paymentMethod: PaymentMethod? = nil,
+    network: Network? = nil,
+    token: StablecoinToken? = nil
   ) {
     self.limit = limit
-    self.offset = offset
     self.startingAfter = startingAfter
     self.endingBefore = endingBefore
     self.customerId = customerId
     self.status = status
+    self.customerName = customerName
+    self.bankAccountId = bankAccountId
+    self.country = country
+    self.paymentMethod = paymentMethod
+    self.network = network
+    self.token = token
   }
 
-  enum CodingKeys: String, CodingKey {
-    case limit
-    case offset
-    case startingAfter = "starting_after"
-    case endingBefore = "ending_before"
-    case customerId = "customer_id"
-    case status
-  }
-
-  /// Converts to query parameters dictionary
-  func toQueryParameters() -> [String: String] {
-    var params: [String: String] = [:]
-    if let limit = limit {
-      params["limit"] = limit
-    }
-    if let offset = offset {
-      params["offset"] = offset
-    }
-    if let startingAfter = startingAfter {
-      params["starting_after"] = startingAfter
-    }
-    if let endingBefore = endingBefore {
-      params["ending_before"] = endingBefore
-    }
-    if let customerId = customerId {
-      params["customer_id"] = customerId
-    }
-    if let status = status {
-      params["status"] = status.rawValue
-    }
+  func toQueryParameters() -> QueryParameters {
+    var params = QueryParameters()
+    params["limit"] = limit.map(String.init)
+    params["offset"] = legacyOffset.map(String.init)
+    params["starting_after"] = startingAfter
+    params["ending_before"] = endingBefore
+    params["customer_id"] = customerId
+    params["status"] = status?.rawValue
+    params["customer_name"] = customerName
+    params["bank_account_id"] = bankAccountId
+    params["country"] = country?.rawValue
+    params["payment_method"] = paymentMethod?.rawValue
+    params["network"] = network?.rawValue
+    params["token"] = token?.rawValue
     return params
   }
 }

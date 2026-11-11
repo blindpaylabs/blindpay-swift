@@ -32,7 +32,7 @@ public final class PayinQuotesService: Sendable {
     ///     blockchainWalletId: "bw_000000000000",
     ///     currencyType: .sender,
     ///     coverFees: true,
-    ///     requestAmount: 1000.0, // dollars; sent as 100000 cents
+    ///     requestAmount: 100000, // cents (1,000.00)
     ///     paymentMethod: .pix,
     ///     token: .usdc,
     ///     partnerFeeId: "pf_000000000000"
@@ -45,70 +45,16 @@ public final class PayinQuotesService: Sendable {
     ///     print("Receiver amount (cents): \(quote.receiverAmount ?? 0)")
     /// }
     /// ```
-    public func create(data: CreatePayinQuoteInput) async throws -> APIResponse<CreatePayinQuoteResponse> {
+    public func create(data: CreatePayinQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
-    /// Retrieves a specific payin quote by ID
-    ///
-    /// This method fetches the details of a specific payin quote.
-    ///
-    /// - Parameter id: The unique identifier of the payin quote
-    /// - Returns: An `APIResponse` containing the `PayinQuote` object
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let response = try await blindPay.instances.payins.quotes.get(id: "pq_123")
-    /// if let quote = response.data {
-    ///     print("Quote ID: \(quote.id)")
-    ///     print("Expires at: \(quote.expiresAt)")
-    ///     print("Sender amount: \(quote.senderAmount)")
-    ///     print("Receiver amount: \(quote.receiverAmount)")
-    /// }
-    /// ```
-    public func get(id: String) async throws -> APIResponse<PayinQuoteResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payin-quotes/\(id)",
-            method: .get
-        )
-    }
     
-    /// Lists all payin quotes for the instance
-    ///
-    /// This method fetches a list of all payin quotes associated with the instance,
-    /// with optional filtering and pagination support.
-    ///
-    /// - Parameter params: Optional parameters for filtering and pagination
-    /// - Returns: An `APIResponse` containing an array of `PayinQuote` objects
-    /// - Throws: `BlindPayError` if the request fails
-    ///
-    /// Example:
-    /// ```swift
-    /// let params = ListPayinQuotesInput(
-    ///     limit: "50",
-    ///     customerId: "re_123"
-    /// )
-    /// let response = try await blindPay.instances.payins.quotes.list(params: params)
-    /// if let quotes = response.data {
-    ///     print("Found \(quotes.count) payin quotes")
-    ///     for quote in quotes {
-    ///         print("Quote ID: \(quote.id)")
-    ///     }
-    /// }
-    /// ```
-    public func list(params: ListPayinQuotesInput? = nil) async throws -> APIResponse<PayinQuotesResponse> {
-        let queryParams = params?.toQueryParameters() ?? [:]
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payin-quotes",
-            method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
-        )
-    }
     
     /// Gets the foreign exchange rate between two currencies for payin quotes
     ///
@@ -125,7 +71,7 @@ public final class PayinQuotesService: Sendable {
     ///     currencyType: .sender,
     ///     from: .usdc,
     ///     to: .brl,
-    ///     requestAmount: 1000.0
+    ///     requestAmount: 100000 // cents (1,000.00)
     /// )
     /// let response = try await blindPay.instances.payins.quotes.getFxRate(data: input)
     /// if let fxRate = response.data {
@@ -134,11 +80,12 @@ public final class PayinQuotesService: Sendable {
     ///     print("Result amount: \(fxRate.resultAmount)")
     /// }
     /// ```
-    public func getFxRate(data: GetFxRateInput) async throws -> APIResponse<GetFxRateResponse> {
+    public func getFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes/fx",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

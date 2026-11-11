@@ -55,11 +55,12 @@ public final class TermsOfServiceService: Sendable {
     ///     // Open result.url in a browser to accept the terms
     /// }
     /// ```
-    public func initiate(data: InitiateTosInput) async throws -> APIResponse<InitiateTosResponse> {
+    public func initiate(data: InitiateTosInput, options: RequestOptions? = nil) async throws -> APIResponse<InitiateTosResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/instances/\(instanceId)/tos",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }
