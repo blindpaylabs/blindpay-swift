@@ -21,6 +21,11 @@ struct RecordedRequest: Sendable {
 
     var path: String { url.path }
 
+    /// The path exactly as sent, percent-encoding included.
+    var rawPath: String {
+        URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedPath ?? ""
+    }
+
     /// Query items in wire order.
     var queryItems: [URLQueryItem] {
         URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []

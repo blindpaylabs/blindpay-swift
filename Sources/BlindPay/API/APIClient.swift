@@ -31,7 +31,7 @@ internal final class APIClient: Sendable {
 
     /// Sends a JSON request (or a body-less one).
     func request<T: Decodable & Sendable>(
-        endpoint: String,
+        endpoint: Endpoint,
         method: HTTPMethod = .get,
         body: (any Encodable)? = nil,
         queryParameters: QueryParameters? = nil,
@@ -62,7 +62,7 @@ internal final class APIClient: Sendable {
     /// carries an idempotency key (the API skips multipart) and is never
     /// retried.
     func requestMultipart<T: Decodable & Sendable>(
-        endpoint: String,
+        endpoint: Endpoint,
         method: HTTPMethod,
         form: MultipartFormData,
         queryParameters: QueryParameters? = nil,
@@ -99,7 +99,7 @@ internal final class APIClient: Sendable {
     }
 
     private func makeRequest(
-        endpoint: String,
+        endpoint: Endpoint,
         method: HTTPMethod,
         queryParameters: QueryParameters?,
         body: Data?,
@@ -123,8 +123,8 @@ internal final class APIClient: Sendable {
         return request
     }
 
-    private func makeURL(endpoint: String, queryParameters: QueryParameters?) throws -> URL {
-        guard var components = URLComponents(string: "\(configuration.baseURL)\(endpoint)") else {
+    private func makeURL(endpoint: Endpoint, queryParameters: QueryParameters?) throws -> URL {
+        guard var components = URLComponents(string: configuration.baseURL + endpoint.path) else {
             throw BlindPayError.invalidURL
         }
         if let queryParameters = queryParameters, !queryParameters.isEmpty {
