@@ -68,11 +68,30 @@ The same applies to `GetFxRateInput.requestAmount`, `CreatePayinQuoteInput.reque
 | `CreatePayoutEvmInput`, `CreatePayoutStellarInput`, `CreatePayoutSolanaInput`, `AuthorizeStellarInput` | `senderWalletAddress` required | exactly one of `senderWalletAddress` or the new `walletId` |
 | `RequestLimitIncreaseInput` | `supportingDocumentType`/`File` required | the three limits are `Int?` (sent as `null` when nil); documents optional; new `supportingDocuments` |
 | `PrepareDelegateSolanaInput` | `init(amount:ownerAddress:tokenAddress:)` | `init(ownerAddress:amount:tokenAddress:quoteId:)` |
-| `CreatePartnerFeeInput` | `evmWalletAddress` required | removed (not an API field); `PartnerFee` lost it too |
+| `CreatePartnerFeeInput` | `evmWalletAddress` required, `stellarWalletAddress` optional | both removed (not API fields); `PartnerFee` and `CreatePartnerFeeResponse` lose them too |
 | `CreateCustomerInput`, `UpdateCustomerInput` | `isFbo` | removed (the API ignores it) |
 | `CreatePayinQuoteInput` | `customerId`, `network`, `description` | removed; matches `CreatePayinQuoteIn` |
 | `UploadInput` | JSON `{bucket, file}` | `UploadInput(file: Data, fileName:, contentType:, bucket:)`, sent as multipart |
 | `List*Input` | `limit: String?`, `offset: String?` | `limit: Int?`, every API filter, `offset` deprecated (the API ignores it) |
+
+```swift
+// 4.x
+CreatePayoutEvmInput(quoteId: "qu_1", senderWalletAddress: "0xabc")
+CreatePartnerFeeInput(evmWalletAddress: "0xabc", name: "fee", payinFlatFee: 0, payinPercentageFee: 0,
+                      payoutFlatFee: 0, payoutPercentageFee: 0)
+RequestLimitIncreaseInput(perTransaction: 500000, daily: 1000000, monthly: 5000000,
+                          supportingDocumentType: .individualBankStatement, supportingDocumentFile: url)
+PrepareDelegateSolanaInput(amount: "10", ownerAddress: owner, tokenAddress: mint)
+CreateCustomerInput(country: .us, email: email, kycType: .standard, type: .individual, isFbo: false)
+
+// 5.0
+CreatePayoutEvmInput(quoteId: "qu_1", senderWalletAddress: "0xabc")   // or walletId: "bw_1"
+CreatePartnerFeeInput(name: "fee", payinFlatFee: 0, payinPercentageFee: 0, payoutFlatFee: 0, payoutPercentageFee: 0)
+RequestLimitIncreaseInput(perTransaction: 500000, daily: 1000000, monthly: nil,
+                          supportingDocuments: [LimitIncreaseSupportingDocument(type: .individualBankStatement, file: url)])
+PrepareDelegateSolanaInput(ownerAddress: owner, amount: "10", tokenAddress: mint)
+CreateCustomerInput(country: .us, email: email, kycType: .standard, type: .individual)
+```
 
 ## Responses
 
@@ -81,6 +100,21 @@ The same applies to `GetFxRateInput.requestAmount`, `CreatePayinQuoteInput.reque
 - Fields the API can omit or return as null are optional: e.g. `Payout.name`/`type`, `VirtualAccount.us`, `SwiftCodeResponse.address`/`postcode`, the customer limit amounts.
 - `FraudWarning.score`, `OnboardingOwner.ownershipPercentage` are `Double`.
 - `CustodialWalletBalanceResponse` gains `eurc`/`eurb`.
+- Cent amounts on quote and transfer responses are `Int`: `CreateQuoteResponse.senderAmount`/`receiverAmount`/`partnerFeeAmount`/`customerLocalAmount`, and `senderAmount`/`receiverAmount`/`partnerFeeAmount` on `CreateTransferQuoteResponse` and `Transfer`.
+
+```swift
+// 4.x
+let upload = try await blindPay.createUpload(data: UploadInput(bucket: .onboarding, file: base64)).data?.url
+let naics = try await blindPay.getNaicsCodes().data?.first?.code
+let fee: Double? = quote.senderAmount                        // 1010.0
+let name: String = payout.name
+
+// 5.0
+let upload = try await blindPay.createUpload(data: UploadInput(file: pdf, fileName: "a.pdf", bucket: .onboarding)).data?.fileUrl
+let naics = try await blindPay.getNaicsCodes().data?.first?.value
+let fee: Int? = quote.senderAmount                           // 1010 (cents)
+let name: String? = payout.name
+```
 
 ## Lists return `ListResult`
 
@@ -113,12 +147,38 @@ let data = try response.get()   // throws the APIError
 ```
 
 - `APIError` gains `status`, `code`, `description`, `errors`, `traceId`, `requestId`, `idempotencyKey`, `retryable`, `headers`. `APIResponse` is no longer `Codable`.
-- `BlindPayError.httpError` is removed: every non-2xx is an `APIError`, including non-JSON bodies. `networkError` carries the idempotency key; new cases: `timeout`, `invalidRequest`, `webhookVerificationFailed`.
+- `BlindPayError.httpError` is removed: every non-2xx is an `APIError`, including non-JSON bodies.
+- `APIError.retryable` means a resend can be safe: a mutation is retryable only if it carried an idempotency key (resend with that key), and a mutation 408 never is.
+- `networkError` and `decodingError` carry more: patterns need the extra bindings.
+- New cases: `timeout`, `invalidRequest`, `incompleteResponse` (the status arrived but the body didn't), `cancelled(lastError:)` (cancelled while waiting to retry after an API error), `webhookVerificationFailed`.
+
+```swift
+// 4.x
+catch BlindPayError.networkError(let error) { ... }
+catch BlindPayError.decodingError(let error) { ... }
+
+// 5.0
+catch BlindPayError.networkError(let error, let idempotencyKey) { ... }        // no response received
+catch BlindPayError.decodingError(let error, let status, let idempotencyKey) { ... }
+catch BlindPayError.incompleteResponse(let status, let error, let idempotencyKey) { ... }
+// or, for any of them:
+catch let error as BlindPayError { resendLater(key: error.idempotencyKey) }
+```
 
 ## Removed methods
 
 - `getPayinQuote(id:)`, `listPayinQuotes(params:)`, `payins.quotes.get(id:)` and `payins.quotes.list(params:)`: the API has no such routes, so they always failed. `PayinQuote`, `PayinQuoteResponse`, `PayinQuotesResponse` and `ListPayinQuotesInput` are removed with them.
 - The `GetRails` executable is no longer a package product (run it with `swift run GetRails` from a checkout).
+
+```swift
+// 4.x
+let quote = try await blindPay.getPayinQuote(id: "pq_1")       // always failed: the route doesn't exist
+let quotes = try await blindPay.listPayinQuotes()
+
+// 5.0: keep the CreatePayinQuoteResponse returned by createPayinQuote(data:);
+// the payin it funds is readable with getPayin(payinId:) / listPayins(params:).
+let quote = try await blindPay.createPayinQuote(data: input).get()
+```
 
 ## Renamed or moved
 
@@ -128,7 +188,22 @@ let data = try response.get()   // throws the APIError
 | `URLSessionTransport(session:)` | `URLSessionTransport(configuration:)` (only in 5.0 pre-releases) |
 | `customers(customerId: "A").virtualAccounts.list(customerId: "B")` (the parameter overrode the scoped customer) | `customers(customerId: "A").virtualAccounts.list()`; same for `get`, `create`, `update` |
 | `bankAccounts.offrampWallets.list(customerId:bankAccountId:)` (and `create`, `get`) | `bankAccounts.offrampWallets.list(bankAccountId:)`; the customer comes from `customers(customerId:)` |
+| `BlindPayError.decodingError(_)` | `BlindPayError.decodingError(_, status:, idempotencyKey:)` |
 | facade-only customer, transfer, fee and payout-document methods | still on the facade, now delegating to `instances.customers`, `customers(customerId:)`, `instances.transfers`, `instances.transferQuotes`, `instances.getFees()`, `instances.payouts.submitDocuments(...)` |
+
+```swift
+// 4.x
+let event: WebhookEvent = .payoutComplete
+CreateWebhookEndpointInput(url: url, events: [.payoutComplete])
+blindPay.customers(customerId: "cu_1").virtualAccounts.list(customerId: "cu_1")
+blindPay.customers(customerId: "cu_1").bankAccounts.offrampWallets.get(customerId: "cu_1", bankAccountId: "ba_1", walletId: "ow_1")
+
+// 5.0
+let event: WebhookEventType = .payoutComplete
+CreateWebhookEndpointInput(url: url, events: [.payoutComplete])  // unchanged call site
+blindPay.customers(customerId: "cu_1").virtualAccounts.list()
+blindPay.customers(customerId: "cu_1").bankAccounts.offrampWallets.get(bankAccountId: "ba_1", walletId: "ow_1")
+```
 
 ## New
 
