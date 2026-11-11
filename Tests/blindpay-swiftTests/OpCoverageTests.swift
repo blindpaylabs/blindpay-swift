@@ -23,7 +23,7 @@ private let file = Data("%PDF-1.4".utf8)
 /// One call per operation, keyed exactly as in Fixtures/index.json.
 private let calls: [String: Call] = [
     // Available
-    "GET /v1/available/bank-details": { _ = try await $0.available.getBankDetails(rail: "pix").get() },
+    "GET /v1/available/bank-details": { _ = try await $0.available.getBankDetails(rail: .pix).get() },
     "GET /v1/available/naics": { _ = try await $0.available.getNaicsCodes().get() },
     "GET /v1/available/rails": { _ = try await $0.available.getRails().get() },
     "GET /v1/available/swift/{swift}": { _ = try await $0.available.getSwiftCode(swift: "BOFAUS3N").get() },

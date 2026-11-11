@@ -70,7 +70,7 @@ public final class BlindPay: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.getBankDetails(rail: "wire")
+    /// let response = try await blindPay.getBankDetails(rail: .wire)
     /// if let fields = response.data {
     ///     for field in fields {
     ///         print("\(field.label): required=\(field.required), key=\(field.key)")
@@ -80,8 +80,14 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
+    public func getBankDetails(rail: Rail, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
         return try await available.getBankDetails(rail: rail, options: options)
+    }
+
+    @available(*, deprecated, message: "Pass a Rail: getBankDetails(rail: .pix).")
+    @_disfavoredOverload
+    public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
+        return try await available.getBankDetails(rail: Rail(rawValue: rail), options: options)
     }
 
     /// Retrieves bank information for a specific SWIFT code
@@ -1108,20 +1114,25 @@ public final class BlindPay: Sendable {
     ///
     /// This method fetches detailed information about a customer, including KYC status, warnings, and limits.
     ///
-    /// - Parameter id: The unique identifier of the customer
+    /// - Parameter customerId: The unique identifier of the customer
     /// - Returns: An `APIResponse` containing the customer details
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.getCustomer(id: "re_123456789012345")
+    /// let response = try await blindPay.getCustomer(customerId: "cu_123456789012345")
     /// if let customer = response.data {
     ///     print("Customer: \(customer.email)")
     ///     print("KYC Status: \(customer.kycStatus?.rawValue ?? "unknown")")
     /// }
     /// ```
+    public func getCustomer(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<Customer> {
+        return try await customers(customerId: customerId).get(options: options)
+    }
+
+    @available(*, deprecated, renamed: "getCustomer(customerId:options:)")
     public func getCustomer(id: String, options: RequestOptions? = nil) async throws -> APIResponse<Customer> {
-        return try await customers(customerId: id).get(options: options)
+        return try await getCustomer(customerId: id, options: options)
     }
     
     /// Updates an existing customer
@@ -1129,7 +1140,7 @@ public final class BlindPay: Sendable {
     /// This method updates customer information. Only provided fields will be updated.
     ///
     /// - Parameters:
-    ///   - id: The unique identifier of the customer to update
+    ///   - customerId: The unique identifier of the customer to update
     ///   - data: The update data containing the fields to update
     /// - Returns: An `APIResponse` containing the update success status
     /// - Throws: `BlindPayError` if the request fails
@@ -1142,52 +1153,67 @@ public final class BlindPay: Sendable {
     ///     firstName: "Jane",
     ///     lastName: "Smith"
     /// )
-    /// let response = try await blindPay.updateCustomer(id: "re_123", data: input)
+    /// let response = try await blindPay.updateCustomer(customerId: "cu_123", data: input)
     /// if let result = response.data {
     ///     print("Update successful: \(result.success)")
     /// }
     /// ```
+    public func updateCustomer(customerId: String, data: UpdateCustomerInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdateCustomerResponse> {
+        return try await customers(customerId: customerId).update(data: data, options: options)
+    }
+
+    @available(*, deprecated, renamed: "updateCustomer(customerId:data:options:)")
     public func updateCustomer(id: String, data: UpdateCustomerInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdateCustomerResponse> {
-        return try await customers(customerId: id).update(data: data, options: options)
+        return try await updateCustomer(customerId: id, data: data, options: options)
     }
     
     /// Deletes a customer
     ///
     /// This method permanently deletes a customer. This action cannot be undone.
     ///
-    /// - Parameter id: The unique identifier of the customer to delete
+    /// - Parameter customerId: The unique identifier of the customer to delete
     /// - Returns: An `APIResponse` containing the deletion success status
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.deleteCustomer(id: "re_123456789012345")
+    /// let response = try await blindPay.deleteCustomer(customerId: "cu_123456789012345")
     /// if let result = response.data {
     ///     print("Deletion successful: \(result.success)")
     /// }
     /// ```
+    public func deleteCustomer(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteCustomerResponse> {
+        return try await customers(customerId: customerId).delete(options: options)
+    }
+
+    @available(*, deprecated, renamed: "deleteCustomer(customerId:options:)")
     public func deleteCustomer(id: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteCustomerResponse> {
-        return try await customers(customerId: id).delete(options: options)
+        return try await deleteCustomer(customerId: id, options: options)
     }
     
     /// Gets customer limits
     ///
     /// This method retrieves the current payin and payout limits for a customer.
     ///
-    /// - Parameter id: The unique identifier of the customer
+    /// - Parameter customerId: The unique identifier of the customer
     /// - Returns: An `APIResponse` containing the customer limits
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.getCustomerLimits(id: "re_123456789012345")
+    /// let response = try await blindPay.getCustomerLimits(customerId: "cu_123456789012345")
     /// if let limits = response.data {
     ///     print("Payin daily: \(limits.limits.payin.daily)")
     ///     print("Payout monthly: \(limits.limits.payout.monthly)")
     /// }
     /// ```
+    public func getCustomerLimits(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<CustomerLimitsResponse> {
+        return try await customers(customerId: customerId).getLimits(options: options)
+    }
+
+    @available(*, deprecated, renamed: "getCustomerLimits(customerId:options:)")
     public func getCustomerLimits(id: String, options: RequestOptions? = nil) async throws -> APIResponse<CustomerLimitsResponse> {
-        return try await customers(customerId: id).getLimits(options: options)
+        return try await getCustomerLimits(customerId: id, options: options)
     }
     
     /// Requests a limit increase for a customer

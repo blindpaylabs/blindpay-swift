@@ -188,6 +188,8 @@ let quote = try await blindPay.createPayinQuote(data: input).get()
 | `URLSessionTransport(session:)` | `URLSessionTransport(configuration:)` (only in 5.0 pre-releases) |
 | `customers(customerId: "A").virtualAccounts.list(customerId: "B")` (the parameter overrode the scoped customer) | `customers(customerId: "A").virtualAccounts.list()`; same for `get`, `create`, `update` |
 | `bankAccounts.offrampWallets.list(customerId:bankAccountId:)` (and `create`, `get`) | `bankAccounts.offrampWallets.list(bankAccountId:)`; the customer comes from `customers(customerId:)` |
+| `getBankDetails(rail: String)` | `getBankDetails(rail: Rail)`, e.g. `.pix` (the `String` form still compiles, deprecated) |
+| `getCustomer(id:)`, `updateCustomer(id:data:)`, `deleteCustomer(id:)`, `getCustomerLimits(id:)` | the same methods with `customerId:` (the `id:` forms still compile, deprecated) |
 | `BlindPayError.decodingError(_)` | `BlindPayError.decodingError(_, status:, idempotencyKey:)` |
 | facade-only customer, transfer, fee and payout-document methods | still on the facade, now delegating to `instances.customers`, `customers(customerId:)`, `instances.transfers`, `instances.transferQuotes`, `instances.getFees()`, `instances.payouts.submitDocuments(...)` |
 

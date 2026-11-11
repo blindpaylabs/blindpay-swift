@@ -53,7 +53,7 @@ public final class AvailableService: Sendable {
     ///
     /// Example:
     /// ```swift
-    /// let response = try await blindPay.available.getBankDetails(rail: "wire")
+    /// let response = try await blindPay.available.getBankDetails(rail: .wire)
     /// if let fields = response.data {
     ///     for field in fields {
     ///         print("\(field.label): required=\(field.required), key=\(field.key)")
@@ -63,15 +63,20 @@ public final class AvailableService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<
-        BankDetailResponse
-    > {
+    public func getBankDetails(rail: Rail, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
         return try await apiClient.request(
             endpoint: "/v1/available/bank-details",
             method: .get,
-            queryParameters: ["rail": rail],
+            queryParameters: ["rail": rail.rawValue],
             options: options
         )
+    }
+
+    /// Pass a ``Rail`` instead (`.pix`, or `Rail(rawValue:)` for any value).
+    @available(*, deprecated, message: "Pass a Rail: getBankDetails(rail: .pix).")
+    @_disfavoredOverload
+    public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
+        return try await getBankDetails(rail: Rail(rawValue: rail), options: options)
     }
 
     /// Retrieves bank information for a specific SWIFT code
