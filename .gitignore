@@ -8,3 +8,4 @@ DerivedData/
 .netrc
 /.api-sync/spec-current.json
 /.api-sync/delivery.json
+Package.resolved

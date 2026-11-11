@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -21,9 +21,17 @@ let package = Package(
             targets: ["GetRails"]
         ),
     ],
+    dependencies: [
+        // HMAC-SHA256 for webhook verification on Linux, where CryptoKit
+        // doesn't exist. Apple platforms use CryptoKit and never link it.
+        .package(url: "https://github.com/apple/swift-crypto.git", "3.0.0"..<"5.0.0"),
+    ],
     targets: [
         .target(
             name: "BlindPay",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+            ],
             path: "Sources/BlindPay"
         ),
         .executableTarget(

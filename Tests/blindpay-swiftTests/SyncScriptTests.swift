@@ -304,7 +304,7 @@ private func baseSpec(extraSchemas: [String: Any] = [:], extraPaths: [String: An
     return spec
 }
 
-private let baseSpecMap: [String: Any] = [
+nonisolated(unsafe) private let baseSpecMap: [String: Any] = [
     "enums": [
         ["spec": ["schema": "ThingOut", "property": "status"], "sdk": ["file": "Models/Thing.swift", "symbol": "FixtureStatus"]],
     ],
