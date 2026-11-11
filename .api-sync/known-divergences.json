@@ -2,7 +2,7 @@
   {
     "field": "request_amount",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "CreatePayinQuoteIn",
     "symbol": "CreatePayinQuoteInput.requestAmount"
@@ -10,7 +10,7 @@
   {
     "field": "request_amount",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "CreateTransferQuoteIn",
     "symbol": "CreateTransferQuoteInput.requestAmount"
@@ -18,7 +18,7 @@
   {
     "enum": "Currency",
     "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "EUR was added to the fx-rate and payin-quote currency enums. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
     "specValues": [
       "EUR"
@@ -27,7 +27,7 @@
   {
     "enum": "EstimatedTimeOfArrival",
     "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "New estimated-arrival bucket between the existing 5_min and 30_min bands. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
     "specValues": [
       "5_30_min"
@@ -36,7 +36,7 @@
   {
     "field": "payin_flat",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "FeeOptions",
     "symbol": "FeeOptions.payinFlat"
@@ -44,7 +44,7 @@
   {
     "field": "payin_percentage",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "FeeOptions",
     "symbol": "FeeOptions.payinPercentage"
@@ -52,7 +52,7 @@
   {
     "field": "payout_flat",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "FeeOptions",
     "symbol": "FeeOptions.payoutFlat"
@@ -60,7 +60,7 @@
   {
     "field": "payout_percentage",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "FeeOptions",
     "symbol": "FeeOptions.payoutPercentage"
@@ -68,7 +68,7 @@
   {
     "field": "request_amount",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "POST /v1/instances/{instance_id}/payin-quotes/fx#requestBody",
     "symbol": "GetFxRateInput.requestAmount"
@@ -76,7 +76,7 @@
   {
     "field": "request_amount",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "POST /v1/instances/{instance_id}/quotes/fx#requestBody",
     "symbol": "GetFxRateInput.requestAmount"
@@ -84,7 +84,7 @@
   {
     "enum": "PaymentType",
     "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "SEPA payout rail exists in the spec's PayoutOut.type enum (and in the BankAccount-side Rail enum already modeled) but no SEPA payout operation or fee options are modeled anywhere else in this SDK yet (see GetFeesOut.sepa in unmodeled.json). Deferred as a package with that broader SEPA-payout gap rather than added in isolation.",
     "specValues": [
       "sepa"
@@ -93,7 +93,7 @@
   {
     "field": "request_amount",
     "kind": "type-conversion",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Spec declares this field as an integer (smallest-unit, e.g. cents) but the SDK models it as Double (major-unit, e.g. dollars) with a hand-rolled or absent unit conversion, matching this SDK's existing per-field amount-unit convention (see the survey: request_amount on Create*QuoteInput converts dollars->cents in a hand-rolled encode(to:); CreateTransferQuoteInput.requestAmount and FeeOptions' rate fields do not convert at all and pass the Double through as-is). Pre-existing, not introduced by this PR; changing the public type is a deliberate decision for its own PR.",
     "schema": "QuoteIn",
     "symbol": "CreateQuoteInput.requestAmount"
@@ -101,7 +101,7 @@
   {
     "enum": "SupportingDocumentType",
     "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "Limit-increase supporting-document catalog was expanded from 6 to 15 document types. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
     "specValues": [
       "business_accounts_receivable",
@@ -118,7 +118,7 @@
   {
     "enum": "TrackingStep",
     "kind": "deferred-addition",
-    "owner": "eric@blindpay.com",
+    "owner": "sdk-maintainers",
     "reason": "New payout tracking step. Deferred to keep this PR's enum changes limited to the explicitly reviewed set.",
     "specValues": [
       "pending_review"

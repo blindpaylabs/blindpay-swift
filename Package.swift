@@ -16,10 +16,6 @@ let package = Package(
             name: "BlindPay",
             targets: ["BlindPay"]
         ),
-        .executable(
-            name: "GetRails",
-            targets: ["GetRails"]
-        ),
     ],
     dependencies: [
         // HMAC-SHA256 for webhook verification on Linux, where CryptoKit
@@ -34,6 +30,8 @@ let package = Package(
             ],
             path: "Sources/BlindPay"
         ),
+        // Example only: buildable with `swift run GetRails`, but not a
+        // product, so packages that depend on BlindPay don't ship it.
         .executableTarget(
             name: "GetRails",
             dependencies: ["BlindPay"],

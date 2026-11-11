@@ -1101,7 +1101,7 @@
       "spec": "PayoutOut"
     },
     {
-      "note": "8 spec properties currently unmodeled here: provider_integration, provider_error_reason, provider_uetr, provider_imad, provider_reference, provider_clearing_system, coelsa_id, end_to_end_id. See unmodeled.json (owner eric@blindpay.com).",
+      "note": "8 spec properties currently unmodeled here: provider_integration, provider_error_reason, provider_uetr, provider_imad, provider_reference, provider_clearing_system, coelsa_id, end_to_end_id. See unmodeled.json (owner sdk-maintainers).",
       "sdk": [
         {
           "file": "Sources/BlindPay/Models/Payout.swift",

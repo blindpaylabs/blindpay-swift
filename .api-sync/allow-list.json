@@ -3,84 +3,84 @@
     "schema": "PartnerFee",
     "field": "evm_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "PartnerFee",
     "field": "stellar_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeInput",
     "field": "evm_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeInput",
     "field": "stellar_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeResponse",
     "field": "evm_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePartnerFeeResponse",
     "field": "stellar_wallet_address",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Payin",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Payin",
     "field": "billing_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayinResponse",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayinResponse",
     "field": "billing_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Payout",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "CreatePayoutResponse",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Transfer",
     "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   },
   {
     "schema": "Customer",
     "field": "aiprise_validation_key",
     "reason": "Absent from the public spec snapshot; only appeared alongside internal-only surface in the unfiltered spec. Pre-existing SDK field, unrelated to the customers rename; needs its own investigation.",
-    "owner": "eric@blindpay.com"
+    "owner": "sdk-maintainers"
   }
 ]
