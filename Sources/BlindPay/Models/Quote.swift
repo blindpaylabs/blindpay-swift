@@ -237,13 +237,13 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     public let blindpayQuotation: Double?
     
     /// Receiver amount
-    public let receiverAmount: Double?
+    public let receiverAmount: Int?
     
     /// Sender amount
-    public let senderAmount: Double?
+    public let senderAmount: Int?
     
     /// Partner fee amount
-    public let partnerFeeAmount: Double?
+    public let partnerFeeAmount: Int?
     
     /// Flat fee
     public let flatFee: Double?
@@ -252,7 +252,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     public let contract: QuoteContract?
 
     /// Customer local amount
-    public let customerLocalAmount: Double?
+    public let customerLocalAmount: Int?
 
     /// Description
     public let description: String?
@@ -262,12 +262,12 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         expiresAt: Int? = nil,
         commercialQuotation: Double? = nil,
         blindpayQuotation: Double? = nil,
-        receiverAmount: Double? = nil,
-        senderAmount: Double? = nil,
-        partnerFeeAmount: Double? = nil,
+        receiverAmount: Int? = nil,
+        senderAmount: Int? = nil,
+        partnerFeeAmount: Int? = nil,
         flatFee: Double? = nil,
         contract: QuoteContract? = nil,
-        customerLocalAmount: Double? = nil,
+        customerLocalAmount: Int? = nil,
         description: String? = nil
     ) {
         self.id = id
@@ -311,8 +311,9 @@ public struct GetFxRateInput: Codable, Sendable {
     /// To currency
     public let to: Currency
     
-    /// Amount in integer cents (`1999` = 19.99), or whole units for currencies
-    /// without cents. Convert with ``Amount/cents(fromMajorUnits:)``. The API
+    /// Amount in integer cents (`1999` = 19.99); convert with
+    /// ``Amount/cents(fromMajorUnits:)``. For a currency without minor units
+    /// and `currencyType: .sender`, it must be a multiple of 100. The API
     /// enforces a per-currency minimum and returns 400 below it.
     public let requestAmount: Int
     
@@ -333,14 +334,6 @@ public struct GetFxRateInput: Codable, Sendable {
         case from
         case to
         case requestAmount = "request_amount"
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(currencyType, forKey: .currencyType)
-        try container.encode(from, forKey: .from)
-        try container.encode(to, forKey: .to)
-        try container.encode(requestAmount, forKey: .requestAmount)
     }
 }
 

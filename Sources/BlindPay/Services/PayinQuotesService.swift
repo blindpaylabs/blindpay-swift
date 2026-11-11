@@ -32,7 +32,7 @@ public final class PayinQuotesService: Sendable {
     ///     blockchainWalletId: "bw_000000000000",
     ///     currencyType: .sender,
     ///     coverFees: true,
-    ///     requestAmount: 1000.0, // dollars; sent as 100000 cents
+    ///     requestAmount: 100000, // cents (1,000.00)
     ///     paymentMethod: .pix,
     ///     token: .usdc,
     ///     partnerFeeId: "pf_000000000000"
@@ -71,7 +71,7 @@ public final class PayinQuotesService: Sendable {
     ///     currencyType: .sender,
     ///     from: .usdc,
     ///     to: .brl,
-    ///     requestAmount: 1000.0
+    ///     requestAmount: 100000 // cents (1,000.00)
     /// )
     /// let response = try await blindPay.instances.payins.quotes.getFxRate(data: input)
     /// if let fxRate = response.data {

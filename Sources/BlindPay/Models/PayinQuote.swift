@@ -89,8 +89,9 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
     /// Whether the sender covers the fees
     public let coverFees: Bool?
 
-    /// Amount in integer cents (`1999` = 19.99), or whole units for currencies
-    /// without cents. Convert with ``Amount/cents(fromMajorUnits:)``. The API
+    /// Amount in integer cents (`1999` = 19.99); convert with
+    /// ``Amount/cents(fromMajorUnits:)``. For a currency without minor units
+    /// and `currencyType: .sender`, it must be a multiple of 100. The API
     /// enforces a per-currency minimum and returns 400 below it.
     public let requestAmount: Int
 
@@ -151,22 +152,6 @@ public struct CreatePayinQuoteInput: Codable, Sendable {
         case payerRules = "payer_rules"
         case isOtc = "is_otc"
         case fundingBankAccountId = "funding_bank_account_id"
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(blockchainWalletId, forKey: .blockchainWalletId)
-        try container.encodeIfPresent(walletId, forKey: .walletId)
-        try container.encode(currencyType, forKey: .currencyType)
-        try container.encodeIfPresent(coverFees, forKey: .coverFees)
-        // Convert dollars to integer cents, rounded (19.99 -> 1999)
-        try container.encode(requestAmount, forKey: .requestAmount)
-        try container.encode(paymentMethod, forKey: .paymentMethod)
-        try container.encode(token, forKey: .token)
-        try container.encodeIfPresent(partnerFeeId, forKey: .partnerFeeId)
-        try container.encodeIfPresent(payerRules, forKey: .payerRules)
-        try container.encodeIfPresent(isOtc, forKey: .isOtc)
-        try container.encodeIfPresent(fundingBankAccountId, forKey: .fundingBankAccountId)
     }
 }
 

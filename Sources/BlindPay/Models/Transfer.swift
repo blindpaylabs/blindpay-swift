@@ -100,10 +100,10 @@ public struct Transfer: Codable, Sendable, Equatable {
     public let senderToken: String?
 
     /// Sender amount
-    public let senderAmount: Double?
+    public let senderAmount: Int?
 
     /// Receiver amount
-    public let receiverAmount: Double?
+    public let receiverAmount: Int?
 
     /// Customer network
     public let customerNetwork: String?
@@ -133,7 +133,7 @@ public struct Transfer: Codable, Sendable, Equatable {
     public let network: String?
 
     /// Partner fee amount
-    public let partnerFeeAmount: Double?
+    public let partnerFeeAmount: Int?
 
     /// Image URL
     public let imageUrl: String?
@@ -163,8 +163,8 @@ public struct Transfer: Codable, Sendable, Equatable {
         trackingPartnerFee: TransferTrackingStep? = nil,
         walletId: String? = nil,
         senderToken: String? = nil,
-        senderAmount: Double? = nil,
-        receiverAmount: Double? = nil,
+        senderAmount: Int? = nil,
+        receiverAmount: Int? = nil,
         customerNetwork: String? = nil,
         customerToken: String? = nil,
         customerWalletAddress: String? = nil,
@@ -174,7 +174,7 @@ public struct Transfer: Codable, Sendable, Equatable {
         customerId: String? = nil,
         address: String? = nil,
         network: String? = nil,
-        partnerFeeAmount: Double? = nil,
+        partnerFeeAmount: Int? = nil,
         imageUrl: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
@@ -345,13 +345,13 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
     public let blindpayQuotation: Double?
 
     /// Receiver amount
-    public let receiverAmount: Double
+    public let receiverAmount: Int
 
     /// Sender amount
-    public let senderAmount: Double
+    public let senderAmount: Int
 
     /// Partner fee amount
-    public let partnerFeeAmount: Double?
+    public let partnerFeeAmount: Int?
 
     /// Flat fee
     public let flatFee: Double?
@@ -365,9 +365,9 @@ public struct CreateTransferQuoteResponse: Codable, Sendable, Equatable {
         expiresAt: Double? = nil,
         commercialQuotation: Double? = nil,
         blindpayQuotation: Double? = nil,
-        receiverAmount: Double,
-        senderAmount: Double,
-        partnerFeeAmount: Double? = nil,
+        receiverAmount: Int,
+        senderAmount: Int,
+        partnerFeeAmount: Int? = nil,
         flatFee: Double? = nil,
         partnerFlatFee: Int? = nil,
         partnerPercentageFee: Int? = nil

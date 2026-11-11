@@ -32,21 +32,18 @@ public final class QuotesService: Sendable {
     ///     bankAccountId: "ba_123",
     ///     currencyType: .sender,
     ///     network: .base,
-    ///     requestAmount: 1000.0,
+    ///     requestAmount: 100000, // cents (1,000.00)
     ///     token: .usdc,
     ///     coverFees: true,
     ///     description: "Payment for services",
-    ///     partnerFeeId: "pf_123",
-    ///     transactionDocumentFile: nil,
-    ///     transactionDocumentId: nil,
-    ///     transactionDocumentType: .invoice
+    ///     partnerFeeId: "pf_123"
     /// )
     /// let response = try await blindPay.instances.quotes.create(data: input)
     /// if let quote = response.data {
     ///     print("Quote ID: \(quote.id)")
-    ///     print("Expires at: \(quote.expiresAt)")
-    ///     print("Sender amount: \(quote.senderAmount)")
-    ///     print("Receiver amount: \(quote.receiverAmount)")
+    ///     print("Expires at: \(quote.expiresAt ?? 0)")
+    ///     print("Sender amount (cents): \(quote.senderAmount ?? 0)")
+    ///     print("Receiver amount (cents): \(quote.receiverAmount ?? 0)")
     /// }
     /// ```
     public func create(data: CreateQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateQuoteResponse> {
@@ -73,7 +70,7 @@ public final class QuotesService: Sendable {
     ///     currencyType: .sender,
     ///     from: .usdc,
     ///     to: .brl,
-    ///     requestAmount: 1000.0
+    ///     requestAmount: 100000 // cents (1,000.00)
     /// )
     /// let response = try await blindPay.instances.quotes.getFxRate(data: input)
     /// if let fxRate = response.data {
