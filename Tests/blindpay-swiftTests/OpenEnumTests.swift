@@ -2,7 +2,7 @@
 //  OpenEnumTests.swift
 //  blindpay-swift
 //
-//  Every SDK enum accepts values it doesn't know (plan C7).
+//  Every SDK enum accepts values it doesn't know.
 //
 
 import Foundation

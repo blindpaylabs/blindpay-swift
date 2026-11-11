@@ -12,7 +12,7 @@ import Foundation
 import Testing
 @testable import BlindPay
 
-/// The list envelope the API returns when a cursor or limit is sent (D3).
+/// The list envelope the API returns when a cursor or limit is sent.
 private struct ListEnvelope<Item: Decodable>: Decodable {
     let data: [Item]
 }

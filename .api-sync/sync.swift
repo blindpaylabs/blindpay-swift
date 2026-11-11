@@ -125,7 +125,7 @@ func paths(of spec: [String: Any]) -> [String: Any] {
 
 /// The SDK surface of a spec: every operation marked `"x-sdk": false` is
 /// dropped (yield, card payment, ToS passthrough, upload extract, the VA
-/// deposit simulators; plan D11), along with paths left empty. Schemas
+/// deposit simulators), along with paths left empty. Schemas
 /// reachable only from those operations then count as unreachable, so they
 /// need no spec-map entry. Specs without the flag are returned unchanged.
 func sdkSurface(_ spec: [String: Any]) -> [String: Any] {
@@ -333,7 +333,7 @@ let codingKeyEqRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+(\w+)\s*
 let codingKeyBareRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+((?:\w+\s*,\s*)*\w+)\s*$"#)
 let enumCaseEqRegex = try! NSRegularExpression(pattern: #"^(\s*)case\s+`?(\w+)`?\s*=\s*"([^"]*)""#)
 /// A value of an open enum (`public struct X: OpenEnum`), the SDK's
-/// forward-compatible enum pattern (plan C7):
+/// forward-compatible enum pattern:
 /// `public static let base = Network(rawValue: "base")`.
 let openEnumValueRegex = try! NSRegularExpression(pattern: #"^(\s*)public\s+static\s+let\s+`?(\w+)`?\s*=\s*\w+\(rawValue:\s*"([^"]*)"\)"#)
 

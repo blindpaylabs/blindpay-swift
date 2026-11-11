@@ -2,7 +2,7 @@
 //  PaginationTests.swift
 //  blindpay-swift
 //
-//  ListResult decodes both list shapes (plan D3) and the auto-pagers follow
+//  ListResult decodes both list shapes and the auto-pagers follow
 //  `next_page` while `has_more` (D4, C5).
 //
 

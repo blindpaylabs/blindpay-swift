@@ -2,7 +2,7 @@
 //  PathEncodingTests.swift
 //  blindpay-swift
 //
-//  Interpolated path segments are percent-encoded (plan C9, A8 item 1).
+//  Interpolated path segments are percent-encoded.
 //
 
 import Foundation

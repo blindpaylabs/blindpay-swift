@@ -9,7 +9,7 @@ import Foundation
 ///
 /// Literal text is kept as written; every interpolated value is a single
 /// path segment and is percent-encoded, so an id containing `/`, `?` or `#`
-/// can't change the route (plan C9).
+/// can't change the route.
 struct Endpoint: ExpressibleByStringInterpolation, Sendable, Equatable {
     let path: String
 

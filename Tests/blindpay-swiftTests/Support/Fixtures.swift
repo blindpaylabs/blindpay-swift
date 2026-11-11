@@ -18,7 +18,7 @@ enum Fixtures {
     }
 
     /// The variants every response type must decode. `unknown_enum` replaces
-    /// every enum value with one no SDK knows (C7).
+    /// every enum value with one no SDK knows.
     static let decodeSafetyVariants = ["full", "required_only", "nullables_null", "unknown_enum", "decimals"]
 
     /// Returns the raw JSON bytes of one response variant for an operation

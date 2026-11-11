@@ -2,9 +2,9 @@
 //  RetryPolicy.swift
 //  blindpay-swift
 //
-//  The retry decision table shared by every BlindPay SDK (plan Appendix A2,
-//  v3): mutations are never retried on 5xx, because the server releases the
-//  idempotency key on 5xx and a retry would run the handler again.
+//  The retry decision table shared by every BlindPay SDK. Mutations are
+//  never retried on 5xx: the server releases the idempotency key on 5xx,
+//  so a retry would run the handler again.
 //
 
 import Foundation

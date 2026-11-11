@@ -412,7 +412,7 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(apply2.stdout.contains("no changes"))
 }
 
-/// The SDK's enums are open (`struct X: OpenEnum`, plan C7). A new spec
+/// The SDK's enums are open (`struct X: OpenEnum`). A new spec
 /// value becomes a new `public static let`, and --check reads those values.
 @Test func openEnumValueIsInsertedAndCheckGoesGreen() throws {
     let dir = makeFixtureDir()

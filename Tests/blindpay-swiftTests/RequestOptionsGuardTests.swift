@@ -3,7 +3,7 @@
 //  blindpay-swift
 //
 //  Every public API method must accept `options: RequestOptions?` and forward
-//  it, so idempotency keys, timeouts and headers reach the wire (plan C2;
+//  it, so idempotency keys, timeouts and headers reach the wire (
 //  mirrors blindpay-node's request-options.test.ts). Scans the sources.
 //
 

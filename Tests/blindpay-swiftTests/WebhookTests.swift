@@ -2,7 +2,7 @@
 //  WebhookTests.swift
 //  blindpay-swift
 //
-//  The 14 shared Svix vectors (plan C6, D20) and typed decoding of every
+//  The 14 shared Svix vectors and typed decoding of every
 //  webhook fixture.
 //
 

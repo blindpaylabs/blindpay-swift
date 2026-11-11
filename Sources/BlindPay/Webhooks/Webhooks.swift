@@ -2,8 +2,7 @@
 //  Webhooks.swift
 //  blindpay-swift
 //
-//  Standalone Svix webhook verification (plan C6, Appendix A4). Needs no
-//  API key or client.
+//  Standalone Svix webhook verification. Needs no API key or client.
 //
 
 import Foundation

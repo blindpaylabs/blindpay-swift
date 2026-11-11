@@ -2,8 +2,8 @@
 //  ClientBehaviorTests.swift
 //  blindpay-swift
 //
-//  Transport contract: headers, idempotency keys (C2), the shared retry table
-//  (plan Appendix A2, v3), timeouts, and typed errors (C4). No test sleeps:
+//  Transport contract: headers, idempotency keys, the retry decision table
+//  shared by every BlindPay SDK, timeouts, and typed errors. No test sleeps:
 //  backoffs are recorded by the mock instead.
 //
 
