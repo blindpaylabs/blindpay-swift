@@ -43,10 +43,11 @@ public final class BankAccountsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list() async throws -> APIResponse<BankAccountsResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<BankAccountsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -80,11 +81,12 @@ public final class BankAccountsService: Sendable {
     ///     print("Type: \(bankAccount.type.rawValue)")
     /// }
     /// ```
-    public func create(data: CreateBankAccountInput) async throws -> APIResponse<CreateBankAccountResponse> {
+    public func create(data: CreateBankAccountInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateBankAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -107,10 +109,11 @@ public final class BankAccountsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func get(id: String) async throws -> APIResponse<BankAccountResponse> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<BankAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -131,10 +134,11 @@ public final class BankAccountsService: Sendable {
     ///     print("Bank account deleted successfully")
     /// }
     /// ```
-    public func delete(id: String) async throws -> APIResponse<VoidResponse> {
+    public func delete(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
 }

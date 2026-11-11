@@ -54,10 +54,11 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func getRails() async throws -> APIResponse<[RailResponse]> {
+    public func getRails(options: RequestOptions? = nil) async throws -> APIResponse<[RailResponse]> {
         return try await apiClient.request(
             endpoint: "/v1/available/rails",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -83,11 +84,12 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func getBankDetails(rail: String) async throws -> APIResponse<BankDetailResponse> {
+    public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<BankDetailResponse> {
         return try await apiClient.request(
             endpoint: "/v1/available/bank-details",
             method: .get,
-            queryParameters: ["rail": rail]
+            queryParameters: ["rail": rail],
+            options: options
         )
     }
 
@@ -110,10 +112,11 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func getSwiftCode(swift: String) async throws -> APIResponse<[SwiftCodeResponse]> {
+    public func getSwiftCode(swift: String, options: RequestOptions? = nil) async throws -> APIResponse<[SwiftCodeResponse]> {
         return try await apiClient.request(
             endpoint: "/v1/available/swift/\(swift)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -136,10 +139,11 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func getMembers() async throws -> APIResponse<InstanceMembersResponse> {
+    public func getMembers(options: RequestOptions? = nil) async throws -> APIResponse<InstanceMembersResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -165,11 +169,12 @@ public final class BlindPay: Sendable {
     ///     print("Instance updated successfully")
     /// }
     /// ```
-    public func updateInstance(data: UpdateInstanceInput) async throws -> APIResponse<VoidResponse> {
+    public func updateInstance(data: UpdateInstanceInput, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)",
             method: .put,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -189,10 +194,11 @@ public final class BlindPay: Sendable {
     ///     print("Instance deleted successfully")
     /// }
     /// ```
-    public func deleteInstance() async throws -> APIResponse<VoidResponse> {
+    public func deleteInstance(options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -213,10 +219,11 @@ public final class BlindPay: Sendable {
     ///     print("Member deleted successfully")
     /// }
     /// ```
-    public func deleteMember(memberId: String) async throws -> APIResponse<VoidResponse> {
+    public func deleteMember(memberId: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -242,12 +249,13 @@ public final class BlindPay: Sendable {
     ///     print("Member role updated successfully")
     /// }
     /// ```
-    public func updateMemberRole(memberId: String, role: InstanceMemberRole) async throws -> APIResponse<VoidResponse> {
+    public func updateMemberRole(memberId: String, role: InstanceMemberRole, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         let updateInput = UpdateMemberRoleInput(role: role)
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/members/\(memberId)",
             method: .put,
-            body: updateInput
+            body: updateInput,
+            options: options
         )
     }
 
@@ -268,8 +276,8 @@ public final class BlindPay: Sendable {
     ///     print("Ownership migration successful: \(result.success)")
     /// }
     /// ```
-    public func migrateInstanceOwnership(data: MigrateInstanceOwnershipInput) async throws -> APIResponse<MigrateInstanceOwnershipResponse> {
-        return try await instances.migrateOwnership(data: data)
+    public func migrateInstanceOwnership(data: MigrateInstanceOwnershipInput, options: RequestOptions? = nil) async throws -> APIResponse<MigrateInstanceOwnershipResponse> {
+        return try await instances.migrateOwnership(data: data, options: options)
     }
 
     /// Creates an asset trustline for a Stellar wallet
@@ -288,11 +296,12 @@ public final class BlindPay: Sendable {
     ///     print("XDR: \(result.xdr)")
     /// }
     /// ```
-    public func createAssetTrustline(data: CreateAssetTrustlineInput) async throws -> APIResponse<CreateAssetTrustlineResponse> {
+    public func createAssetTrustline(data: CreateAssetTrustlineInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateAssetTrustlineResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/create-asset-trustline",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -316,11 +325,12 @@ public final class BlindPay: Sendable {
     ///     print("Success: \(result.success)")
     /// }
     /// ```
-    public func mintUsdbStellar(data: MintUsdbStellarInput) async throws -> APIResponse<MintUsdbStellarResponse> {
+    public func mintUsdbStellar(data: MintUsdbStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<MintUsdbStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/mint-usdb-stellar",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -346,11 +356,12 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func mintUsdbSolana(data: MintUsdbSolanaInput) async throws -> APIResponse<MintUsdbSolanaResponse> {
+    public func mintUsdbSolana(data: MintUsdbSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<MintUsdbSolanaResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/mint-usdb-solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -377,11 +388,12 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func prepareDelegateSolana(data: PrepareDelegateSolanaInput) async throws -> APIResponse<PrepareDelegateSolanaResponse> {
+    public func prepareDelegateSolana(data: PrepareDelegateSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<PrepareDelegateSolanaResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/prepare-delegate-solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -403,10 +415,11 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func listPartnerFees() async throws -> APIResponse<PartnerFeesResponse> {
+    public func listPartnerFees(options: RequestOptions? = nil) async throws -> APIResponse<PartnerFeesResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -433,11 +446,12 @@ public final class BlindPay: Sendable {
     ///     print("Created fee: \(created.id)")
     /// }
     /// ```
-    public func createPartnerFee(data: CreatePartnerFeeInput) async throws -> APIResponse<CreatePartnerFeeResponse> {
+    public func createPartnerFee(data: CreatePartnerFeeInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePartnerFeeResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -456,10 +470,11 @@ public final class BlindPay: Sendable {
     ///     print("Fee: \(fee.name)")
     /// }
     /// ```
-    public func getPartnerFee(id: String) async throws -> APIResponse<PartnerFee> {
+    public func getPartnerFee(id: String, options: RequestOptions? = nil) async throws -> APIResponse<PartnerFee> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -480,10 +495,11 @@ public final class BlindPay: Sendable {
     ///     print("Partner fee deleted successfully")
     /// }
     /// ```
-    public func deletePartnerFee(id: String) async throws -> APIResponse<VoidResponse> {
+    public func deletePartnerFee(id: String, options: RequestOptions? = nil) async throws -> APIResponse<VoidResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -520,11 +536,12 @@ public final class BlindPay: Sendable {
     ///     print("Receiver amount: \(quote.receiverAmount)")
     /// }
     /// ```
-    public func createQuote(data: CreateQuoteInput) async throws -> APIResponse<CreateQuoteResponse> {
+    public func createQuote(data: CreateQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/quotes",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -552,11 +569,12 @@ public final class BlindPay: Sendable {
     ///     print("Result amount: \(fxRate.resultAmount)")
     /// }
     /// ```
-    public func getFxRate(data: GetFxRateInput) async throws -> APIResponse<GetFxRateResponse> {
+    public func getFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/quotes/fx",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -578,10 +596,11 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func listWebhookEndpoints() async throws -> APIResponse<WebhookEndpointsResponse> {
+    public func listWebhookEndpoints(options: RequestOptions? = nil) async throws -> APIResponse<WebhookEndpointsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -604,11 +623,12 @@ public final class BlindPay: Sendable {
     ///     print("Created endpoint: \(created.id)")
     /// }
     /// ```
-    public func createWebhookEndpoint(data: CreateWebhookEndpointInput) async throws -> APIResponse<CreateWebhookEndpointResponse> {
+    public func createWebhookEndpoint(data: CreateWebhookEndpointInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateWebhookEndpointResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -627,10 +647,11 @@ public final class BlindPay: Sendable {
     ///     print("Deleted: \(result.success)")
     /// }
     /// ```
-    public func deleteWebhookEndpoint(id: String) async throws -> APIResponse<DeleteWebhookEndpointResponse> {
+    public func deleteWebhookEndpoint(id: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteWebhookEndpointResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -649,10 +670,11 @@ public final class BlindPay: Sendable {
     ///     print("Secret key: \(secret.key)")
     /// }
     /// ```
-    public func getWebhookEndpointSecret(id: String) async throws -> APIResponse<WebhookEndpointSecret> {
+    public func getWebhookEndpointSecret(id: String, options: RequestOptions? = nil) async throws -> APIResponse<WebhookEndpointSecret> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/\(id)/secret",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -671,10 +693,11 @@ public final class BlindPay: Sendable {
     ///     print("Portal URL: \(portal.url)")
     /// }
     /// ```
-    public func getWebhookPortalAccessUrl() async throws -> APIResponse<WebhookPortalAccess> {
+    public func getWebhookPortalAccessUrl(options: RequestOptions? = nil) async throws -> APIResponse<WebhookPortalAccess> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/portal-access",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -697,12 +720,13 @@ public final class BlindPay: Sendable {
     ///     print("Found \(payins.count) payins")
     /// }
     /// ```
-    public func listPayins(params: ListPayinsInput? = nil) async throws -> APIResponse<ListPayinsResponse> {
+    public func listPayins(params: ListPayinsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayinsResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -722,10 +746,11 @@ public final class BlindPay: Sendable {
     ///     print("Receiver amount: \(payin.receiverAmount ?? 0)")
     /// }
     /// ```
-    public func getPayin(payinId: String) async throws -> APIResponse<PayinResponse> {
+    public func getPayin(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins/\(payinId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -745,10 +770,11 @@ public final class BlindPay: Sendable {
     ///     print("Tracking payment step: \(payin.trackingPayment?.step ?? "N/A")")
     /// }
     /// ```
-    public func getPayinTrack(payinId: String) async throws -> APIResponse<PayinResponse> {
+    public func getPayinTrack(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/payins/\(payinId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -773,11 +799,12 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func createPayinEvm(data: CreatePayinInput) async throws -> APIResponse<CreatePayinResponse> {
+    public func createPayinEvm(data: CreatePayinInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins/evm",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -810,8 +837,8 @@ public final class BlindPay: Sendable {
     ///     print("Receiver amount (cents): \(quote.receiverAmount ?? 0)")
     /// }
     /// ```
-    public func createPayinQuote(data: CreatePayinQuoteInput) async throws -> APIResponse<CreatePayinQuoteResponse> {
-        return try await instances.payins.quotes.create(data: data)
+    public func createPayinQuote(data: CreatePayinQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinQuoteResponse> {
+        return try await instances.payins.quotes.create(data: data, options: options)
     }
     
     /// Retrieves a specific payin quote by ID
@@ -832,10 +859,11 @@ public final class BlindPay: Sendable {
     ///     print("Receiver amount: \(quote.receiverAmount)")
     /// }
     /// ```
-    public func getPayinQuote(id: String) async throws -> APIResponse<PayinQuoteResponse> {
+    public func getPayinQuote(id: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -862,12 +890,13 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func listPayinQuotes(params: ListPayinQuotesInput? = nil) async throws -> APIResponse<PayinQuotesResponse> {
+    public func listPayinQuotes(params: ListPayinQuotesInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<PayinQuotesResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -895,11 +924,12 @@ public final class BlindPay: Sendable {
     ///     print("Result amount: \(fxRate.resultAmount)")
     /// }
     /// ```
-    public func getPayinQuoteFxRate(data: GetFxRateInput) async throws -> APIResponse<GetFxRateResponse> {
+    public func getPayinQuoteFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes/fx",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -922,12 +952,13 @@ public final class BlindPay: Sendable {
     ///     print("Found \(payouts.count) payouts")
     /// }
     /// ```
-    public func listPayouts(params: ListPayoutsInput? = nil) async throws -> APIResponse<ListPayoutsResponse> {
+    public func listPayouts(params: ListPayoutsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayoutsResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -947,10 +978,11 @@ public final class BlindPay: Sendable {
     ///     print("Receiver amount: \(payout.receiverAmount)")
     /// }
     /// ```
-    public func getPayout(payoutId: String) async throws -> APIResponse<PayoutResponse> {
+    public func getPayout(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -970,10 +1002,11 @@ public final class BlindPay: Sendable {
     ///     print("Tracking payment step: \(payout.trackingPayment?.step.rawValue ?? "N/A")")
     /// }
     /// ```
-    public func getPayoutTrack(payoutId: String) async throws -> APIResponse<PayoutResponse> {
+    public func getPayoutTrack(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/payouts/\(payoutId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -998,11 +1031,12 @@ public final class BlindPay: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createPayoutEvm(data: CreatePayoutEvmInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createPayoutEvm(data: CreatePayoutEvmInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/evm",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -1028,11 +1062,12 @@ public final class BlindPay: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createPayoutStellar(data: CreatePayoutStellarInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createPayoutStellar(data: CreatePayoutStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -1058,11 +1093,12 @@ public final class BlindPay: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createPayoutSolana(data: CreatePayoutSolanaInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createPayoutSolana(data: CreatePayoutSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -1085,11 +1121,12 @@ public final class BlindPay: Sendable {
     ///     print("Transaction hash: \(result.transactionHash)")
     /// }
     /// ```
-    public func authorizeStellar(data: AuthorizeStellarInput) async throws -> APIResponse<AuthorizeStellarResponse> {
+    public func authorizeStellar(data: AuthorizeStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<AuthorizeStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar/authorize",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -1100,11 +1137,12 @@ public final class BlindPay: Sendable {
     /// - Parameter data: The input data containing transfer quote configuration
     /// - Returns: An `APIResponse` containing the created transfer quote
     /// - Throws: `BlindPayError` if the request fails
-    public func createTransferQuote(data: CreateTransferQuoteInput) async throws -> APIResponse<CreateTransferQuoteResponse> {
+    public func createTransferQuote(data: CreateTransferQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateTransferQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/transfer-quotes",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -1113,11 +1151,12 @@ public final class BlindPay: Sendable {
     /// - Parameter data: The input data containing the transfer quote ID
     /// - Returns: An `APIResponse` containing the created transfer
     /// - Throws: `BlindPayError` if the request fails
-    public func createTransfer(data: CreateTransferInput) async throws -> APIResponse<CreateTransferResponse> {
+    public func createTransfer(data: CreateTransferInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateTransferResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/transfers",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -1126,12 +1165,13 @@ public final class BlindPay: Sendable {
     /// - Parameter params: Optional parameters for pagination
     /// - Returns: An `APIResponse` containing a list of transfers with pagination
     /// - Throws: `BlindPayError` if the request fails
-    public func listTransfers(params: ListTransfersInput? = nil) async throws -> APIResponse<ListTransfersResponse> {
+    public func listTransfers(params: ListTransfersInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListTransfersResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/transfers",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
 
@@ -1140,10 +1180,11 @@ public final class BlindPay: Sendable {
     /// - Parameter transferId: The unique identifier of the transfer
     /// - Returns: An `APIResponse` containing the transfer details
     /// - Throws: `BlindPayError` if the request fails
-    public func getTransfer(transferId: String) async throws -> APIResponse<TransferResponse> {
+    public func getTransfer(transferId: String, options: RequestOptions? = nil) async throws -> APIResponse<TransferResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/transfers/\(transferId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -1152,10 +1193,11 @@ public final class BlindPay: Sendable {
     /// - Parameter transferId: The unique identifier of the transfer
     /// - Returns: An `APIResponse` containing the transfer with tracking info
     /// - Throws: `BlindPayError` if the request fails
-    public func getTransferTrack(transferId: String) async throws -> APIResponse<TransferResponse> {
+    public func getTransferTrack(transferId: String, options: RequestOptions? = nil) async throws -> APIResponse<TransferResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/transfers/\(transferId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -1165,10 +1207,11 @@ public final class BlindPay: Sendable {
     ///
     /// - Returns: An `APIResponse` containing fees for all rails
     /// - Throws: `BlindPayError` if the request fails
-    public func getFees() async throws -> APIResponse<FeesResponse> {
+    public func getFees(options: RequestOptions? = nil) async throws -> APIResponse<FeesResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/billing/fees",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -1181,11 +1224,12 @@ public final class BlindPay: Sendable {
     ///   - data: The document submission data
     /// - Returns: An `APIResponse` containing the submission result
     /// - Throws: `BlindPayError` if the request fails
-    public func submitPayoutDocuments(payoutId: String, data: SubmitPayoutDocumentsInput) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
+    public func submitPayoutDocuments(payoutId: String, data: SubmitPayoutDocumentsInput, options: RequestOptions? = nil) async throws -> APIResponse<SubmitPayoutDocumentsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)/documents",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -1195,8 +1239,8 @@ public final class BlindPay: Sendable {
     ///
     /// - Returns: An `APIResponse` containing an array of NAICS codes
     /// - Throws: `BlindPayError` if the request fails
-    public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
-        return try await available.getNaicsCodes()
+    public func getNaicsCodes(options: RequestOptions? = nil) async throws -> APIResponse<[NaicsCode]> {
+        return try await available.getNaicsCodes(options: options)
     }
 
     // MARK: - Upload Service Methods
@@ -1219,8 +1263,8 @@ public final class BlindPay: Sendable {
     ///     print("Uploaded file URL: \(result.fileUrl)")
     /// }
     /// ```
-    public func createUpload(data: UploadInput) async throws -> APIResponse<UploadResponse> {
-        return try await upload.create(data: data)
+    public func createUpload(data: UploadInput, options: RequestOptions? = nil) async throws -> APIResponse<UploadResponse> {
+        return try await upload.create(data: data, options: options)
     }
 
     // MARK: - Terms of Service Service Methods
@@ -1262,11 +1306,12 @@ public final class BlindPay: Sendable {
     ///     // Open result.url in a browser to accept the terms
     /// }
     /// ```
-    public func initiateTermsOfService(data: InitiateTosInput) async throws -> APIResponse<InitiateTosResponse> {
+    public func initiateTermsOfService(data: InitiateTosInput, options: RequestOptions? = nil) async throws -> APIResponse<InitiateTosResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/instances/\(instanceId)/tos",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 
@@ -1299,11 +1344,12 @@ public final class BlindPay: Sendable {
     ///     print("Created customer: \(customer.id)")
     /// }
     /// ```
-    public func createCustomer(data: CreateCustomerInput) async throws -> APIResponse<CreateCustomerResponse> {
+    public func createCustomer(data: CreateCustomerInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateCustomerResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -1342,7 +1388,8 @@ public final class BlindPay: Sendable {
         status: String? = nil,
         customerId: String? = nil,
         bankAccountId: String? = nil,
-        country: String? = nil
+        country: String? = nil,
+        options: RequestOptions? = nil
     ) async throws -> APIResponse<ListCustomersResponse> {
         var queryParameters = QueryParameters()
         if let limit = limit {
@@ -1379,7 +1426,8 @@ public final class BlindPay: Sendable {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers",
             method: .get,
-            queryParameters: queryParameters.isEmpty ? nil : queryParameters
+            queryParameters: queryParameters.isEmpty ? nil : queryParameters,
+            options: options
         )
     }
     
@@ -1399,10 +1447,11 @@ public final class BlindPay: Sendable {
     ///     print("KYC Status: \(customer.kycStatus?.rawValue ?? "unknown")")
     /// }
     /// ```
-    public func getCustomer(id: String) async throws -> APIResponse<Customer> {
+    public func getCustomer(id: String, options: RequestOptions? = nil) async throws -> APIResponse<Customer> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -1429,11 +1478,12 @@ public final class BlindPay: Sendable {
     ///     print("Update successful: \(result.success)")
     /// }
     /// ```
-    public func updateCustomer(id: String, data: UpdateCustomerInput) async throws -> APIResponse<UpdateCustomerResponse> {
+    public func updateCustomer(id: String, data: UpdateCustomerInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdateCustomerResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
             method: .put,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -1452,10 +1502,11 @@ public final class BlindPay: Sendable {
     ///     print("Deletion successful: \(result.success)")
     /// }
     /// ```
-    public func deleteCustomer(id: String) async throws -> APIResponse<DeleteCustomerResponse> {
+    public func deleteCustomer(id: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteCustomerResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -1475,10 +1526,11 @@ public final class BlindPay: Sendable {
     ///     print("Payout monthly: \(limits.limits.payout.monthly)")
     /// }
     /// ```
-    public func getCustomerLimits(id: String) async throws -> APIResponse<CustomerLimitsResponse> {
+    public func getCustomerLimits(id: String, options: RequestOptions? = nil) async throws -> APIResponse<CustomerLimitsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/limits/customers/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -1507,11 +1559,12 @@ public final class BlindPay: Sendable {
     ///     print("Request ID: \(result.id)")
     /// }
     /// ```
-    public func requestCustomerLimitIncrease(customerId: String, data: RequestLimitIncreaseInput) async throws -> APIResponse<RequestLimitIncreaseResponse> {
+    public func requestCustomerLimitIncrease(customerId: String, data: RequestLimitIncreaseInput, options: RequestOptions? = nil) async throws -> APIResponse<RequestLimitIncreaseResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/limit-increase",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -1532,10 +1585,11 @@ public final class BlindPay: Sendable {
     ///     }
     /// }
     /// ```
-    public func listCustomerLimitIncreaseRequests(customerId: String) async throws -> APIResponse<[LimitIncreaseRequest]> {
+    public func listCustomerLimitIncreaseRequests(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<[LimitIncreaseRequest]> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/limit-increase",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 

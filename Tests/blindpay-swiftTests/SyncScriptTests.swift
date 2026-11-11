@@ -1144,7 +1144,8 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(readReportBump(dir) == "minor")
 
     let service = readSource(dir, "Services/ThingsService.swift")
-    #expect(service.contains("public func get(id: String) async throws -> APIResponse<FixtureThing>"))
+    #expect(service.contains("public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<FixtureThing>"))
+    #expect(service.contains("options: options"))
     #expect(service.contains("endpoint: \"/things/\\(id)\""))
     #expect(service.contains("method: .get"))
     // No new model needed: the response reuses the already-mapped FixtureThing.
@@ -1181,7 +1182,7 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(readReportBump(dir) == "minor")
 
     let service = readSource(dir, "Services/ThingsService.swift")
-    #expect(service.contains("public func createBulk(data: NewThingInput) async throws -> APIResponse<FixtureThing>"))
+    #expect(service.contains("public func createBulk(data: NewThingInput, options: RequestOptions? = nil) async throws -> APIResponse<FixtureThing>"))
     #expect(service.contains("endpoint: \"/things/bulk\""))
     #expect(service.contains("method: .post,"))
     #expect(service.contains("body: data"))

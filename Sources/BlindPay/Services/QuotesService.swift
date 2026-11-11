@@ -49,11 +49,12 @@ public final class QuotesService: Sendable {
     ///     print("Receiver amount: \(quote.receiverAmount)")
     /// }
     /// ```
-    public func create(data: CreateQuoteInput) async throws -> APIResponse<CreateQuoteResponse> {
+    public func create(data: CreateQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/quotes",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -81,11 +82,12 @@ public final class QuotesService: Sendable {
     ///     print("Result amount: \(fxRate.resultAmount)")
     /// }
     /// ```
-    public func getFxRate(data: GetFxRateInput) async throws -> APIResponse<GetFxRateResponse> {
+    public func getFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/quotes/fx",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

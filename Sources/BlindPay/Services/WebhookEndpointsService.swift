@@ -34,10 +34,11 @@ public final class WebhookEndpointsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list() async throws -> APIResponse<WebhookEndpointsResponse> {
+    public func list(options: RequestOptions? = nil) async throws -> APIResponse<WebhookEndpointsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -60,11 +61,12 @@ public final class WebhookEndpointsService: Sendable {
     ///     print("Created endpoint: \(created.id)")
     /// }
     /// ```
-    public func create(data: CreateWebhookEndpointInput) async throws -> APIResponse<CreateWebhookEndpointResponse> {
+    public func create(data: CreateWebhookEndpointInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateWebhookEndpointResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -83,10 +85,11 @@ public final class WebhookEndpointsService: Sendable {
     ///     print("Deleted: \(result.success)")
     /// }
     /// ```
-    public func delete(id: String) async throws -> APIResponse<DeleteWebhookEndpointResponse> {
+    public func delete(id: String, options: RequestOptions? = nil) async throws -> APIResponse<DeleteWebhookEndpointResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/\(id)",
-            method: .delete
+            method: .delete,
+            options: options
         )
     }
     
@@ -105,10 +108,11 @@ public final class WebhookEndpointsService: Sendable {
     ///     print("Secret key: \(secret.key)")
     /// }
     /// ```
-    public func getSecret(id: String) async throws -> APIResponse<WebhookEndpointSecret> {
+    public func getSecret(id: String, options: RequestOptions? = nil) async throws -> APIResponse<WebhookEndpointSecret> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/\(id)/secret",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -127,10 +131,11 @@ public final class WebhookEndpointsService: Sendable {
     ///     print("Portal URL: \(portal.url)")
     /// }
     /// ```
-    public func getPortalAccessUrl() async throws -> APIResponse<WebhookPortalAccess> {
+    public func getPortalAccessUrl(options: RequestOptions? = nil) async throws -> APIResponse<WebhookPortalAccess> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/webhook-endpoints/portal-access",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 }

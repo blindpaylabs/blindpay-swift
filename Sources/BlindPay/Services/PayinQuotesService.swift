@@ -45,11 +45,12 @@ public final class PayinQuotesService: Sendable {
     ///     print("Receiver amount (cents): \(quote.receiverAmount ?? 0)")
     /// }
     /// ```
-    public func create(data: CreatePayinQuoteInput) async throws -> APIResponse<CreatePayinQuoteResponse> {
+    public func create(data: CreatePayinQuoteInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -71,10 +72,11 @@ public final class PayinQuotesService: Sendable {
     ///     print("Receiver amount: \(quote.receiverAmount)")
     /// }
     /// ```
-    public func get(id: String) async throws -> APIResponse<PayinQuoteResponse> {
+    public func get(id: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinQuoteResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -101,12 +103,13 @@ public final class PayinQuotesService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list(params: ListPayinQuotesInput? = nil) async throws -> APIResponse<PayinQuotesResponse> {
+    public func list(params: ListPayinQuotesInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<PayinQuotesResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -134,11 +137,12 @@ public final class PayinQuotesService: Sendable {
     ///     print("Result amount: \(fxRate.resultAmount)")
     /// }
     /// ```
-    public func getFxRate(data: GetFxRateInput) async throws -> APIResponse<GetFxRateResponse> {
+    public func getFxRate(data: GetFxRateInput, options: RequestOptions? = nil) async throws -> APIResponse<GetFxRateResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payin-quotes/fx",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

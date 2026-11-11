@@ -44,12 +44,13 @@ public final class PayinsService: Sendable {
     ///     print("Has more: \(result.pagination.hasMore)")
     /// }
     /// ```
-    public func list(params: ListPayinsInput? = nil) async throws -> APIResponse<ListPayinsResponse> {
+    public func list(params: ListPayinsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayinsResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -69,10 +70,11 @@ public final class PayinsService: Sendable {
     ///     print("Receiver amount: \(payin.receiverAmount ?? 0)")
     /// }
     /// ```
-    public func get(payinId: String) async throws -> APIResponse<PayinResponse> {
+    public func get(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins/\(payinId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -92,10 +94,11 @@ public final class PayinsService: Sendable {
     ///     print("Tracking payment step: \(payin.trackingPayment?.step ?? "N/A")")
     /// }
     /// ```
-    public func getTrack(payinId: String) async throws -> APIResponse<PayinResponse> {
+    public func getTrack(payinId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/payins/\(payinId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -120,11 +123,12 @@ public final class PayinsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func createEvm(data: CreatePayinInput) async throws -> APIResponse<CreatePayinResponse> {
+    public func createEvm(data: CreatePayinInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayinResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payins/evm",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

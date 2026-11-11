@@ -33,10 +33,11 @@ public final class AvailableService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getRails() async throws -> APIResponse<[RailResponse]> {
+    public func getRails(options: RequestOptions? = nil) async throws -> APIResponse<[RailResponse]> {
         return try await apiClient.request(
             endpoint: "/v1/available/rails",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -62,13 +63,14 @@ public final class AvailableService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getBankDetails(rail: String) async throws -> APIResponse<
+    public func getBankDetails(rail: String, options: RequestOptions? = nil) async throws -> APIResponse<
         BankDetailResponse
     > {
         return try await apiClient.request(
             endpoint: "/v1/available/bank-details",
             method: .get,
-            queryParameters: ["rail": rail]
+            queryParameters: ["rail": rail],
+            options: options
         )
     }
 
@@ -91,12 +93,13 @@ public final class AvailableService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getSwiftCode(swift: String) async throws -> APIResponse<
+    public func getSwiftCode(swift: String, options: RequestOptions? = nil) async throws -> APIResponse<
         [SwiftCodeResponse]
     > {
         return try await apiClient.request(
             endpoint: "/v1/available/swift/\(swift)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 
@@ -117,10 +120,11 @@ public final class AvailableService: Sendable {
     ///     }
     /// }
     /// ```
-    public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
+    public func getNaicsCodes(options: RequestOptions? = nil) async throws -> APIResponse<[NaicsCode]> {
         return try await apiClient.request(
             endpoint: "/v1/available/naics",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 }

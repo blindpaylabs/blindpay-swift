@@ -37,10 +37,11 @@ public final class OfframpWalletsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list(customerId: String, bankAccountId: String) async throws -> APIResponse<OfframpWalletsResponse> {
+    public func list(customerId: String, bankAccountId: String, options: RequestOptions? = nil) async throws -> APIResponse<OfframpWalletsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(bankAccountId)/offramp-wallets",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -67,11 +68,12 @@ public final class OfframpWalletsService: Sendable {
     ///     print("Address: \(wallet.address)")
     /// }
     /// ```
-    public func create(customerId: String, bankAccountId: String, data: CreateOfframpWalletInput) async throws -> APIResponse<CreateOfframpWalletResponse> {
+    public func create(customerId: String, bankAccountId: String, data: CreateOfframpWalletInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateOfframpWalletResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(bankAccountId)/offramp-wallets",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -94,10 +96,11 @@ public final class OfframpWalletsService: Sendable {
     ///     print("Network: \(wallet.network.rawValue)")
     /// }
     /// ```
-    public func get(customerId: String, bankAccountId: String, walletId: String) async throws -> APIResponse<OfframpWalletResponse> {
+    public func get(customerId: String, bankAccountId: String, walletId: String, options: RequestOptions? = nil) async throws -> APIResponse<OfframpWalletResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/bank-accounts/\(bankAccountId)/offramp-wallets/\(walletId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
 }

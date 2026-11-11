@@ -39,10 +39,11 @@ public final class VirtualAccountsService: Sendable {
     ///     }
     /// }
     /// ```
-    public func list(customerId: String) async throws -> APIResponse<VirtualAccountsResponse> {
+    public func list(customerId: String, options: RequestOptions? = nil) async throws -> APIResponse<VirtualAccountsResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -67,10 +68,11 @@ public final class VirtualAccountsService: Sendable {
     ///     print("Virtual account not found")
     /// }
     /// ```
-    public func get(customerId: String, id: String) async throws -> APIResponse<VirtualAccountResponse> {
+    public func get(customerId: String, id: String, options: RequestOptions? = nil) async throws -> APIResponse<VirtualAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts/\(id)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -98,11 +100,12 @@ public final class VirtualAccountsService: Sendable {
     ///     print("ACH Routing: \(virtualAccount.us.ach.routingNumber)")
     /// }
     /// ```
-    public func create(customerId: String, data: CreateVirtualAccountInput) async throws -> APIResponse<CreateVirtualAccountResponse> {
+    public func create(customerId: String, data: CreateVirtualAccountInput, options: RequestOptions? = nil) async throws -> APIResponse<CreateVirtualAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -128,11 +131,12 @@ public final class VirtualAccountsService: Sendable {
     ///     print("Update successful: \(result.success)")
     /// }
     /// ```
-    public func update(customerId: String, id: String, data: UpdateVirtualAccountInput) async throws -> APIResponse<UpdateVirtualAccountResponse> {
+    public func update(customerId: String, id: String, data: UpdateVirtualAccountInput, options: RequestOptions? = nil) async throws -> APIResponse<UpdateVirtualAccountResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/customers/\(customerId)/virtual-accounts/\(id)",
             method: .put,
-            body: data
+            body: data,
+            options: options
         )
     }
 }

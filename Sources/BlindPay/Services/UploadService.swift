@@ -35,7 +35,7 @@ public final class UploadService: Sendable {
     ///     print("Uploaded file URL: \(result.fileUrl)")
     /// }
     /// ```
-    public func create(data: UploadInput) async throws -> APIResponse<UploadResponse> {
+    public func create(data: UploadInput, options: RequestOptions? = nil) async throws -> APIResponse<UploadResponse> {
         var form = MultipartFormData()
         form.addFile(name: "file", fileName: data.fileName, contentType: data.contentType, data: data.file)
         form.addField(name: "bucket", value: data.bucket.rawValue)
@@ -43,7 +43,8 @@ public final class UploadService: Sendable {
             endpoint: "/v1/upload",
             method: .post,
             form: form,
-            queryParameters: ["instance_id": instanceId]
+            queryParameters: ["instance_id": instanceId],
+            options: options
         )
     }
 }

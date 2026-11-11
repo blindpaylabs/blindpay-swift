@@ -40,12 +40,13 @@ public final class PayoutsService: Sendable {
     ///     print("Has more: \(result.pagination.hasMore)")
     /// }
     /// ```
-    public func list(params: ListPayoutsInput? = nil) async throws -> APIResponse<ListPayoutsResponse> {
+    public func list(params: ListPayoutsInput? = nil, options: RequestOptions? = nil) async throws -> APIResponse<ListPayoutsResponse> {
         let queryParams = params?.toQueryParameters() ?? QueryParameters()
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts",
             method: .get,
-            queryParameters: queryParams.isEmpty ? nil : queryParams
+            queryParameters: queryParams.isEmpty ? nil : queryParams,
+            options: options
         )
     }
     
@@ -65,10 +66,11 @@ public final class PayoutsService: Sendable {
     ///     print("Receiver amount: \(payout.receiverAmount)")
     /// }
     /// ```
-    public func get(payoutId: String) async throws -> APIResponse<PayoutResponse> {
+    public func get(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/\(payoutId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -88,10 +90,11 @@ public final class PayoutsService: Sendable {
     ///     print("Tracking payment step: \(payout.trackingPayment?.step.rawValue ?? "N/A")")
     /// }
     /// ```
-    public func getTrack(payoutId: String) async throws -> APIResponse<PayoutResponse> {
+    public func getTrack(payoutId: String, options: RequestOptions? = nil) async throws -> APIResponse<PayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/e/payouts/\(payoutId)",
-            method: .get
+            method: .get,
+            options: options
         )
     }
     
@@ -116,11 +119,12 @@ public final class PayoutsService: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createEvm(data: CreatePayoutEvmInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createEvm(data: CreatePayoutEvmInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/evm",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -146,11 +150,12 @@ public final class PayoutsService: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createStellar(data: CreatePayoutStellarInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createStellar(data: CreatePayoutStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -176,11 +181,12 @@ public final class PayoutsService: Sendable {
     ///     print("Status: \(payout.status.rawValue)")
     /// }
     /// ```
-    public func createSolana(data: CreatePayoutSolanaInput) async throws -> APIResponse<CreatePayoutResponse> {
+    public func createSolana(data: CreatePayoutSolanaInput, options: RequestOptions? = nil) async throws -> APIResponse<CreatePayoutResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/solana",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
     
@@ -203,11 +209,12 @@ public final class PayoutsService: Sendable {
     ///     print("Transaction hash: \(result.transactionHash)")
     /// }
     /// ```
-    public func authorizeStellar(data: AuthorizeStellarInput) async throws -> APIResponse<AuthorizeStellarResponse> {
+    public func authorizeStellar(data: AuthorizeStellarInput, options: RequestOptions? = nil) async throws -> APIResponse<AuthorizeStellarResponse> {
         return try await apiClient.request(
             endpoint: "/v1/instances/\(instanceId)/payouts/stellar/authorize",
             method: .post,
-            body: data
+            body: data,
+            options: options
         )
     }
 }
