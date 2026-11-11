@@ -195,3 +195,72 @@ final class MockURLProtocol: URLProtocol, @unchecked Sendable {
         return data
     }
 }
+
+extension MockResponse {
+    /// One of the shared error fixtures (Fixtures/errors/<name>.json).
+    static func errorFixture(_ name: String) throws -> MockResponse {
+        let fixture = try Fixtures.json(at: Fixtures.root.appendingPathComponent("errors/\(name).json"))
+        var headers = fixture["headers"] as? [String: String] ?? ["Content-Type": "application/json"]
+        headers["X-Request-Id"] = "req_\(name)"
+        let body: Data
+        if let raw = fixture["raw_body"] as? String {
+            body = Data(raw.utf8)
+        } else if let json = fixture["body"] {
+            body = try JSONSerialization.data(withJSONObject: json)
+        } else {
+            body = Data()
+        }
+        return MockResponse(status: fixture["status"] as? Int ?? 500, headers: headers, body: body)
+    }
+
+    static func status(_ status: Int, retryAfter: String? = nil, body: String = #"{"success":false,"message":"error"}"#) -> MockResponse {
+        var headers = ["Content-Type": "application/json"]
+        if let retryAfter = retryAfter { headers["Retry-After"] = retryAfter }
+        return MockResponse(status: status, headers: headers, body: Data(body.utf8))
+    }
+
+    static let ok = MockResponse(status: 200, body: Data(#"{"success":true}"#.utf8))
+}
+
+/// A transport that runs a scripted step per attempt, then defers to the mock.
+final class ScriptedTransport: HTTPTransport, @unchecked Sendable {
+    enum Step {
+        case fail(URLError.Code)
+        case hang
+        case pass
+    }
+
+    private let lock = NSLock()
+    private var steps: [Step]
+    private(set) var attempts = 0
+
+    init(_ steps: [Step]) { self.steps = steps }
+
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        let step: Step = {
+            lock.lock(); defer { lock.unlock() }
+            attempts += 1
+            return steps.isEmpty ? .pass : steps.removeFirst()
+        }()
+        switch step {
+        case .fail(let code):
+            throw URLError(code)
+        case .hang:
+            // Honours cancellation, like URLSession does.
+            try await Task.sleep(nanoseconds: 30_000_000_000)
+            throw URLError(.unknown)
+        case .pass:
+            return try await MockServer.transport.send(request)
+        }
+    }
+}
+
+extension MockServer {
+    /// A client whose transport runs `transport`'s script before reaching this mock.
+    func client(transport: ScriptedTransport, maxRetries: Int = 2, timeout: TimeInterval = 60) -> BlindPay {
+        let base = configuration(maxRetries: maxRetries, timeout: timeout)
+        return BlindPay(apiKey: "test_key", instanceId: instanceId, configuration: Configuration(
+            baseURL: base.baseURL, timeout: timeout, maxRetries: maxRetries, transport: transport,
+            sleep: base.sleep, jitter: base.jitter))
+    }
+}
