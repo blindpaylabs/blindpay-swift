@@ -18,12 +18,17 @@ internal final class APIClient: Sendable {
     private let configuration: Configuration
     private let session: URLSession
     
-    init(apiKey: String, instanceId: String, configuration: Configuration) {
+    /// - Parameter protocolClasses: Internal test seam. When set, these
+    ///   `URLProtocol` subclasses intercept every request (tests only).
+    init(apiKey: String, instanceId: String, configuration: Configuration, protocolClasses: [AnyClass]? = nil) {
         self.apiKey = apiKey
         self.instanceId = instanceId
         self.configuration = configuration
         
         let sessionConfiguration = URLSessionConfiguration.default
+        if let protocolClasses = protocolClasses {
+            sessionConfiguration.protocolClasses = protocolClasses
+        }
         sessionConfiguration.httpAdditionalHeaders = [
             "Content-Type": "application/json",
             "User-Agent": "blindpay-swift/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")",
@@ -39,6 +44,32 @@ internal final class APIClient: Sendable {
         body: (any Codable)? = nil,
         queryParameters: [String: String]? = nil
     ) async throws -> APIResponse<T> {
+        var request = URLRequest(url: try makeURL(endpoint: endpoint, queryParameters: queryParameters))
+        request.httpMethod = method.rawValue
+        
+        if let body = body {
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+        
+        return try await send(request)
+    }
+
+    /// Sends a `multipart/form-data` request (used by file uploads).
+    func requestMultipart<T: Codable>(
+        endpoint: String,
+        method: HTTPMethod,
+        form: MultipartFormData,
+        queryParameters: [String: String]? = nil
+    ) async throws -> APIResponse<T> {
+        var request = URLRequest(url: try makeURL(endpoint: endpoint, queryParameters: queryParameters))
+        request.httpMethod = method.rawValue
+        // Overrides the session's default JSON Content-Type.
+        request.setValue(form.contentType, forHTTPHeaderField: "Content-Type")
+        request.httpBody = form.encoded()
+        return try await send(request)
+    }
+
+    private func makeURL(endpoint: String, queryParameters: [String: String]?) throws -> URL {
         var urlString = "\(configuration.baseURL)\(endpoint)"
         
         if let queryParameters = queryParameters, !queryParameters.isEmpty {
@@ -52,14 +83,10 @@ internal final class APIClient: Sendable {
         guard let url = URL(string: urlString) else {
             throw BlindPayError.invalidURL
         }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = method.rawValue
-        
-        if let body = body {
-            request.httpBody = try JSONEncoder().encode(body)
-        }
-        
+        return url
+    }
+
+    private func send<T: Codable>(_ request: URLRequest) async throws -> APIResponse<T> {
         let (data, response) = try await session.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse else {

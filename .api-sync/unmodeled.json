@@ -7,20 +7,6 @@
     "symbol": "BankDetailField"
   },
   {
-    "field": "label",
-    "owner": "eric@blindpay.com",
-    "reason": "AvailableNaicsList's item shape gained label/value fields alongside code/title; not yet modeled on NaicsCode (possible duplicate of code/title, needs product confirmation).",
-    "schema": "AvailableNaicsList",
-    "symbol": "NaicsCode"
-  },
-  {
-    "field": "value",
-    "owner": "eric@blindpay.com",
-    "reason": "AvailableNaicsList's item shape gained label/value fields alongside code/title; not yet modeled on NaicsCode (possible duplicate of code/title, needs product confirmation).",
-    "schema": "AvailableNaicsList",
-    "symbol": "NaicsCode"
-  },
-  {
     "field": "business_industry",
     "owner": "eric@blindpay.com",
     "reason": "Modeled on CreateBankAccountInput (request) but not mirrored back onto the BankAccount response struct.",
@@ -159,27 +145,6 @@
     "reason": "New fee breakdown field; not yet modeled on CreatePayinResponse.",
     "schema": "CreatePayinOut",
     "symbol": "CreatePayinResponse"
-  },
-  {
-    "field": "payer_rules",
-    "owner": "eric@blindpay.com",
-    "reason": "Present on the PayinQuote response already; not yet accepted as a create-time input field.",
-    "schema": "CreatePayinQuoteIn",
-    "symbol": "CreatePayinQuoteInput"
-  },
-  {
-    "field": "billing_fee_amount",
-    "owner": "eric@blindpay.com",
-    "reason": "New billing-fee breakdown field; not yet modeled on PayinQuote.",
-    "schema": "CreatePayinQuoteOut",
-    "symbol": "PayinQuote"
-  },
-  {
-    "field": "is_otc",
-    "owner": "eric@blindpay.com",
-    "reason": "New OTC-flag field; not yet modeled on PayinQuote.",
-    "schema": "CreatePayinQuoteOut",
-    "symbol": "PayinQuote"
   },
   {
     "field": "additional_info",
@@ -635,13 +600,6 @@
     "reason": "New instance-level compliance notification setting; not yet modeled on UpdateInstanceInput.",
     "schema": "UpdateInstanceIn",
     "symbol": "UpdateInstanceInput"
-  },
-  {
-    "field": "file_url",
-    "owner": "eric@blindpay.com",
-    "reason": "Possible rename/duplicate of the already-modeled url field; needs product confirmation before modeling both.",
-    "schema": "UploadOut",
-    "symbol": "UploadResponse"
   },
   {
     "field": "customer_id",

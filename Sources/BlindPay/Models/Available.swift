@@ -50,17 +50,17 @@ public enum RecipientRelationship: String, Codable, Sendable {
     case other = "other"
 }
 
-/// Represents a NAICS business industry code
+/// Represents a NAICS business industry code (an `AvailableNaicsList` item)
 public struct NaicsCode: Codable, Sendable, Equatable {
-    /// NAICS code value
-    public let code: String
+    /// Display label, e.g. `"(339910) Jewelry and Silverware Manufacturing"`
+    public let label: String
 
-    /// Business industry title
-    public let title: String
+    /// NAICS code, e.g. `"339910"`. Send this as `business_industry`.
+    public let value: String
 
-    public init(code: String, title: String) {
-        self.code = code
-        self.title = title
+    public init(label: String, value: String) {
+        self.label = label
+        self.value = value
     }
 }
 
@@ -226,11 +226,11 @@ public struct SwiftCodeResponse: Codable, Sendable, Equatable {
     /// Country slug identifier
     public let countrySlug: String
 
-    /// Bank address
-    public let address: String
+    /// Bank address. Not in the API spec; usually absent.
+    public let address: String?
 
-    /// Postal code
-    public let postcode: String
+    /// Postal code. Not in the API spec; usually absent.
+    public let postcode: String?
 
     public init(
         id: String,
@@ -241,8 +241,8 @@ public struct SwiftCodeResponse: Codable, Sendable, Equatable {
         swiftCodeLink: String,
         country: String,
         countrySlug: String,
-        address: String,
-        postcode: String
+        address: String? = nil,
+        postcode: String? = nil
     ) {
         self.id = id
         self.bank = bank

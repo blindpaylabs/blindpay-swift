@@ -20,14 +20,18 @@ public enum PayinStatus: String, Codable, Sendable {
 
 /// Manual execution status for payin
 public enum ManualExecutionStatus: String, Codable, Sendable {
+  case pending = "pending"
+  case concluded = "concluded"
   case failed = "failed"
 }
 
 /// Payment method for payin
 public enum PaymentMethod: String, Codable, Sendable {
   case ach = "ach"
+  case achPull = "ach_pull"
   case wire = "wire"
   case pix = "pix"
+  case card = "card"
   case spei = "spei"
   case transfers = "transfers"
   case pse = "pse"
@@ -121,7 +125,9 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
 }
 
 /// Payment tracking information for payin
-public struct PayinTrackingPayment: Codable, Sendable, Equatable {
+///
+/// `@unchecked Sendable` because `reviewContexts` holds `AnyCodable`.
+public struct PayinTrackingPayment: Codable, Equatable, @unchecked Sendable {
   /// Step name
   public let step: String
 
@@ -131,11 +137,12 @@ public struct PayinTrackingPayment: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
-  public let reviewContexts: [String: String]?
+  /// Structured risk context per flagging source (free-form JSON object)
+  public let reviewContexts: [String: AnyCodable]?
 
   public let reviewSources: [String]?
 
-  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: String]? = nil, reviewSources: [String]? = nil) {
+  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: AnyCodable]? = nil, reviewSources: [String]? = nil) {
     self.step = step
     self.providerName = providerName
     self.completedAt = completedAt
@@ -262,15 +269,15 @@ public struct RTPDetails: Codable, Sendable, Equatable {
 /// Beneficiary information
 public struct BeneficiaryInfo: Codable, Sendable, Equatable {
   /// Beneficiary name
-  public let name: String
+  public let name: String?
 
   /// Address line 1
-  public let addressLine1: String
+  public let addressLine1: String?
 
   /// Address line 2
-  public let addressLine2: String
+  public let addressLine2: String?
 
-  public init(name: String, addressLine1: String, addressLine2: String) {
+  public init(name: String? = nil, addressLine1: String? = nil, addressLine2: String? = nil) {
     self.name = name
     self.addressLine1 = addressLine1
     self.addressLine2 = addressLine2
@@ -286,15 +293,15 @@ public struct BeneficiaryInfo: Codable, Sendable, Equatable {
 /// Receiving bank information
 public struct ReceivingBankInfo: Codable, Sendable, Equatable {
   /// Bank name
-  public let name: String
+  public let name: String?
 
   /// Address line 1
-  public let addressLine1: String
+  public let addressLine1: String?
 
   /// Address line 2
-  public let addressLine2: String
+  public let addressLine2: String?
 
-  public init(name: String, addressLine1: String, addressLine2: String) {
+  public init(name: String? = nil, addressLine1: String? = nil, addressLine2: String? = nil) {
     self.name = name
     self.addressLine1 = addressLine1
     self.addressLine2 = addressLine2
@@ -310,16 +317,16 @@ public struct ReceivingBankInfo: Codable, Sendable, Equatable {
 /// BlindPay bank details
 public struct BlindPayBankDetails: Codable, Sendable, Equatable {
   /// Routing number
-  public let routingNumber: String
+  public let routingNumber: String?
 
   /// Account number
-  public let accountNumber: String
+  public let accountNumber: String?
 
   /// Account type
-  public let accountType: String
+  public let accountType: String?
 
   /// SWIFT BIC code
-  public let swiftBicCode: String
+  public let swiftBicCode: String?
 
   /// ACH payment details
   public let ach: ACHDetails?
@@ -337,10 +344,10 @@ public struct BlindPayBankDetails: Codable, Sendable, Equatable {
   public let receivingBank: ReceivingBankInfo?
 
   public init(
-    routingNumber: String,
-    accountNumber: String,
-    accountType: String,
-    swiftBicCode: String,
+    routingNumber: String? = nil,
+    accountNumber: String? = nil,
+    accountType: String? = nil,
+    swiftBicCode: String? = nil,
     ach: ACHDetails? = nil,
     wire: WireDetails? = nil,
     rtp: RTPDetails? = nil,

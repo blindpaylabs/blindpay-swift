@@ -231,7 +231,7 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
     public let kycStatus: KYCStatus?
     
     /// US account details
-    public let us: VirtualAccountUS
+    public let us: VirtualAccountUS?
     
     /// Token (USDC, USDT, or USDB)
     public let token: StablecoinToken
@@ -246,7 +246,7 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         id: String,
         bankingPartner: BankingPartner? = nil,
         kycStatus: KYCStatus? = nil,
-        us: VirtualAccountUS,
+        us: VirtualAccountUS? = nil,
         token: StablecoinToken,
         blockchainWalletId: String? = nil,
         blockchainWallet: BlockchainWalletRef? = nil

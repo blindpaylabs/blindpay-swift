@@ -12,12 +12,15 @@ blindpay-swift/
     Core/
       BlindPay.swift                    # Main client class. Facade that duplicates every service method as a flat convenience method AND exposes service objects.
       Configuration.swift               # Configuration struct (baseURL only).
+      Amount.swift                      # Internal Amount.cents(fromMajorUnits:) and KeyedEncodingContainer.encodeCents(_:forKey:): dollars -> rounded integer cents.
     API/
-      APIClient.swift                   # Internal HTTP client. Generic request<T: Codable>() method. Handles APIResponse<T> envelope and error decoding.
+      APIClient.swift                   # Internal HTTP client. Generic request<T: Codable>() (JSON) and requestMultipart<T>() (multipart/form-data) methods. Handles APIResponse<T> envelope and error decoding. Internal `protocolClasses` init parameter is a test-only seam.
+      MultipartFormData.swift           # Internal multipart/form-data body builder used by uploads.
       Errors.swift                      # BlindPayError enum (invalidURL, invalidResponse, encodingError, decodingError, networkError, httpError).
     Models/
       APIResponse.swift                 # APIResponse<T> and APIError. Generic response envelope.
       Common.swift                      # Country enum (ISO 3166-1 alpha-2), PaginationParams, PaginationMetadata.
+      Upload.swift                      # UploadBucket, UploadInput (file bytes + name + content type; multipart, not Codable), UploadResponse (file_url).
       Available.swift                   # Rail, BankAccountType, AccountClass, RecipientRelationship, NaicsCode, RailResponse, BankDetailKey, BankDetailItem, BankDetailField, SwiftCodeResponse.
       Instance.swift                    # InstanceMemberRole, InstanceMember, UpdateInstanceInput, UpdateMemberRoleInput, VoidResponse.
       Customer.swift                    # KYCType, CustomerType, IDDocType, ProofOfAddressDocType, SourceOfFundsDocType, PurposeOfTransactions, OwnerRole, CustomerOwner, CreateCustomerInput, Customer (full model), UpdateCustomerInput, response types, ListCustomersResponse.
@@ -53,12 +56,20 @@ blindpay-swift/
       TermsOfServiceService.swift       # Initiate TOS. Instance-scoped.
       VirtualAccountsService.swift      # CRUD for virtual accounts. Customer-scoped.
       WebhookEndpointsService.swift     # CRUD + getSecret + getPortalAccessUrl. Instance-scoped.
+      UploadService.swift               # Top-level service. create(data:) sends multipart/form-data to POST /v1/upload?instance_id=<instance>.
   Examples/
     GetRails.swift                      # Executable example target.
   Tests/blindpay-swiftTests/
     BlindPayTests.swift                 # Initialization test.
     BlindPayErrorTests.swift            # Error description tests.
     ConfigurationTests.swift            # Configuration tests.
+    FixtureDecodingTests.swift          # Decode-safety tests over the shared spec fixtures (full / required_only / nullables_null).
+    DecodeSafetyClientTests.swift       # The same fixtures through the real service methods.
+    *RequestTests.swift, AmountTests.swift  # Request-shape tests against the mock (method, path, query, headers, body).
+    SyncScriptTests.swift               # Tests for .api-sync/sync.swift.
+    Support/MockServer.swift            # URLProtocol mock: one unique host per MockServer, records every request.
+    Support/Fixtures.swift              # Loader for Fixtures/ by "METHOD /v1/path" and variant name.
+    Fixtures/                           # Verbatim copy of the SDK-parity reference fixtures (generated from the public spec). Don't hand-edit; re-copy.
 ```
 
 ### Service hierarchy (access path from client)
@@ -82,7 +93,7 @@ BlindPay
     .custodialWallets                  -> CustodialWalletsService
 ```
 
-IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a flat convenience method on the root `BlindPay` class. When you add or modify a service method, you MUST also add or update the corresponding convenience method in `BlindPay.swift`.
+IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a flat convenience method on the root `BlindPay` class. When you add or modify a service method, you MUST also add or update the corresponding convenience method in `BlindPay.swift`. New or changed facade methods delegate to the service (`return try await upload.create(data: data)`) instead of repeating the endpoint literal, so the two can't drift.
 
 ---
 
@@ -101,7 +112,7 @@ IMPORTANT: `BlindPay.swift` (the facade) duplicates every service method as a fl
 
 ### Swift Patterns
 
-- All public types conform to `Codable` and `Sendable`.
+- All public types conform to `Codable` and `Sendable`. Exception: multipart inputs (`UploadInput`) are only `Sendable`, because they are never JSON-encoded.
 - Response model structs also conform to `Equatable`.
 - All service classes: `@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) public final class ... : Sendable`.
 - Service classes hold `private let apiClient: APIClient` (and `instanceId`, `customerId`, etc. as needed).
@@ -128,7 +139,7 @@ If ALL properties match their JSON keys exactly (no snake_case conversion needed
 ### Custom encode(to:) Pattern
 
 Some Input types implement custom `encode(to:)` to:
-- Convert amounts from Double to Int (smallest unit: `Int(requestAmount * 100)`)
+- Convert amounts from Double dollars to Int cents with `container.encodeCents(_:forKey:)` (Core/Amount.swift). Never write `Int(x * 100)`: it truncates, so 19.99 becomes 1998.
 - Skip nil optional fields with `encodeIfPresent`
 
 Only add custom encoding when the API expects a different type than the Swift property stores (e.g., amount conversion). Do not add it merely to skip nils -- Codable already skips nils with optional properties.
@@ -271,7 +282,13 @@ In `InstancesService.swift`:
 
 ### Step 4: Add convenience methods to BlindPay.swift
 
-In `BlindPay.swift`, add flat convenience methods that delegate to the service. Follow the existing pattern -- each method should have full doc comments with examples, matching the service method signature but with a descriptive verb name (e.g., `listInvoices`, `getInvoice`, `createInvoice`, `deleteInvoice`).
+In `BlindPay.swift`, add flat convenience methods that delegate to the service. Each method has full doc comments with examples, matches the service method signature, and uses a descriptive verb name (e.g., `listInvoices`, `getInvoice`, `createInvoice`, `deleteInvoice`). Never repeat the endpoint literal in the facade:
+
+```swift
+public func createInvoice(data: CreateInvoiceInput) async throws -> APIResponse<CreateInvoiceResponse> {
+    return try await instances.invoices.create(data: data)
+}
+```
 
 ### Step 5: No Package.swift changes needed
 
@@ -300,14 +317,10 @@ public func update(id: String, data: UpdatePartnerFeeInput) async throws -> APIR
 }
 ```
 
-In `BlindPay.swift`, add:
+In `BlindPay.swift`, add a method that delegates to the service:
 ```swift
 public func updatePartnerFee(id: String, data: UpdatePartnerFeeInput) async throws -> APIResponse<UpdatePartnerFeeResponse> {
-    return try await apiClient.request(
-        endpoint: "/v1/instances/\(instanceId)/partner-fees/\(id)",
-        method: .put,
-        body: data
-    )
+    return try await instances.partnerFees.update(id: id, data: data)
 }
 ```
 
@@ -436,7 +449,18 @@ The test target is `blindpay-swiftTests` defined in `Package.swift`, located at 
 
 ### Current test coverage
 
-Tests are minimal -- they cover initialization, error descriptions, and configuration defaults. There are no network-level tests or mocked API tests.
+- **Decode safety:** every response type you add or change must decode the `full`, `required_only` and `nullables_null` variants of its operation's fixture in `Tests/blindpay-swiftTests/Fixtures/` (add a row to `FixtureDecodingTests`). A non-optional field that is absent in `required_only` or `null` in `nullables_null` is a bug. List operations have `.b0` (envelope) and `.b1` (bare array) variants.
+- **Request shape:** use `MockServer` (no network). It gives you a `BlindPay` client wired to a `URLProtocol` mock and records each request:
+
+```swift
+let server = MockServer(respondWith: .json(try Fixtures.response("POST /v1/upload", variant: "full")))
+let response = try await server.client.upload.create(data: input)
+let request = try #require(server.requests.first)
+#expect(request.method == "POST")
+#expect(request.queryItems == [URLQueryItem(name: "instance_id", value: "in_000000000000")])
+```
+
+Use placeholder ids (`in_000000000000`, `test_key`) only.
 
 ### Adding a test
 
@@ -547,10 +571,10 @@ Non-paginated list endpoints use `typealias {Resource}sResponse = [{Resource}]`.
 
 ### Amount fields
 
-The API uses integer amounts in smallest currency unit (e.g., 100 = $1.00). Some Input types accept `Double` in Swift and convert to `Int` in custom `encode(to:)`:
+The API uses integer amounts in smallest currency unit (e.g., 100 = $1.00). Some Input types accept `Double` in Swift and convert to `Int` in custom `encode(to:)` through the shared rounding helper (19.99 -> 1999):
 
 ```swift
-try container.encode(Int(requestAmount * 100), forKey: .requestAmount)
+try container.encodeCents(requestAmount, forKey: .requestAmount)
 ```
 
 ### HTTP methods

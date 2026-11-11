@@ -34,7 +34,13 @@ let package = Package(
         ),
         .testTarget(
             name: "blindpay-swiftTests",
-            dependencies: ["BlindPay"]
+            dependencies: ["BlindPay"],
+            resources: [
+                // Shared spec-shaped fixtures from the SDK parity effort
+                // (reference/fixtures). Keep the layout so a regeneration is a
+                // plain copy.
+                .copy("Fixtures")
+            ]
         ),
     ]
 )

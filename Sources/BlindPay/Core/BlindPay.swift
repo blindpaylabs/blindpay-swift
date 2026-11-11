@@ -27,11 +27,17 @@ public final class BlindPay: Sendable {
     ///   - apiKey: Your BlindPay API key
     ///   - instanceId: Your BlindPay instance ID
     ///   - configuration: Optional configuration for custom base URL and other settings
-    public init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
+    public convenience init(apiKey: String, instanceId: String, configuration: Configuration = .default) {
+        self.init(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: nil)
+    }
+
+    /// Internal test seam: routes every request through the given
+    /// `URLProtocol` subclasses instead of the network.
+    init(apiKey: String, instanceId: String, configuration: Configuration, protocolClasses: [AnyClass]?) {
         self.instanceId = instanceId
-        self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration)
+        self.apiClient = APIClient(apiKey: apiKey, instanceId: instanceId, configuration: configuration, protocolClasses: protocolClasses)
         self.available = AvailableService(apiClient: apiClient)
-        self.upload = UploadService(apiClient: apiClient)
+        self.upload = UploadService(apiClient: apiClient, instanceId: instanceId)
         self.instances = InstancesService(apiClient: apiClient, instanceId: instanceId)
     }
     
@@ -794,31 +800,24 @@ public final class BlindPay: Sendable {
     /// Example:
     /// ```swift
     /// let input = CreatePayinQuoteInput(
-    ///     customerId: "re_123",
-    ///     blockchainWalletId: "bw_123",
-    ///     paymentMethod: .pix,
+    ///     blockchainWalletId: "bw_000000000000",
     ///     currencyType: .sender,
-    ///     network: .base,
-    ///     requestAmount: 1000.0,
-    ///     token: .usdc,
     ///     coverFees: true,
-    ///     description: "Payment for services",
-    ///     partnerFeeId: "pf_123"
+    ///     requestAmount: 1000.0, // dollars; sent as 100000 cents
+    ///     paymentMethod: .pix,
+    ///     token: .usdc,
+    ///     partnerFeeId: "pf_000000000000"
     /// )
     /// let response = try await blindPay.createPayinQuote(data: input)
     /// if let quote = response.data {
     ///     print("Quote ID: \(quote.id)")
-    ///     print("Expires at: \(quote.expiresAt)")
-    ///     print("Sender amount: \(quote.senderAmount)")
-    ///     print("Receiver amount: \(quote.receiverAmount)")
+    ///     print("Expires at (epoch ms): \(quote.expiresAt ?? 0)")
+    ///     print("Sender amount (cents): \(quote.senderAmount ?? 0)")
+    ///     print("Receiver amount (cents): \(quote.receiverAmount ?? 0)")
     /// }
     /// ```
     public func createPayinQuote(data: CreatePayinQuoteInput) async throws -> APIResponse<CreatePayinQuoteResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/instances/\(instanceId)/payin-quotes",
-            method: .post,
-            body: data
-        )
+        return try await instances.payins.quotes.create(data: data)
     }
     
     /// Retrieves a specific payin quote by ID
@@ -1203,36 +1202,31 @@ public final class BlindPay: Sendable {
     /// - Returns: An `APIResponse` containing an array of NAICS codes
     /// - Throws: `BlindPayError` if the request fails
     public func getNaicsCodes() async throws -> APIResponse<[NaicsCode]> {
-        return try await apiClient.request(
-            endpoint: "/v1/available/naics",
-            method: .get
-        )
+        return try await available.getNaicsCodes()
     }
 
     // MARK: - Upload Service Methods
 
     /// Uploads a file to the specified bucket
     ///
-    /// This method uploads a file and returns the URL of the uploaded file.
+    /// Sends the file as `multipart/form-data` to `POST /v1/upload` with your
+    /// instance id. Same as `upload.create(data:)`.
     ///
-    /// - Parameter data: The input data containing the bucket and file
-    /// - Returns: An `APIResponse` containing the upload URL
+    /// - Parameter data: The file bytes, file name, content type and bucket
+    /// - Returns: An `APIResponse` containing the uploaded file's URL
     /// - Throws: `BlindPayError` if the request fails
     ///
     /// Example:
     /// ```swift
-    /// let input = UploadInput(bucket: .onboarding, file: "base64encodedfile...")
+    /// let pdf = try Data(contentsOf: URL(fileURLWithPath: "passport.pdf"))
+    /// let input = UploadInput(file: pdf, fileName: "passport.pdf", contentType: "application/pdf", bucket: .onboarding)
     /// let response = try await blindPay.createUpload(data: input)
     /// if let result = response.data {
-    ///     print("Uploaded file URL: \(result.url)")
+    ///     print("Uploaded file URL: \(result.fileUrl)")
     /// }
     /// ```
     public func createUpload(data: UploadInput) async throws -> APIResponse<UploadResponse> {
-        return try await apiClient.request(
-            endpoint: "/v1/upload",
-            method: .post,
-            body: data
-        )
+        return try await upload.create(data: data)
     }
 
     // MARK: - Terms of Service Service Methods

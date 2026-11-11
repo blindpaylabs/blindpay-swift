@@ -534,12 +534,17 @@ func swiftType(for node: [String: Any]) -> String {
     if let arr = t as? [Any] {
         t = arr.first(where: { ($0 as? String) != "null" })
     }
+    // A `format: binary` string is a file part of a multipart body.
+    if t as? String == "string", node["format"] as? String == "binary" { return "Data?" }
     switch t as? String {
     case "integer": return "Int?"
     case "number": return "Double?"
     case "boolean": return "Bool?"
     case "array": return "[String]?"
-    case "object": return "[String: String]?"
+    // An unmodeled object can hold any JSON value (nested objects, numbers,
+    // arrays), so a [String: String] dictionary would fail to decode real
+    // payloads. AnyCodable accepts every JSON value.
+    case "object": return "[String: AnyCodable]?"
     default: return "String?"
     }
 }
@@ -806,6 +811,9 @@ func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText
         // corresponds to it.
         return nil
     case "string":
+        // `format: binary` is raw file content (a multipart file part), which
+        // the SDK carries as Data.
+        if swiftBase == "Data", propNode["format"] as? String == "binary" { return nil }
         return swiftBase == "String" ? nil : "spec type \"string\" vs SDK type \(swiftBase)"
     case "integer":
         return swiftBase == "Int" ? nil : "spec type \"integer\" vs SDK type \(swiftBase)"
@@ -819,6 +827,9 @@ func typeMismatchReason(propName: String, propNode: [String: Any], swiftTypeText
     case "array":
         return swiftBase.hasPrefix("[") ? nil : "spec type \"array\" vs SDK type \(swiftBase)"
     case "object":
+        // A free-form JSON object (e.g. `additionalProperties: {}`) is modeled
+        // as [String: AnyCodable]; any other dictionary or array is too narrow.
+        if swiftBase.replacingOccurrences(of: " ", with: "") == "[String:AnyCodable]" { return nil }
         return (primitiveTypes.contains(swiftBase) || swiftBase.hasPrefix("["))
             ? "spec type \"object\" vs SDK type \(swiftBase)" : nil
     default:

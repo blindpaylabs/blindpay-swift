@@ -356,7 +356,6 @@
       }
     },
     {
-      "note": "KNOWN DIVERGENCE: spec has members \"concluded\" and \"pending\" not yet modeled (SDK only declares \"failed\"). See known-divergences.json.",
       "sdk": {
         "file": "Sources/BlindPay/Models/Payin.swift",
         "symbol": "ManualExecutionStatus"
@@ -938,10 +937,19 @@
       "sdk": [
         {
           "file": "Sources/BlindPay/Models/PayinQuote.swift",
-          "symbol": "PayinQuote"
+          "symbol": "CreatePayinQuoteResponse"
         }
       ],
       "spec": "CreatePayinQuoteOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuotePayerRules"
+        }
+      ],
+      "spec": "CreatePayinQuoteIn.payer_rules"
     },
     {
       "sdk": [
