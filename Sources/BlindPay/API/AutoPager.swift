@@ -23,8 +23,8 @@ public protocol CursorPaginatedInput: Sendable {
 ///
 /// If the server answers `has_more: true` with the same `next_page` cursor
 /// it was just sent, the stream yields that page's items and then throws
-/// ``BlindPayError/invalidResponse`` instead of requesting it forever (the
-/// Node SDK's "pagination did not advance" error).
+/// ``BlindPayError/invalidResponse``: following that cursor would request
+/// the same page forever.
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 enum AutoPager {
     /// Page size used when the caller sets none; valid in every limit enum.
@@ -51,10 +51,18 @@ enum AutoPager {
         private let fetch: @Sendable (Input) async throws -> APIResponse<ListResult<Element>>
         private var buffer: [Element] = []
         private var index = 0
-        private var finished = false
-        /// The server repeated the cursor it was sent: throw once this page's
-        /// items are read.
-        private var stalled = false
+        private var phase = Phase.fetching
+
+        /// What happens once the buffered page is read.
+        private enum Phase {
+            /// Fetch the page at `params.startingAfter`.
+            case fetching
+            /// The last page was read: end the stream.
+            case done
+            /// The server repeated the cursor it was sent: throw instead of
+            /// requesting the same page again.
+            case stalled
+        }
 
         init(params: Input, fetch: @escaping @Sendable (Input) async throws -> APIResponse<ListResult<Element>>) {
             self.params = params
@@ -67,14 +75,18 @@ enum AutoPager {
                     defer { index += 1 }
                     return buffer[index]
                 }
-                if stalled {
-                    stalled = false
+                switch phase {
+                case .done:
+                    return nil
+                case .stalled:
+                    phase = .done
                     throw BlindPayError.invalidResponse
+                case .fetching:
+                    break
                 }
-                if finished { return nil }
                 let response = try await fetch(params)
                 if let error = response.error {
-                    finished = true
+                    phase = .done
                     throw error
                 }
                 let page = response.data ?? ListResult(data: [])
@@ -82,13 +94,10 @@ enum AutoPager {
                 index = 0
                 if let pagination = page.pagination, pagination.hasMore, let next = pagination.nextPage {
                     // A cursor that didn't advance would refetch this page forever.
-                    if next == params.startingAfter {
-                        finished = true
-                        stalled = true
-                    }
+                    if next == params.startingAfter { phase = .stalled }
                     params.startingAfter = next
                 } else {
-                    finished = true
+                    phase = .done
                 }
             }
         }

@@ -43,6 +43,8 @@ public final class PayablesService: Sendable {
 
     /// Iterates every payable matching `params`, fetching pages of 100 (or
     /// `params.limit`) on demand. `endingBefore` is not supported.
+    /// If the server answers `hasMore` with the same cursor it was just sent,
+    /// iteration ends after that page by throwing ``BlindPayError/invalidResponse``.
     public func listAutoPaging(params: ListPayablesInput = ListPayablesInput(), options: RequestOptions? = nil) -> AsyncThrowingStream<Payable, Error> {
         AutoPager.stream(params: params) { [self] page in try await self.list(params: page, options: options) }
     }
