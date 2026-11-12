@@ -17,8 +17,11 @@
 //       Diffs .api-sync/spec-snapshot.json (old) against --spec (new, default
 //       .api-sync/spec-current.json) for version-bump/removal purposes, then
 //       reconciles source against the new spec. Hard fails (no writes) on any
-//       needs-human finding. Otherwise applies every applicable edit, refreshes
-//       the snapshot to match the new spec, and writes --report as JSON.
+//       needs-human finding. Otherwise applies every applicable edit, bumps
+//       BlindPaySDK.version (minor: every applied edit is additive), refreshes
+//       the snapshot by copying the spec file verbatim (pass a 2-space
+//       pretty-printed spec, e.g. `jq --indent 2 .`, so the diff stays small),
+//       and writes --report as JSON.
 //   swift .api-sync/sync.swift --validate-map
 //       Verifies every spec-map.json entry resolves: SDK file exists, SDK
 //       symbol is found in source, and the spec locator resolves against the
@@ -2506,13 +2509,14 @@ case .apply:
     } else {
         applyFindings(applicable)
         applyOperationInsertions(applicable, spec: newSpec, scanned: scanned)
-        let hasOperationInsert = applicable.contains { $0.kind == .operationInsert }
-        // A brand-new endpoint is a new backward-compatible capability, so
-        // operation-insert always forces at least a minor bump -- even in
-        // the (structurally impossible in practice, since a new operation
-        // implies new paths) edge case where classifyBump's own paths-diff
-        // check wouldn't otherwise notice.
-        let bump = hasOperationInsert ? Bump.minor : classifyBump(old: snapshot, new: newSpec)
+        // Every edit --apply makes is additive public API: a new optional
+        // field (a new init parameter), a new enum constant or a new
+        // operation. Additive changes are a minor release (CLAUDE.md
+        // "Versioning"), so any of them forces a minor bump; classifyBump
+        // only decides for applied kinds that aren't listed here.
+        let additiveKinds: Set<FindingKind> = [.applicableField, .applicableEnumCase, .operationInsert]
+        let isAdditive = applicable.contains { additiveKinds.contains($0.kind) }
+        let bump = isAdditive ? Bump.minor : classifyBump(old: snapshot, new: newSpec)
         print("sync --apply: applied \(applicable.count) change(s), bump=\(bump.rawValue)")
         for f in applicable { print("  - \(f.message)") }
         report["appliedCount"] = applicable.count

@@ -482,7 +482,8 @@ private func commonArgs(_ dir: String) -> [String] {
     let apply = runSync(in: dir, args)
     #expect(apply.exitCode == 0)
     let bump = try #require(readReportBump(dir))
-    let expected = bump == "minor" ? "5.1.0" : "5.0.10"
+    #expect(bump == "minor")
+    let expected = "5.1.0"
     let report = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: dir + "/report.json"))) as? [String: Any]
     #expect(report?["version"] as? String == expected)
     #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains("public static let version = \"\(expected)\""))
@@ -1176,7 +1177,8 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(readReportBump(dir) == "minor")
 }
 
-@Test func bumpIsPatchForFieldOnlyAdditions() {
+/// A new optional field is a new public init parameter: additive, so minor.
+@Test func bumpIsMinorForFieldOnlyAdditions() {
     let dir = makeFixtureDir()
     var spec = baseSpec()
     var comps = spec["components"] as! [String: Any]
@@ -1192,7 +1194,7 @@ private func commonArgs(_ dir: String) -> [String] {
 
     let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json"] + commonArgs(dir))
     #expect(apply.exitCode == 0)
-    #expect(readReportBump(dir) == "patch")
+    #expect(readReportBump(dir) == "minor")
 }
 
 // MARK: - unmodeled.json / known-divergences.json honoring
