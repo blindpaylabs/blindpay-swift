@@ -176,6 +176,43 @@ public struct BankDetailItem: Codable, Sendable, Equatable {
     }
 }
 
+/// How a ``BankDetailRequiredWhen`` condition compares its field.
+public struct BankDetailConditionOperator: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let `in` = BankDetailConditionOperator(rawValue: "in")
+    public static let eq = BankDetailConditionOperator(rawValue: "eq")
+    public static let notIn = BankDetailConditionOperator(rawValue: "notIn")
+    public static let notEq = BankDetailConditionOperator(rawValue: "notEq")
+}
+
+/// A condition under which a bank-detail field becomes required, e.g.
+/// `field: "country"`, `operator: "in"`, `values: ["US", "GB"]`.
+public struct BankDetailRequiredWhen: Codable, Sendable, Equatable {
+    /// The other field the condition reads (a bank-detail key such as `country`).
+    public let field: String
+
+    /// How `field` is compared with `values` (the wire key `operator`; for
+    /// example `in`).
+    public let operatorName: BankDetailConditionOperator
+
+    /// The values `field` is compared against.
+    public let values: [String]
+
+    public init(field: String, operatorName: BankDetailConditionOperator, values: [String]) {
+        self.field = field
+        self.operatorName = operatorName
+        self.values = values
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case field
+        case operatorName = "operator"
+        case values
+    }
+}
+
 /// Represents a bank detail field configuration
 public struct BankDetailField: Codable, Sendable, Equatable {
     /// Display label for the field
@@ -193,18 +230,23 @@ public struct BankDetailField: Codable, Sendable, Equatable {
     /// Whether this field is required
     public let required: Bool?
 
+    /// When set, the field is required only if this condition holds.
+    public let requiredWhen: BankDetailRequiredWhen?
+
     public init(
         label: String,
         regex: String,
         key: BankDetailKey,
         items: [BankDetailItem]? = nil,
-        required: Bool? = nil
+        required: Bool? = nil,
+        requiredWhen: BankDetailRequiredWhen? = nil
     ) {
         self.label = label
         self.regex = regex
         self.key = key
         self.items = items
         self.required = required
+        self.requiredWhen = requiredWhen
     }
 }
 

@@ -619,6 +619,46 @@
         "property": "yield_status",
         "schema": "WalletOut"
       }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Customer.swift",
+        "symbol": "AdditionalInfoLabel"
+      },
+      "spec": {
+        "property": "label",
+        "schema": "AdditionalInfoItem"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/BankAccount.swift",
+        "symbol": "BankAccountStatus"
+      },
+      "spec": {
+        "property": "status",
+        "schema": "BankAccountOut"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/BankAccount.swift",
+        "symbol": "BankAccountStatus"
+      },
+      "spec": {
+        "property": "status",
+        "schema": "CreateBankAccountIn"
+      }
+    },
+    {
+      "sdk": {
+        "file": "Sources/BlindPay/Models/Available.swift",
+        "symbol": "BankDetailConditionOperator"
+      },
+      "spec": {
+        "property": "operator",
+        "schema": "AvailableBankDetails.requiredWhen"
+      }
     }
   ],
   "ignore": {
@@ -634,10 +674,6 @@
       {
         "reason": "Generic {success:true} envelope reused by many operations; modeled ad hoc per-operation as VoidResponse or an operation-specific *Response struct rather than one shared type.",
         "schema": "Success"
-      },
-      {
-        "reason": "Nested shape used only inside unmapped Billing/RFI schemas.",
-        "schema": "AdditionalInfoItem"
       },
       {
         "reason": "Array wrapper only (type: array). The item shape is mapped separately as spec schema SwiftCodeItem -> Available.swift:SwiftCodeResponse (confusing name collision: the SDK's SwiftCodeResponse struct is the item, not the array).",
@@ -1830,6 +1866,105 @@
         }
       ],
       "spec": "PayinNewWebhookOut.tracking_transaction.card_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Customer.swift",
+          "symbol": "AdditionalInfoItem"
+        }
+      ],
+      "spec": "AdditionalInfoItem"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Available.swift",
+          "symbol": "BankDetailRequiredWhen"
+        }
+      ],
+      "spec": "AvailableBankDetails.requiredWhen"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuotePayerRules"
+        }
+      ],
+      "spec": "PayinOut.payer_rules"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinPseInstruction"
+        }
+      ],
+      "spec": "PayinOut.tracking_transaction.pse_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTedInstruction"
+        }
+      ],
+      "spec": "PayinOut.tracking_transaction.ted_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTransfersInstruction"
+        }
+      ],
+      "spec": "PayinOut.tracking_transaction.transfers_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinPseInstruction"
+        }
+      ],
+      "spec": "PayinNewWebhookOut.tracking_transaction.pse_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTedInstruction"
+        }
+      ],
+      "spec": "PayinNewWebhookOut.tracking_transaction.ted_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTransfersInstruction"
+        }
+      ],
+      "spec": "PayinNewWebhookOut.tracking_transaction.transfers_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingDocuments"
+        }
+      ],
+      "spec": "PayoutOut.tracking_documents"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingDocuments"
+        }
+      ],
+      "spec": "PayoutOnEvmOut.tracking_documents"
     }
   ]
 }

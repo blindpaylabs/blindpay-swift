@@ -425,6 +425,49 @@ public struct CustomerOwner: Codable, Sendable, Equatable {
     }
 }
 
+// MARK: - Additional Info
+
+/// Category of an ``AdditionalInfoItem``.
+public struct AdditionalInfoLabel: OpenEnum {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let einLetter = AdditionalInfoLabel(rawValue: "EIN_LETTER")
+    public static let kycProviderDocument = AdditionalInfoLabel(rawValue: "KYC_PROVIDER_DOCUMENT")
+    public static let flowOfFunds = AdditionalInfoLabel(rawValue: "FLOW_OF_FUNDS")
+    public static let bankStatement = AdditionalInfoLabel(rawValue: "BANK_STATEMENT")
+    public static let taxReturn = AdditionalInfoLabel(rawValue: "TAX_RETURN")
+    public static let auditedFinancials = AdditionalInfoLabel(rawValue: "AUDITED_FINANCIALS")
+    public static let operatingAgreement = AdditionalInfoLabel(rawValue: "OPERATING_AGREEMENT")
+    public static let boardResolution = AdditionalInfoLabel(rawValue: "BOARD_RESOLUTION")
+    public static let certificateOfGoodStanding = AdditionalInfoLabel(rawValue: "CERTIFICATE_OF_GOOD_STANDING")
+    public static let businessLicense = AdditionalInfoLabel(rawValue: "BUSINESS_LICENSE")
+    public static let msbLicense = AdditionalInfoLabel(rawValue: "MSB_LICENSE")
+    public static let powerOfAttorney = AdditionalInfoLabel(rawValue: "POWER_OF_ATTORNEY")
+    public static let trustDeed = AdditionalInfoLabel(rawValue: "TRUST_DEED")
+    public static let shareholderRegistry = AdditionalInfoLabel(rawValue: "SHAREHOLDER_REGISTRY")
+    public static let beneficialOwnerDeclaration = AdditionalInfoLabel(rawValue: "BENEFICIAL_OWNER_DECLARATION")
+    public static let complianceQuestionnaire = AdditionalInfoLabel(rawValue: "COMPLIANCE_QUESTIONNAIRE")
+    public static let proofOfEmployment = AdditionalInfoLabel(rawValue: "PROOF_OF_EMPLOYMENT")
+    public static let referenceLetter = AdditionalInfoLabel(rawValue: "REFERENCE_LETTER")
+    public static let other = AdditionalInfoLabel(rawValue: "OTHER")
+}
+
+/// An extra document or note attached to a customer. `value` is a URL
+/// (BlindPay downloads and re-hosts it) or a free-text description.
+public struct AdditionalInfoItem: Codable, Sendable, Equatable {
+    /// The kind of document or note.
+    public let label: AdditionalInfoLabel
+
+    /// A document URL or a free-text description.
+    public let value: String
+
+    public init(label: AdditionalInfoLabel, value: String) {
+        self.label = label
+        self.value = value
+    }
+}
+
 // MARK: - Create Customer Input
 
 /// Input for creating a customer
@@ -565,6 +608,15 @@ public struct CreateCustomerInput: Codable, Sendable {
     /// Occupation (optional)
     public let occupation: String?
 
+    /// Optional extra documents or notes for this customer. `label` is a known category, `value` is either a URL to upload or a free-text description. Any URLs are downloaded and re-hosted on Blindpay storage before being stored.
+    public let additionalInfo: [AdditionalInfoItem]?
+
+    /// Optional geolocation latitude collected from the customer. Forwarded to AiPrise and SEON for fraud analysis.
+    public let latitude: Double?
+
+    /// Optional geolocation longitude collected from the customer. Forwarded to AiPrise and SEON for fraud analysis.
+    public let longitude: Double?
+
     public init(
         country: Country,
         email: String,
@@ -610,7 +662,10 @@ public struct CreateCustomerInput: Codable, Sendable {
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
-        occupation: String? = nil
+        occupation: String? = nil,
+        additionalInfo: [AdditionalInfoItem]? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil
     ) {
         self.country = country
         self.email = email
@@ -657,6 +712,9 @@ public struct CreateCustomerInput: Codable, Sendable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.additionalInfo = additionalInfo
+        self.latitude = latitude
+        self.longitude = longitude
     }
 
     enum CodingKeys: String, CodingKey {
@@ -705,6 +763,9 @@ public struct CreateCustomerInput: Codable, Sendable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case additionalInfo = "additional_info"
+        case latitude
+        case longitude
     }
 }
 
@@ -993,6 +1054,15 @@ public struct Customer: Codable, Sendable, Equatable {
 
     public let virtualAccountPreapproval: [String: AnyCodable]?
 
+    /// Optional extra documents or notes for this customer. `label` is a known category, `value` is either a URL to upload or a free-text description. Any URLs are downloaded and re-hosted on Blindpay storage before being stored.
+    public let additionalInfo: [AdditionalInfoItem]?
+
+    /// Optional geolocation latitude collected from the customer. Forwarded to AiPrise and SEON for fraud analysis.
+    public let latitude: Double?
+
+    /// Optional geolocation longitude collected from the customer. Forwarded to AiPrise and SEON for fraud analysis.
+    public let longitude: Double?
+
     public init(
         id: String,
         type: CustomerType,
@@ -1055,7 +1125,10 @@ public struct Customer: Codable, Sendable, Equatable {
         customerId: String? = nil,
         cnaeCondition: [String: AnyCodable]? = nil,
         isNested: Bool? = nil,
-        virtualAccountPreapproval: [String: AnyCodable]? = nil
+        virtualAccountPreapproval: [String: AnyCodable]? = nil,
+        additionalInfo: [AdditionalInfoItem]? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil
     ) {
         self.id = id
         self.type = type
@@ -1119,6 +1192,9 @@ public struct Customer: Codable, Sendable, Equatable {
         self.cnaeCondition = cnaeCondition
         self.isNested = isNested
         self.virtualAccountPreapproval = virtualAccountPreapproval
+        self.additionalInfo = additionalInfo
+        self.latitude = latitude
+        self.longitude = longitude
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1184,6 +1260,9 @@ public struct Customer: Codable, Sendable, Equatable {
         case cnaeCondition = "cnae_condition"
         case isNested = "is_nested"
         case virtualAccountPreapproval = "virtual_account_preapproval"
+        case additionalInfo = "additional_info"
+        case latitude
+        case longitude
     }
 }
 
@@ -1321,6 +1400,15 @@ public struct UpdateCustomerInput: Codable, Sendable {
     /// Occupation (optional)
     public let occupation: String?
 
+    /// Optional extra documents or notes for this customer. `label` is a known category, `value` is either a URL to upload or a free-text description. Any URLs are downloaded and re-hosted on Blindpay storage before being stored.
+    public let additionalInfo: [AdditionalInfoItem]?
+
+    /// Optional geolocation latitude collected from the customer. Forwarded to AiPrise and SEON for fraud analysis.
+    public let latitude: Double?
+
+    /// Optional geolocation longitude collected from the customer. Forwarded to AiPrise and SEON for fraud analysis.
+    public let longitude: Double?
+
     public init(
         country: Country,
         email: String,
@@ -1364,7 +1452,10 @@ public struct UpdateCustomerInput: Codable, Sendable {
         estimatedAnnualRevenue: EstimatedAnnualRevenue? = nil,
         sourceOfWealth: SourceOfWealth? = nil,
         publiclyTraded: Bool? = nil,
-        occupation: String? = nil
+        occupation: String? = nil,
+        additionalInfo: [AdditionalInfoItem]? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil
     ) {
         self.country = country
         self.email = email
@@ -1409,6 +1500,9 @@ public struct UpdateCustomerInput: Codable, Sendable {
         self.sourceOfWealth = sourceOfWealth
         self.publiclyTraded = publiclyTraded
         self.occupation = occupation
+        self.additionalInfo = additionalInfo
+        self.latitude = latitude
+        self.longitude = longitude
     }
 
     enum CodingKeys: String, CodingKey {
@@ -1455,6 +1549,9 @@ public struct UpdateCustomerInput: Codable, Sendable {
         case sourceOfWealth = "source_of_wealth"
         case publiclyTraded = "publicly_traded"
         case occupation
+        case additionalInfo = "additional_info"
+        case latitude
+        case longitude
     }
 }
 

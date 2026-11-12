@@ -208,5 +208,65 @@
     "field": "partner_tos_terms_accepted",
     "reason": "Boolean that must be true (enum [true]); modeled as Bool.",
     "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountOut",
+    "field": "business_industry",
+    "reason": "NAICS code (hundreds of values), modeled as String like CreateBankAccountInput.businessIndustry and the customer structs.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountOut",
+    "field": "swift_payment_code",
+    "reason": "Large country-specific SWIFT payment-code enum, modeled as String like CreateBankAccountInput.swiftPaymentCode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinOut.tracking_transaction",
+    "field": "provider_name",
+    "reason": "Tracking sub-object provider fields are modeled as bare String across the Payin/Payout tracking structs (same as PayoutOut.tracking_payment.provider_name).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction",
+    "field": "provider_name",
+    "reason": "Tracking sub-object provider fields are modeled as bare String across the Payin/Payout tracking structs (same as PayoutOut.tracking_payment.provider_name).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "AvailableBankDetails.requiredWhen",
+    "field": "field",
+    "reason": "Names another bank-detail key (the BankDetailKey set); modeled as String so a new key never needs a constant here.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinOut.payer_rules",
+    "field": "pse_document_type",
+    "reason": "CC/NIT; modeled as String on the shared PayinQuotePayerRules struct (same as CreatePayinQuoteIn.payer_rules).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinOut.tracking_transaction.pse_instruction",
+    "field": "document_type",
+    "reason": "Small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinOut.tracking_transaction.transfers_instruction",
+    "field": "type",
+    "reason": "CVU/CBU/ALIAS; small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction.pse_instruction",
+    "field": "document_type",
+    "reason": "Small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinNewWebhookOut.tracking_transaction.transfers_instruction",
+    "field": "type",
+    "reason": "CVU/CBU/ALIAS; small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
   }
 ]

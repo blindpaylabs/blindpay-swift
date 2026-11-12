@@ -20,6 +20,15 @@ public struct SupportingDocumentType: OpenEnum {
     public static let businessBankStatement = SupportingDocumentType(rawValue: "business_bank_statement")
     public static let businessFinancialStatements = SupportingDocumentType(rawValue: "business_financial_statements")
     public static let businessTaxReturn = SupportingDocumentType(rawValue: "business_tax_return")
+    public static let businessAccountsReceivable = SupportingDocumentType(rawValue: "business_accounts_receivable")
+    public static let businessContract = SupportingDocumentType(rawValue: "business_contract")
+    public static let businessMerchantProcessorStatement = SupportingDocumentType(rawValue: "business_merchant_processor_statement")
+    public static let businessShareholderLoan = SupportingDocumentType(rawValue: "business_shareholder_loan")
+    public static let individualBlockchainWalletStatement = SupportingDocumentType(rawValue: "individual_blockchain_wallet_statement")
+    public static let individualCryptoExchangeStatement = SupportingDocumentType(rawValue: "individual_crypto_exchange_statement")
+    public static let individualEmploymentLetter = SupportingDocumentType(rawValue: "individual_employment_letter")
+    public static let individualInvestmentStatement = SupportingDocumentType(rawValue: "individual_investment_statement")
+    public static let individualPayStub = SupportingDocumentType(rawValue: "individual_pay_stub")
 }
 
 // MARK: - Limit Increase Request Status
@@ -217,6 +226,15 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     /// is rejected, or approved below the requested limits; `nil` otherwise.
     public let reviewReason: String?
 
+    /// Daily limit compliance approved, in cents. Set once the request is approved; may be lower than `daily` (see ``reviewReason``).
+    public let approvedDaily: Int?
+
+    /// Monthly limit compliance approved, in cents. Set once the request is approved; may be lower than `monthly`.
+    public let approvedMonthly: Int?
+
+    /// Per-transaction limit compliance approved, in cents. Set once the request is approved; may be lower than `perTransaction`.
+    public let approvedPerTransaction: Int?
+
     public init(
         id: String,
         customerId: String,
@@ -229,7 +247,10 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         supportingDocumentFile: String? = nil,
         supportingDocumentType: SupportingDocumentType? = nil,
         supportingDocuments: [LimitIncreaseSupportingDocument]? = nil,
-        reviewReason: String? = nil
+        reviewReason: String? = nil,
+        approvedDaily: Int? = nil,
+        approvedMonthly: Int? = nil,
+        approvedPerTransaction: Int? = nil
     ) {
         self.id = id
         self.customerId = customerId
@@ -243,6 +264,9 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         self.supportingDocumentType = supportingDocumentType
         self.supportingDocuments = supportingDocuments
         self.reviewReason = reviewReason
+        self.approvedDaily = approvedDaily
+        self.approvedMonthly = approvedMonthly
+        self.approvedPerTransaction = approvedPerTransaction
     }
     
     enum CodingKeys: String, CodingKey {
@@ -258,5 +282,8 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         case supportingDocumentType = "supporting_document_type"
         case supportingDocuments = "supporting_documents"
         case reviewReason = "review_reason"
+        case approvedDaily = "approved_daily"
+        case approvedMonthly = "approved_monthly"
+        case approvedPerTransaction = "approved_per_transaction"
     }
 }

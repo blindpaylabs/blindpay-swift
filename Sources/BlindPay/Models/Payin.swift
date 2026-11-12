@@ -111,6 +111,30 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
 
 
 
+  /// BACEN Pix end-to-end transaction ID (govt Pix ID)
+  public let endToEndId: String?
+
+  /// Payment provider name
+  public let providerName: String?
+
+  /// Payment provider transaction id
+  public let providerTransactionId: String?
+
+  /// PSE (Colombia) payment link and payer details.
+  public let pseInstruction: PayinPseInstruction?
+
+  /// Name of the bank the funds came from.
+  public let senderBankName: String?
+
+  /// TED (Brazil) bank details to pay into.
+  public let tedInstruction: PayinTedInstruction?
+
+  /// Blockchain transaction hash
+  public let transactionHash: String?
+
+  /// Transfers (Argentina) account to pay into.
+  public let transfersInstruction: PayinTransfersInstruction?
+
   public init(
     step: String,
     status: String? = nil,
@@ -127,7 +151,15 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     cardClaimAt: String? = nil,
     cardEvidence: [String: AnyCodable]? = nil,
     cardFailedAttempts: Int? = nil,
-    cardGatesFailedAt: String? = nil
+    cardGatesFailedAt: String? = nil,
+    endToEndId: String? = nil,
+    providerName: String? = nil,
+    providerTransactionId: String? = nil,
+    pseInstruction: PayinPseInstruction? = nil,
+    senderBankName: String? = nil,
+    tedInstruction: PayinTedInstruction? = nil,
+    transactionHash: String? = nil,
+    transfersInstruction: PayinTransfersInstruction? = nil
   ) {
     self.step = step
     self.status = status
@@ -145,6 +177,14 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     self.cardEvidence = cardEvidence
     self.cardFailedAttempts = cardFailedAttempts
     self.cardGatesFailedAt = cardGatesFailedAt
+    self.endToEndId = endToEndId
+    self.providerName = providerName
+    self.providerTransactionId = providerTransactionId
+    self.pseInstruction = pseInstruction
+    self.senderBankName = senderBankName
+    self.tedInstruction = tedInstruction
+    self.transactionHash = transactionHash
+    self.transfersInstruction = transfersInstruction
   }
 
   enum CodingKeys: String, CodingKey {
@@ -164,7 +204,137 @@ public struct PayinTrackingTransaction: Codable, Sendable, Equatable {
     case cardEvidence = "card_evidence"
     case cardFailedAttempts = "card_failed_attempts"
     case cardGatesFailedAt = "card_gates_failed_at"
+    case endToEndId = "end_to_end_id"
+    case providerName = "provider_name"
+    case providerTransactionId = "provider_transaction_id"
+    case pseInstruction = "pse_instruction"
+    case senderBankName = "sender_bank_name"
+    case tedInstruction = "ted_instruction"
+    case transactionHash = "transaction_hash"
+    case transfersInstruction = "transfers_instruction"
   }
+}
+
+/// PSE (Colombia) payment instruction on a payin's `tracking_transaction`.
+public struct PayinPseInstruction: Codable, Sendable, Equatable {
+    /// PSE payment link URL.
+    public let paymentLink: String?
+    /// PSE provider reference used for webhook matching (the payin intent id).
+    public let fid: String?
+    /// PSE payin intent id at the provider.
+    public let payinIntentId: String?
+    /// When the PSE payment link expires.
+    public let expiresAt: String?
+    /// Payer full name.
+    public let fullName: String?
+    /// Payer document number.
+    public let taxId: String?
+    /// Payer document type (`CC` or `NIT`).
+    public let documentType: String?
+    /// Payer phone number.
+    public let phone: String?
+    /// Payer email.
+    public let email: String?
+    /// Payer bank code.
+    public let bankCode: String?
+
+    public init(
+        paymentLink: String? = nil,
+        fid: String? = nil,
+        payinIntentId: String? = nil,
+        expiresAt: String? = nil,
+        fullName: String? = nil,
+        taxId: String? = nil,
+        documentType: String? = nil,
+        phone: String? = nil,
+        email: String? = nil,
+        bankCode: String? = nil
+    ) {
+        self.paymentLink = paymentLink
+        self.fid = fid
+        self.payinIntentId = payinIntentId
+        self.expiresAt = expiresAt
+        self.fullName = fullName
+        self.taxId = taxId
+        self.documentType = documentType
+        self.phone = phone
+        self.email = email
+        self.bankCode = bankCode
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case paymentLink = "payment_link"
+        case fid
+        case payinIntentId = "payin_intent_id"
+        case expiresAt = "expires_at"
+        case fullName = "full_name"
+        case taxId = "tax_id"
+        case documentType = "document_type"
+        case phone
+        case email
+        case bankCode = "bank_code"
+    }
+}
+
+/// TED (Brazil) bank details to pay a payin into.
+public struct PayinTedInstruction: Codable, Sendable, Equatable {
+    public let beneficiaryName: String?
+    public let taxId: String?
+    public let bankCode: String?
+    public let bankName: String?
+    public let branchCode: String?
+    public let accountNumber: String?
+    public let accountType: String?
+
+    public init(
+        beneficiaryName: String? = nil,
+        taxId: String? = nil,
+        bankCode: String? = nil,
+        bankName: String? = nil,
+        branchCode: String? = nil,
+        accountNumber: String? = nil,
+        accountType: String? = nil
+    ) {
+        self.beneficiaryName = beneficiaryName
+        self.taxId = taxId
+        self.bankCode = bankCode
+        self.bankName = bankName
+        self.branchCode = branchCode
+        self.accountNumber = accountNumber
+        self.accountType = accountType
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case beneficiaryName = "beneficiary_name"
+        case taxId = "tax_id"
+        case bankCode = "bank_code"
+        case bankName = "bank_name"
+        case branchCode = "branch_code"
+        case accountNumber = "account_number"
+        case accountType = "account_type"
+    }
+}
+
+/// Transfers (Argentina) account to pay a payin into.
+public struct PayinTransfersInstruction: Codable, Sendable, Equatable {
+    /// CVU, CBU or alias account.
+    public let account: String?
+    /// Account type: `CVU`, `CBU` or `ALIAS`.
+    public let type: String?
+    /// CUIT/CUIL, digits only.
+    public let taxId: String?
+
+    public init(account: String? = nil, type: String? = nil, taxId: String? = nil) {
+        self.account = account
+        self.type = type
+        self.taxId = taxId
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case account
+        case type
+        case taxId = "tax_id"
+    }
 }
 
 /// Payment tracking information for payin
@@ -185,12 +355,24 @@ public struct PayinTrackingPayment: Codable, Equatable, @unchecked Sendable {
 
   public let reviewSources: [String]?
 
-  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: AnyCodable]? = nil, reviewSources: [String]? = nil) {
+  /// Risk sources already approved by an analyst
+  public let approvedRiskSources: [String]?
+
+  /// Structured risk context for manual review
+  public let reviewContext: [String: AnyCodable]?
+
+  /// Primary risk source that sent this payin to manual review
+  public let reviewSource: String?
+
+  public init(step: String, providerName: String? = nil, completedAt: String? = nil, reviewContexts: [String: AnyCodable]? = nil, reviewSources: [String]? = nil, approvedRiskSources: [String]? = nil, reviewContext: [String: AnyCodable]? = nil, reviewSource: String? = nil) {
     self.step = step
     self.providerName = providerName
     self.completedAt = completedAt
     self.reviewContexts = reviewContexts
     self.reviewSources = reviewSources
+    self.approvedRiskSources = approvedRiskSources
+    self.reviewContext = reviewContext
+    self.reviewSource = reviewSource
   }
 
   enum CodingKeys: String, CodingKey {
@@ -199,6 +381,9 @@ public struct PayinTrackingPayment: Codable, Equatable, @unchecked Sendable {
     case completedAt = "completed_at"
     case reviewContexts = "review_contexts"
     case reviewSources = "review_sources"
+    case approvedRiskSources = "approved_risk_sources"
+    case reviewContext = "review_context"
+    case reviewSource = "review_source"
   }
 }
 
@@ -548,6 +733,23 @@ public struct Payin: Codable, Sendable, Equatable {
   /// PSE tax ID
   public let pseTaxId: String?
 
+  /// When `manual_execution_status` became `concluded`: an ISO 8601 string,
+  /// or `nil`. `AnyCodable` because the spec declares no type for it; read
+  /// it with `manualConcludedAt?.value as? String`.
+  public let manualConcludedAt: AnyCodable?
+
+  /// Identifier of the operator who marked the manual OTC concluded.
+  public let manualConcludedBy: String?
+
+  /// Payin partner fee amount in cents
+  public let partnerFee: Int?
+
+  /// Restrictions on who may fund this payin, copied from the payin quote.
+  public let payerRules: PayinQuotePayerRules?
+
+  /// BlindPay fee in cents deducted from the transaction at the time it is processed. Virtual account deposits of $100.00 or more are charged here (unless your instance is configured for end-of-month billing, in which case every fee accrues to billing_fee_amount).
+  public let transactionFeeAmount: Double?
+
   public init(
     id: String,
     customerId: String,
@@ -589,7 +791,12 @@ public struct Payin: Codable, Sendable, Equatable {
     pseDocumentType: String? = nil,
     pseFullName: String? = nil,
     psePaymentLink: String? = nil,
-    pseTaxId: String? = nil
+    pseTaxId: String? = nil,
+    manualConcludedAt: AnyCodable? = nil,
+    manualConcludedBy: String? = nil,
+    partnerFee: Int? = nil,
+    payerRules: PayinQuotePayerRules? = nil,
+    transactionFeeAmount: Double? = nil
   ) {
     self.id = id
     self.customerId = customerId
@@ -632,6 +839,11 @@ public struct Payin: Codable, Sendable, Equatable {
     self.pseFullName = pseFullName
     self.psePaymentLink = psePaymentLink
     self.pseTaxId = pseTaxId
+    self.manualConcludedAt = manualConcludedAt
+    self.manualConcludedBy = manualConcludedBy
+    self.partnerFee = partnerFee
+    self.payerRules = payerRules
+    self.transactionFeeAmount = transactionFeeAmount
   }
 
   enum CodingKeys: String, CodingKey {
@@ -676,6 +888,11 @@ public struct Payin: Codable, Sendable, Equatable {
     case pseFullName = "pse_full_name"
     case psePaymentLink = "pse_payment_link"
     case pseTaxId = "pse_tax_id"
+    case manualConcludedAt = "manual_concluded_at"
+    case manualConcludedBy = "manual_concluded_by"
+    case partnerFee = "partner_fee"
+    case payerRules = "payer_rules"
+    case transactionFeeAmount = "transaction_fee_amount"
   }
 }
 
@@ -837,6 +1054,15 @@ public struct CreatePayinResponse: Codable, Sendable {
   /// Sender amount
   public let senderAmount: Int?
 
+  /// BlindPay fee in cents accrued to your billing cycle (charged at the end of the month). Virtual account deposits below $100.00 always accrue here, so small deposits are delivered in full.
+  public let billingFeeAmount: Double?
+
+  /// Payin partner fee amount in cents
+  public let partnerFee: Int?
+
+  /// BlindPay fee in cents deducted from the transaction at the time it is processed. Virtual account deposits of $100.00 or more are charged here (unless your instance is configured for end-of-month billing, in which case every fee accrues to billing_fee_amount).
+  public let transactionFeeAmount: Double?
+
   public init(
     id: String,
     status: PayinStatus,
@@ -852,7 +1078,10 @@ public struct CreatePayinResponse: Codable, Sendable {
     receiverAmount: Int? = nil,
     paymentMethod: PaymentMethod? = nil,
     billingFee: Int? = nil,
-    senderAmount: Int? = nil
+    senderAmount: Int? = nil,
+    billingFeeAmount: Double? = nil,
+    partnerFee: Int? = nil,
+    transactionFeeAmount: Double? = nil
   ) {
     self.id = id
     self.status = status
@@ -869,6 +1098,9 @@ public struct CreatePayinResponse: Codable, Sendable {
     self.paymentMethod = paymentMethod
     self.billingFee = billingFee
     self.senderAmount = senderAmount
+    self.billingFeeAmount = billingFeeAmount
+    self.partnerFee = partnerFee
+    self.transactionFeeAmount = transactionFeeAmount
   }
 
   enum CodingKeys: String, CodingKey {
@@ -887,5 +1119,8 @@ public struct CreatePayinResponse: Codable, Sendable {
     case paymentMethod = "payment_method"
     case billingFee = "billing_fee"
     case senderAmount = "sender_amount"
+    case billingFeeAmount = "billing_fee_amount"
+    case partnerFee = "partner_fee"
+    case transactionFeeAmount = "transaction_fee_amount"
   }
 }
