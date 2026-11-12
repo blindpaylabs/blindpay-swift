@@ -212,6 +212,11 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
     /// Every supporting document attached to the request (up to 5).
     public let supportingDocuments: [LimitIncreaseSupportingDocument]?
 
+    /// Why compliance rejected the request or approved lower limits than
+    /// requested, and what to send to get the full amount. Set when `status`
+    /// is rejected, or approved below the requested limits; `nil` otherwise.
+    public let reviewReason: String?
+
     public init(
         id: String,
         customerId: String,
@@ -223,7 +228,8 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         monthly: Int? = nil,
         supportingDocumentFile: String? = nil,
         supportingDocumentType: SupportingDocumentType? = nil,
-        supportingDocuments: [LimitIncreaseSupportingDocument]? = nil
+        supportingDocuments: [LimitIncreaseSupportingDocument]? = nil,
+        reviewReason: String? = nil
     ) {
         self.id = id
         self.customerId = customerId
@@ -236,6 +242,7 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         self.supportingDocumentFile = supportingDocumentFile
         self.supportingDocumentType = supportingDocumentType
         self.supportingDocuments = supportingDocuments
+        self.reviewReason = reviewReason
     }
     
     enum CodingKeys: String, CodingKey {
@@ -250,5 +257,6 @@ public struct LimitIncreaseRequest: Codable, Sendable, Equatable {
         case supportingDocumentFile = "supporting_document_file"
         case supportingDocumentType = "supporting_document_type"
         case supportingDocuments = "supporting_documents"
+        case reviewReason = "review_reason"
     }
 }
