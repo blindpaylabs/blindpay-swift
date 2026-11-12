@@ -22,6 +22,8 @@ concurrency:
 jobs:
   release:
     name: Tag and release
+    # A dispatch can name any ref; only main's constant is ever released.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
