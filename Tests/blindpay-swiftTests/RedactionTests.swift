@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 import Testing
 @testable import BlindPay
 
@@ -80,7 +83,9 @@ struct SecretHygieneTests {
                 #expect(!text.contains(key))
             }
             // The path stays, so the failure is still diagnosable.
-            #expect(String(describing: underlying).contains("/v1/instances/in_000000000000/customers"))
+            let failingURL = (underlying as NSError).userInfo[NSURLErrorFailingURLErrorKey] as? URL
+            #expect(failingURL?.path == "/v1/instances/in_000000000000/customers")
+            #expect(failingURL?.query == nil)
         }
     }
 }
