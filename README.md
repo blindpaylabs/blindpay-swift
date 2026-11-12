@@ -234,6 +234,8 @@ Uploads are `multipart/form-data`, are never retried, and require a finished onb
 - [BlindPay API documentation](https://blindpay.com/docs/introduction)
 - [API reference](https://api.blindpay.com/reference)
 
+Maintainers: the release process is in [RELEASING.md](RELEASING.md).
+
 ## Support
 
 - Issues: [GitHub Issues](https://github.com/blindpaylabs/blindpay-swift/issues)

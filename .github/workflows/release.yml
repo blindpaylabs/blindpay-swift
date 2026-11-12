@@ -8,6 +8,9 @@ name: Release
 on:
   push:
     branches: [main]
+  # Re-run a release that failed after the merge (see RELEASING.md). The
+  # check is idempotent: an existing tag means nothing to do.
+  workflow_dispatch:
 
 permissions:
   contents: write
