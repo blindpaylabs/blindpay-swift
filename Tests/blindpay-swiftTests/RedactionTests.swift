@@ -50,8 +50,57 @@ private struct FailingURLTransport: HTTPTransport {
     }
 }
 
+/// Headers arrive, then the body fails like URLSession's does: the error
+/// carries the full request URL.
+private struct IncompleteBodyTransport: HTTPTransport {
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        let url = request.url!
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: [:])!
+        throw HTTPTransportError.incompleteResponse(response, underlying: URLError(.networkConnectionLost, userInfo: [
+            NSURLErrorFailingURLErrorKey: url, NSURLErrorFailingURLStringErrorKey: url.absoluteString,
+        ]))
+    }
+}
+
+private func expectNoQuery(_ error: Error, _ underlying: Error, file: String = #fileID, line: Int = #line) {
+    var dumped = ""
+    dump(error, to: &dumped)
+    let texts = [String(describing: error), String(reflecting: error), error.localizedDescription,
+                 String(describing: underlying), "\((underlying as NSError).userInfo)", dumped]
+    for text in texts {
+        #expect(!text.contains("Jane"), "query string leaked: \(text)")
+        #expect(!text.contains("full_name"), "query string leaked: \(text)")
+    }
+}
+
 struct SecretHygieneTests {
     private let key = "sk_live_should_never_leak"
+
+    @Test func anIncompleteResponseDoesNotCarryTheQueryString() async throws {
+        let client = BlindPay(apiKey: key, instanceId: "in_000000000000", configuration: Configuration(
+            baseURL: "https://api.example.com", maxRetries: 0, transport: IncompleteBodyTransport()))
+        do {
+            _ = try await client.instances.customers.list(params: ListCustomersInput(fullName: "Jane Private Doe"))
+            Issue.record("expected an incomplete response")
+        } catch BlindPayError.incompleteResponse(_, let underlying, _) {
+            expectNoQuery(BlindPayError.incompleteResponse(status: 200, underlying: underlying, idempotencyKey: nil), underlying)
+        }
+    }
+
+    /// The real URLSession transport against a closed local port: whatever
+    /// error URLSession builds (on macOS or Linux), the query never surfaces.
+    @Test func aRealConnectionFailureDoesNotCarryTheQueryString() async throws {
+        let client = BlindPay(apiKey: key, instanceId: "in_000000000000", configuration: Configuration(
+            baseURL: "http://127.0.0.1:1", timeout: 10, maxRetries: 0))
+        do {
+            _ = try await client.instances.customers.list(params: ListCustomersInput(fullName: "Jane Private Doe"))
+            Issue.record("expected a network error")
+        } catch BlindPayError.networkError(let underlying, _) {
+            expectNoQuery(BlindPayError.networkError(underlying, idempotencyKey: nil), underlying)
+        } catch {
+            Issue.record("expected .networkError, got \(error)")
+        }
+    }
 
     @Test func theConfigurationAndServicesNeverPrintTheKey() {
         let client = BlindPay(apiKey: key, instanceId: "in_000000000000", configuration: Configuration(baseURL: "https://api.example.com"))

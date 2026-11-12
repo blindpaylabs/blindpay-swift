@@ -195,7 +195,7 @@ internal final class APIClient: Sendable {
                 if status >= 400 {
                     return APIResponse(data: nil, error: makeAPIError(data: Data(), response: response, method: method, idempotencyKey: idempotencyKey))
                 }
-                throw BlindPayError.incompleteResponse(status: status, underlying: underlying, idempotencyKey: idempotencyKey)
+                throw BlindPayError.incompleteResponse(status: status, underlying: redactingQueries(in: underlying), idempotencyKey: idempotencyKey)
             } catch let error as BlindPayError {
                 // Raised by this client (decoding, cancellation after an API
                 // error, ...): never retried.
@@ -208,10 +208,8 @@ internal final class APIClient: Sendable {
                     failure = .timeout(idempotencyKey: idempotencyKey)
                 case let urlError as URLError where urlError.code == .timedOut:
                     failure = .timeout(idempotencyKey: idempotencyKey)
-                case let urlError as URLError:
-                    failure = .networkError(URLError(urlError.code, userInfo: redactingQueries(urlError.userInfo)), idempotencyKey: idempotencyKey)
                 default:
-                    failure = .networkError(error, idempotencyKey: idempotencyKey)
+                    failure = .networkError(redactingQueries(in: error), idempotencyKey: idempotencyKey)
                 }
                 if canRetry, RetryPolicy.shouldRetry(method: method, isMultipart: isMultipart, hasIdempotencyKey: idempotencyKey != nil, outcome: .noResponse) {
                     try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: nil, jitter: configuration.jitter()))
@@ -335,6 +333,21 @@ extension APIClient: CustomReflectable, CustomStringConvertible, CustomDebugStri
     var description: String { "APIClient(baseURL: \(configuration.baseURL), apiKey: <redacted>)" }
 
     var debugDescription: String { description }
+}
+
+/// A transport error with every URL in its `userInfo` stripped of its query
+/// and fragment (see ``redactingQueries(_:)``). Other errors pass through.
+func redactingQueries(in error: Error) -> Error {
+    if let urlError = error as? URLError {
+        return URLError(urlError.code, userInfo: redactingQueries(urlError.userInfo))
+    }
+    let nsError = error as NSError
+    // Linux URLSession can surface URL-loading failures as plain NSErrors.
+    // Errors from a custom transport keep their own type.
+    if nsError.domain == NSURLErrorDomain {
+        return NSError(domain: nsError.domain, code: nsError.code, userInfo: redactingQueries(nsError.userInfo))
+    }
+    return error
 }
 
 /// Copies a transport error's `userInfo` with every URL's query string and
