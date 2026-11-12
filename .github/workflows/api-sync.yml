@@ -118,6 +118,8 @@ jobs:
       - name: Build and test the patched SDK
         if: steps.sync.outputs.applied != '0'
         run: |
+          # ErrorCode.swift is generated from the refreshed snapshot's error table.
+          swift .api-sync/check-contract.swift --write-error-codes
           swift build
           swift test
           swift .api-sync/check-contract.swift

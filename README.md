@@ -89,7 +89,26 @@ _ = try await blindpay.instances.payouts.createEvm(data: input, options: options
 - **Client errors** are thrown as `BlindPayError`: `.networkError` (no response; carries the idempotency key), `.timeout`, `.invalidRequest` (rejected before sending, e.g. an empty idempotency key), `.decodingError`, `.encodingError`, `.webhookVerificationFailed`.
 - A successful response with no body (204) has `data == nil` and no error.
 
-Errors never contain your API key or the request body, and `dump(blindpay)` shows the key as `<redacted>`.
+Branch on `errorCode`, a typed `ErrorCode` (an open enum generated from the API's error table, so a code this SDK version doesn't know still compares by its raw string). `retryClass` says how to react (`.retryable`, `.terminal`, `.actionable`, or `.unknown` when there is no code), and `errorCode?.info` gives the documented status. Some errors carry no `code` (idempotency conflicts, non-JSON bodies), so keep `message` as the fallback:
+
+```swift
+let response = try await blindpay.instances.transferQuotes.create(data: quoteInput)
+if let error = response.error {
+    switch error.errorCode {
+    case .transfersSwapAmountBelowMinimum?:
+        // Swaps between different tokens need at least 100 USDC.
+        print("Raise the amount: \(error.description ?? error.message)")
+    case .quotesExpired?:
+        print("Request a new quote")
+    default:
+        if error.retryClass == .actionable { print("Fix the request: \(error.description ?? error.message)") }
+    }
+}
+```
+
+`retryClass` is advisory: the client's own retries follow `retryable` (see below).
+
+Errors never contain your API key, the request body or the request's query string, and `dump(blindpay)` shows the key as `<redacted>`.
 
 ## Idempotency and retries
 
