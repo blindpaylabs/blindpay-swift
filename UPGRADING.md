@@ -210,3 +210,14 @@ blindPay.customers(customerId: "cu_1").bankAccounts.offrampWallets.get(bankAccou
 ## New
 
 Payables, instance and customer RFI, instance onboarding, `instances.get()`, Plaid links, `setSelfCustody`, offramp wallet updates, wallet deposits, `upload.presign`/`analyze`, `RequestOptions` on every method, auto-pagers, the webhook verifier and typed events, and `Configuration(timeout:maxRetries:transport:)`. See the [README](README.md).
+
+## Within 5.x
+
+Minor releases add API without breaking your build. Behaviour notes:
+
+### 5.2.0
+
+- **Auto-pagination:** if the server answers `hasMore` with the same cursor it was just sent, `listAutoPaging` / `getDepositsAutoPaging` yield that page and then throw `BlindPayError.invalidResponse`. Before, the loop requested the same page forever. The API always advances the cursor, so only a misbehaving server or proxy triggers it.
+- **Webhooks:** `Webhooks.verify` and `Webhooks.constructEvent` gain `now:` overloads (a fixed `Date` instead of the clock). The timestamp check now compares whole seconds, which matters only within one second of the tolerance boundary.
+- **README webhook handler:** a correctly signed delivery that fails to decode (`BlindPayError.decodingError`) should be answered with 2xx and logged, not 400; see the README.
+
