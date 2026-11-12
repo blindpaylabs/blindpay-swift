@@ -55,6 +55,8 @@ public final class PayinsService: Sendable {
 
     /// Iterates every payin matching `params`, fetching pages of 100 (or
     /// `params.limit`) on demand. `endingBefore` is not supported.
+    /// If the server answers `hasMore` with the same cursor it was just sent,
+    /// iteration ends after that page by throwing ``BlindPayError/invalidResponse``.
     ///
     /// ```swift
     /// for try await payin in blindPay.instances.payins.listAutoPaging(params: ListPayinsInput(status: .completed)) {

@@ -12,13 +12,23 @@ Upgrading from 4.x? Read [UPGRADING.md](UPGRADING.md).
 
 Swift Package Manager, Swift 6.0 or newer, iOS 15 / macOS 12 / tvOS 15 / watchOS 8, and Linux:
 
+Add the package, then the `BlindPay` product to each target that uses it (the package is `blindpay-swift`, the library is `BlindPay`):
+
 ```swift
 dependencies: [
-    .package(url: "https://github.com/blindpaylabs/blindpay-swift.git", from: "5.0.0")
+    .package(url: "https://github.com/blindpaylabs/blindpay-swift.git", from: "5.2.0")
+],
+targets: [
+    .target(
+        name: "YourApp",
+        dependencies: [
+            .product(name: "BlindPay", package: "blindpay-swift")
+        ]
+    )
 ]
 ```
 
-In Xcode: File → Add Packages… and enter `https://github.com/blindpaylabs/blindpay-swift.git`.
+Then `import BlindPay`. In Xcode: File → Add Packages…, enter `https://github.com/blindpaylabs/blindpay-swift.git` and add the `BlindPay` library to your target.
 
 ## Quick start
 
@@ -158,7 +168,7 @@ for try await payout in blindpay.instances.payouts.listAutoPaging(params: ListPa
 }
 ```
 
-Auto-pagers exist for payouts, payins, customers, transfers, payables and managed-wallet deposits (`custodialWallets.getDepositsAutoPaging(id:)`). They only go forward, so `endingBefore` is rejected. Every list input takes all the filters the API supports and never sends unset values.
+Auto-pagers exist for payouts, payins, customers, transfers, payables and managed-wallet deposits (`custodialWallets.getDepositsAutoPaging(id:)`). They only go forward, so `endingBefore` is rejected. If the server ever repeats the cursor it was sent (`hasMore` with the same `nextPage`), the loop throws `BlindPayError.invalidResponse` after that page instead of requesting it forever. Every list input takes all the filters the API supports and never sends unset values.
 
 ## Enums
 
@@ -192,12 +202,24 @@ do {
     default:
         break
     }
+    // Answer 2xx once the event is handled.
+} catch BlindPayError.webhookVerificationFailed {
+    // Bad signature, a timestamp outside the tolerance, or missing svix-* headers:
+    // not a genuine delivery. Answer 400.
+} catch BlindPayError.decodingError {
+    // The signature verified, but this SDK version couldn't decode the payload.
+    // Answer 2xx anyway: any other status makes BlindPay redeliver it for hours.
+    // Log the svix-id and the raw body, and replay the event from the dashboard
+    // once your handler or the SDK is updated.
 } catch {
-    // BlindPayError.webhookVerificationFailed: answer 400
+    // constructEvent throws only the two errors above, so this is your own
+    // handling code failing. Answer 500: BlindPay redelivers the event later.
 }
 ```
 
+- Answer non-2xx only to deliveries you reject. BlindPay retries every non-2xx with backoff over the following hours, keeping the same `svix-id`.
 - `Webhooks.verify(payload:headers:secret:tolerance:)` returns a `Bool` and never throws. The default tolerance is 300 seconds.
+- Every verify and `constructEvent` call has a `now:` overload that checks the timestamp against a fixed `Date` instead of the clock, for tests, replays and the shared webhook test vectors: `Webhooks.verify(payload: body, headers: headers, secret: webhookSecret, now: Date(timeIntervalSince1970: 1_762_790_400))`.
 - Deduplicate deliveries on the `svix-id` header.
 - Never log your `whsec_` secret. Get it with `instances.webhookEndpoints.getSecret(id:)`.
 

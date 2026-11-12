@@ -17,7 +17,8 @@ import Crypto
 /// BlindPay signs webhooks with Svix. Verify the **raw** request body, exactly
 /// as received: re-encoding parsed JSON changes the bytes and fails
 /// verification. Deduplicate deliveries on the `svix-id` header, and never
-/// log your `whsec_` secret.
+/// log your `whsec_` secret. Every method has a `now:` overload that checks
+/// the timestamp against a fixed time instead of the clock.
 ///
 /// ```swift
 /// // Vapor: req.body.data, req.headers; any framework works the same way.
@@ -92,9 +93,19 @@ public enum Webhooks {
         try constructEvent(payload: Data(payload.utf8), headers: headers, secret: secret, tolerance: tolerance)
     }
 
-    // MARK: - Internals (the clock is a test seam)
+    // MARK: - Fixed clock (tests, replays, the shared vectors)
 
-    static func constructEvent(payload: Data, headers: [String: String], secret: String, tolerance: TimeInterval, now: Date) throws -> WebhookEvent {
+    /// ``constructEvent(payload:headers:secret:tolerance:)`` checked against
+    /// `now` instead of the current time: for tests, the shared webhook
+    /// vectors, or re-verifying a stored delivery. `now` is truncated to whole
+    /// seconds, the unit of `svix-timestamp`.
+    public static func constructEvent(
+        payload: Data,
+        headers: [String: String],
+        secret: String,
+        tolerance: TimeInterval = defaultTolerance,
+        now: Date
+    ) throws -> WebhookEvent {
         guard verify(payload: payload, headers: headers, secret: secret, tolerance: tolerance, now: now) else {
             throw BlindPayError.webhookVerificationFailed
         }
@@ -105,7 +116,42 @@ public enum Webhooks {
         }
     }
 
-    static func verify(payload: Data, headers: [String: String], secret: String, tolerance: TimeInterval, now: Date) -> Bool {
+    /// ``constructEvent(payload:headers:secret:tolerance:now:)`` for a body
+    /// you hold as a string. Pass it exactly as received.
+    public static func constructEvent(
+        payload: String,
+        headers: [String: String],
+        secret: String,
+        tolerance: TimeInterval = defaultTolerance,
+        now: Date
+    ) throws -> WebhookEvent {
+        try constructEvent(payload: Data(payload.utf8), headers: headers, secret: secret, tolerance: tolerance, now: now)
+    }
+
+    /// ``verify(payload:headers:secret:tolerance:)`` for a body you hold as a
+    /// string, checked against `now` instead of the current time.
+    public static func verify(
+        payload: String,
+        headers: [String: String],
+        secret: String,
+        tolerance: TimeInterval = defaultTolerance,
+        now: Date
+    ) -> Bool {
+        verify(payload: Data(payload.utf8), headers: headers, secret: secret, tolerance: tolerance, now: now)
+    }
+
+    /// ``verify(payload:headers:secret:tolerance:)`` checked against `now`
+    /// instead of the current time: for tests, the shared webhook vectors, or
+    /// re-verifying a stored delivery. `now` is truncated to whole seconds,
+    /// the unit of `svix-timestamp`; the timestamp may be up to `tolerance`
+    /// seconds before or after it.
+    public static func verify(
+        payload: Data,
+        headers: [String: String],
+        secret: String,
+        tolerance: TimeInterval = defaultTolerance,
+        now: Date
+    ) -> Bool {
         guard let id = header("svix-id", "webhook-id", in: headers),
               let timestamp = header("svix-timestamp", "webhook-timestamp", in: headers),
               let signatures = header("svix-signature", "webhook-signature", in: headers) else {
@@ -113,7 +159,7 @@ public enum Webhooks {
         }
         guard !timestamp.isEmpty, timestamp.utf8.allSatisfy({ $0 >= 48 && $0 <= 57 }),
               let seconds = Double(timestamp),
-              abs(now.timeIntervalSince1970 - seconds) <= tolerance else {
+              abs(now.timeIntervalSince1970.rounded(.down) - seconds) <= tolerance else {
             return false
         }
         guard let key = decodeSecret(secret) else { return false }

@@ -29,7 +29,7 @@ blindpay-swift/
     Models/                             # One file per resource: OpenEnum enums, response structs, inputs. Rfi, Payable, WebhookPayloads, ...
     Services/                           # One service per resource (see the hierarchy below).
     Webhooks/
-      Webhooks.swift                    # Standalone Svix verifier: verify(...) -> Bool, constructEvent(...) -> WebhookEvent.
+      Webhooks.swift                    # Standalone Svix verifier: verify(...) -> Bool, constructEvent(...) -> WebhookEvent; public `now:` overloads check against a fixed Date.
       WebhookEvent.swift                # Typed webhook union, one case per event, plus unknown(type:payload:).
   Examples/GetRails.swift               # Example target (`swift run GetRails`); not a product.
   Examples/WebhookReceiver/main.swift   # E1: verify -> dispatch -> dedupe a webhook delivery (`swift run WebhookReceiver`).
@@ -43,6 +43,8 @@ blindpay-swift/
     ErrorCodeTests.swift                # ErrorCode vs the shared oracle (Vectors/error-codes.json); check-contract's error-code gate.
     FieldCoverageTests.swift            # Fields added in 5.1: request keys encode, response fields decode from fixtures.
     WebhookDriftTests.swift             # A webhook-only spec field fails `sync.swift --check` (webhook schemas are mapped).
+    PublicWebhookVectorTests.swift      # The 14 shared vectors through the public API only (no @testable), via the `now:` overloads.
+    ReadmeSnippetTests.swift            # The README webhook handler, compiled verbatim and matched line for line against README.md.
     Support/MockServer.swift            # URLProtocol mock: one host per MockServer; records requests and sleeps.
     Support/Fixtures.swift              # Loader for Fixtures/ by "METHOD /v1/path" and variant.
     Fixtures/                           # Verbatim copy of the shared spec fixtures. Don't hand-edit; re-copy.
@@ -447,7 +449,7 @@ The test target is `blindpay-swiftTests` defined in `Package.swift`, located at 
 
 - **Operation coverage:** `OpCoverageTests` has one call per operation of the SDK surface (keyed as in `Fixtures/index.json`). It checks method and path and decodes every variant (`full`, `required_only`, `nullables_null`, `unknown_enum`, `decimals`; lists `.b0` envelope and `.b1` bare array). A new operation needs a row there. A non-optional field absent in `required_only` or `null` in `nullables_null` is a bug; a cent amount stays `Int` (only genuinely decimal fields get `1234.56` in `decimals`).
 - **Transport contract:** `ClientBehaviorTests` covers headers, idempotency keys, one test per retry-table row (no test sleeps: `MockServer` records backoffs) and incomplete responses. A mutation must never be resent after any response arrived.
-- **Webhooks:** `WebhookTests` runs the 14 shared vectors at each vector's clock and decodes every webhook fixture into its typed case.
+- **Webhooks:** `WebhookTests` runs the 14 shared vectors at each vector's clock and decodes every webhook fixture into its typed case; `PublicWebhookVectorTests` runs them again through the public `now:` overloads only.
 - **Request shape:** use `MockServer` (no network). It gives you a `BlindPay` client wired to a `URLProtocol` mock and records each request:
 
 ```swift

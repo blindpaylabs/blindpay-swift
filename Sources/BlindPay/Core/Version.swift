@@ -10,5 +10,5 @@ public enum BlindPaySDK {
     /// The single source of truth for releases: `release.yml` tags
     /// `v<version>` when this changes on `main`, and the API-sync workflow
     /// bumps it. Change it only in a release-bearing PR.
-    public static let version = "5.1.0"
+    public static let version = "5.2.0"
 }

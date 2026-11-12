@@ -51,6 +51,8 @@ public final class PayoutsService: Sendable {
 
     /// Iterates every payout matching `params`, fetching pages of 100 (or
     /// `params.limit`) on demand. `endingBefore` is not supported.
+    /// If the server answers `hasMore` with the same cursor it was just sent,
+    /// iteration ends after that page by throwing ``BlindPayError/invalidResponse``.
     ///
     /// ```swift
     /// for try await payout in blindPay.instances.payouts.listAutoPaging(params: ListPayoutsInput(status: .completed)) {
