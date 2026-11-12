@@ -32,6 +32,8 @@ blindpay-swift/
       Webhooks.swift                    # Standalone Svix verifier: verify(...) -> Bool, constructEvent(...) -> WebhookEvent.
       WebhookEvent.swift                # Typed webhook union, one case per event, plus unknown(type:payload:).
   Examples/GetRails.swift               # Example target (`swift run GetRails`); not a product.
+  Examples/WebhookReceiver/main.swift   # E1: verify -> dispatch -> dedupe a webhook delivery (`swift run WebhookReceiver`).
+  Examples/ManagedWalletPayout/main.swift # E2: managed wallet + payin, then a payout with `walletId`. CI compiles both.
   Tests/blindpay-swiftTests/
     OpCoverageTests.swift               # All 94 operations: method + path, and every fixture variant decodes.
     ClientBehaviorTests.swift           # Headers, idempotency keys, one test per retry-table row, errors, incomplete responses.

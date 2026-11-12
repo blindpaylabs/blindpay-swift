@@ -229,6 +229,13 @@ Uploads are `multipart/form-data`, are never retried, and require a finished onb
 - Development instances are rate limited per instance on every route (429 `AUTH_RATE_LIMITED` with `Retry-After`, which the SDK honours).
 - The `getTrack` methods call public tracking endpoints meant for BlindPay's web and iOS apps; server-side calls get 401 in production. Use `get` instead.
 
+## Examples
+
+Compile-checked programs in [`Examples/`](Examples):
+
+- [`WebhookReceiver`](Examples/WebhookReceiver/main.swift): verify a delivery against the raw body, dispatch on the event type and drop redeliveries by `svix-id`.
+- [`ManagedWalletPayout`](Examples/ManagedWalletPayout/main.swift): fund a managed wallet with a payin, then pay a bank account from it with `walletId`.
+
 ## Documentation
 
 - [BlindPay API documentation](https://blindpay.com/docs/introduction)
