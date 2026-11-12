@@ -257,5 +257,12 @@
     "reason": "Legacy/internal alias for id on some customer responses; superseded by id, never wired to a second property.",
     "schema": "CustomerUpdateWebhookOut",
     "symbol": "Customer"
+  },
+  {
+    "field": "status",
+    "owner": "sdk-maintainers",
+    "reason": "Server-owned: the API overwrites it with \"approved\" when it creates the bank account (modules/bank-accounts/lib/create-bank-account.ts:282), so sending it has no effect. Node, Python, Go and PHP skip it too.",
+    "schema": "CreateBankAccountIn",
+    "symbol": "CreateBankAccountInput"
   }
 ]

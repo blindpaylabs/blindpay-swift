@@ -805,8 +805,6 @@ public struct CreateBankAccountInput: Codable, Sendable {
     /// Force CPF/CNPJ validation for PIX key
     public let forceCpfCnpj: Bool?
 
-    /// Initial review status. Usually omitted; BlindPay sets it.
-    public let status: BankAccountStatus?
 
     /// IFSC branch code, required for India (`international_swift` to INR): four letters, `0`, then six characters (e.g. `BARB0AHIMCI`).
     public let swiftIfscBranchCode: String?
@@ -890,7 +888,6 @@ public struct CreateBankAccountInput: Codable, Sendable {
         fasterPaymentsSortCode: String? = nil,
         swiftIntermediaryBankRoutingNumber: String? = nil,
         forceCpfCnpj: Bool? = nil,
-        status: BankAccountStatus? = nil,
         swiftIfscBranchCode: String? = nil
     ) {
         self.name = name
@@ -971,7 +968,6 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.fasterPaymentsSortCode = fasterPaymentsSortCode
         self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
         self.forceCpfCnpj = forceCpfCnpj
-        self.status = status
         self.swiftIfscBranchCode = swiftIfscBranchCode
     }
 
@@ -1054,7 +1050,6 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case fasterPaymentsSortCode = "faster_payments_sort_code"
         case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
         case forceCpfCnpj = "force_cpf_cnpj"
-        case status
         case swiftIfscBranchCode = "swift_ifsc_branch_code"
     }
 }

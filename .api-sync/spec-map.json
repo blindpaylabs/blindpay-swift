@@ -642,16 +642,6 @@
     },
     {
       "sdk": {
-        "file": "Sources/BlindPay/Models/BankAccount.swift",
-        "symbol": "BankAccountStatus"
-      },
-      "spec": {
-        "property": "status",
-        "schema": "CreateBankAccountIn"
-      }
-    },
-    {
-      "sdk": {
         "file": "Sources/BlindPay/Models/Available.swift",
         "symbol": "BankDetailConditionOperator"
       },
