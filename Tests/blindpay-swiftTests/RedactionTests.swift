@@ -33,3 +33,54 @@ struct RedactionTests {
         #expect(!text.contains("request_amount"))
     }
 }
+
+/// Fails like URLSession does: a URLError whose userInfo carries the full
+/// request URL, query string included.
+private struct FailingURLTransport: HTTPTransport {
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        var info: [String: Any] = [NSLocalizedDescriptionKey: "Could not connect to the server."]
+        if let url = request.url {
+            info[NSURLErrorFailingURLErrorKey] = url
+            info[NSURLErrorFailingURLStringErrorKey] = url.absoluteString
+        }
+        throw URLError(.cannotConnectToHost, userInfo: info)
+    }
+}
+
+struct SecretHygieneTests {
+    private let key = "sk_live_should_never_leak"
+
+    @Test func theConfigurationAndServicesNeverPrintTheKey() {
+        let client = BlindPay(apiKey: key, instanceId: "in_000000000000", configuration: Configuration(baseURL: "https://api.example.com"))
+        var dumped = ""
+        dump(Configuration(baseURL: "https://api.example.com"), to: &dumped)
+        dump(client.customers(customerId: "cu_000000000000").bankAccounts, to: &dumped)
+        dump(client.instances, to: &dumped)
+        #expect(!dumped.contains(key))
+        #expect(!String(reflecting: client.instances).contains(key))
+    }
+
+    @Test func aNetworkErrorDoesNotCarryTheQueryString() async throws {
+        let client = BlindPay(apiKey: key, instanceId: "in_000000000000", configuration: Configuration(
+            baseURL: "https://api.example.com", maxRetries: 0, transport: FailingURLTransport()))
+        do {
+            _ = try await client.instances.customers.list(params: ListCustomersInput(fullName: "Jane Private Doe"))
+            Issue.record("expected a network error")
+        } catch {
+            guard case BlindPayError.networkError(let underlying, _) = error else {
+                Issue.record("expected .networkError, got \(error)"); return
+            }
+            var dumped = ""
+            dump(error, to: &dumped)
+            let texts = [String(describing: error), String(reflecting: error), error.localizedDescription,
+                         String(describing: underlying), "\((underlying as NSError).userInfo)", dumped]
+            for text in texts {
+                #expect(!text.contains("Jane"), "query string leaked: \(text)")
+                #expect(!text.contains("full_name"), "query string leaked: \(text)")
+                #expect(!text.contains(key))
+            }
+            // The path stays, so the failure is still diagnosable.
+            #expect(String(describing: underlying).contains("/v1/instances/in_000000000000/customers"))
+        }
+    }
+}

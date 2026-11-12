@@ -209,7 +209,7 @@ internal final class APIClient: Sendable {
                 case let urlError as URLError where urlError.code == .timedOut:
                     failure = .timeout(idempotencyKey: idempotencyKey)
                 case let urlError as URLError:
-                    failure = .networkError(urlError, idempotencyKey: idempotencyKey)
+                    failure = .networkError(URLError(urlError.code, userInfo: redactingQueries(urlError.userInfo)), idempotencyKey: idempotencyKey)
                 default:
                     failure = .networkError(error, idempotencyKey: idempotencyKey)
                 }
@@ -335,4 +335,32 @@ extension APIClient: CustomReflectable, CustomStringConvertible, CustomDebugStri
     var description: String { "APIClient(baseURL: \(configuration.baseURL), apiKey: <redacted>)" }
 
     var debugDescription: String { description }
+}
+
+/// Copies a transport error's `userInfo` with every URL's query string and
+/// fragment removed. URLSession puts the full request URL in the failing-URL
+/// keys, and list filters (names, emails) travel in the query, so printing a
+/// raw `URLError` would leak them into logs.
+func redactingQueries(_ userInfo: [String: Any]) -> [String: Any] {
+    var result: [String: Any] = [:]
+    for (key, value) in userInfo {
+        switch value {
+        case let url as URL:
+            result[key] = withoutQuery(url)
+        case let string as String where key == NSURLErrorFailingURLStringErrorKey:
+            result[key] = string.split(separator: "?", maxSplits: 1).first.map { String($0.split(separator: "#", maxSplits: 1).first ?? $0) } ?? string
+        case let error as NSError:
+            result[key] = NSError(domain: error.domain, code: error.code, userInfo: redactingQueries(error.userInfo))
+        default:
+            result[key] = value
+        }
+    }
+    return result
+}
+
+private func withoutQuery(_ url: URL) -> URL {
+    guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url }
+    components.query = nil
+    components.fragment = nil
+    return components.url ?? url
 }
