@@ -206,12 +206,14 @@ do {
 } catch BlindPayError.webhookVerificationFailed {
     // Bad signature, a timestamp outside the tolerance, or missing svix-* headers:
     // not a genuine delivery. Answer 400.
+} catch BlindPayError.decodingError {
+    // The signature verified, but this SDK version couldn't decode the payload.
+    // Answer 2xx anyway: any other status makes BlindPay redeliver it for hours.
+    // Log the svix-id and the raw body, and replay the event from the dashboard
+    // once your handler or the SDK is updated.
 } catch {
-    // The signature verified, but this SDK version couldn't decode the payload
-    // (BlindPayError.decodingError). Answer 2xx anyway: any other status makes
-    // BlindPay redeliver it for hours. Log the svix-id and the raw body, and replay
-    // the event from the dashboard (Webhooks → Events dashboard) once your handler
-    // or the SDK is updated.
+    // constructEvent throws only the two errors above, so this is your own
+    // handling code failing. Answer 500: BlindPay redelivers the event later.
 }
 ```
 
