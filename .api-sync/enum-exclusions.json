@@ -268,5 +268,275 @@
     "field": "type",
     "reason": "CVU/CBU/ALIAS; small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
     "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutUpdateWebhookOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutUpdateWebhookOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutCompleteWebhookOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutCompleteWebhookOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutPartnerFeeWebhookOut.tracking_payment",
+    "field": "provider_name",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayoutPartnerFeeWebhookOut.tracking_payment",
+    "field": "refund_review_reason",
+    "reason": "Review reason label, informational; modeled as String so new reasons decode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_payment",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_transaction",
+    "field": "status",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_transaction",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_complete",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_transaction",
+    "field": "provider_name",
+    "reason": "Tracking sub-object provider fields are modeled as bare String across the Payin/Payout tracking structs (same as PayoutOut.tracking_payment.provider_name).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_transaction.pse_instruction",
+    "field": "document_type",
+    "reason": "Small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_transaction.transfers_instruction",
+    "field": "type",
+    "reason": "CVU/CBU/ALIAS; small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_payment",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_transaction",
+    "field": "status",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_transaction",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_complete",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_transaction",
+    "field": "provider_name",
+    "reason": "Tracking sub-object provider fields are modeled as bare String across the Payin/Payout tracking structs (same as PayoutOut.tracking_payment.provider_name).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_transaction.pse_instruction",
+    "field": "document_type",
+    "reason": "Small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_transaction.transfers_instruction",
+    "field": "type",
+    "reason": "CVU/CBU/ALIAS; small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_payment",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_transaction",
+    "field": "status",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_transaction",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_complete",
+    "field": "step",
+    "reason": "Tracking sub-object step/status fields are modeled as bare String across Payin/Payout/Transfer tracking structs; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_transaction",
+    "field": "provider_name",
+    "reason": "Tracking sub-object provider fields are modeled as bare String across the Payin/Payout tracking structs (same as PayoutOut.tracking_payment.provider_name).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_transaction.pse_instruction",
+    "field": "document_type",
+    "reason": "Small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_transaction.transfers_instruction",
+    "field": "type",
+    "reason": "CVU/CBU/ALIAS; small provider enum modeled as String, like PayinQuotePayerRules.pseDocumentType.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountWebhookOut",
+    "field": "swift_intermediary_bank_routing_number",
+    "reason": "Routing number value (the spec enum lists sample codes); modeled as String.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountWebhookOut",
+    "field": "business_industry",
+    "reason": "NAICS code (hundreds of values), modeled as String like CreateBankAccountInput.businessIndustry and the customer structs.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountWebhookOut",
+    "field": "swift_payment_code",
+    "reason": "Large country-specific SWIFT payment-code enum, modeled as String like CreateBankAccountInput.swiftPaymentCode.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "customer_network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String (see also known-divergences.json's Transfer.* nullability entries); pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "customer_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "sender_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "customer_network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String (see also known-divergences.json's Transfer.* nullability entries); pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "customer_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "sender_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "customer_network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String (see also known-divergences.json's Transfer.* nullability entries); pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "customer_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "network",
+    "reason": "Same Network enum values as Quote.swift's Network, but Transfer's network-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "sender_token",
+    "reason": "Same StablecoinToken enum values as Quote.swift's StablecoinToken, but Transfer's token-shaped fields are modeled as bare optional String; pre-existing, not part of this coverage-check PR's scope.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut.tracking_partner_fee",
+    "field": "step",
+    "reason": "TransferTrackingStep.step is a String shared by every transfer tracking step; pre-existing.",
+    "owner": "sdk-maintainers"
   }
 ]

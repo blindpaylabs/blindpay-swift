@@ -243,5 +243,19 @@
     "reason": "provider-named field; pending blindpay-v2 decision",
     "schema": "RfiField",
     "symbol": "RfiField"
+  },
+  {
+    "field": "customer_id",
+    "owner": "sdk-maintainers",
+    "reason": "Legacy/internal alias for id on some customer responses; superseded by id, never wired to a second property.",
+    "schema": "CustomerNewWebhookOut",
+    "symbol": "Customer"
+  },
+  {
+    "field": "customer_id",
+    "owner": "sdk-maintainers",
+    "reason": "Legacy/internal alias for id on some customer responses; superseded by id, never wired to a second property.",
+    "schema": "CustomerUpdateWebhookOut",
+    "symbol": "Customer"
   }
 ]

@@ -710,98 +710,6 @@
       {
         "schema": "UpdateBlockchainWalletIn",
         "reason": "Internal request body built by BlockchainWalletsService.setSelfCustody(id:isSelfCustody:)."
-      },
-      {
-        "reason": "Same schema as PayoutNewWebhookOut (mapped to PayoutWebhook). Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayoutUpdateWebhookOut"
-      },
-      {
-        "reason": "Same schema as PayoutNewWebhookOut (mapped to PayoutWebhook). Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayoutCompleteWebhookOut"
-      },
-      {
-        "reason": "Same schema as PayoutNewWebhookOut (mapped to PayoutWebhook). Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayoutPartnerFeeWebhookOut"
-      },
-      {
-        "reason": "Same schema as PayinNewWebhookOut (mapped to PayinWebhook). Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayinUpdateWebhookOut"
-      },
-      {
-        "reason": "Same schema as PayinNewWebhookOut (mapped to PayinWebhook). Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayinCompleteWebhookOut"
-      },
-      {
-        "reason": "Same schema as PayinNewWebhookOut (mapped to PayinWebhook). Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayinPartnerFeeWebhookOut"
-      },
-      {
-        "reason": "Same shape as PayableOut (+ webhook_event); decoded as Payable. Covered by the PayableOut mapping and the webhook fixture tests. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayableNewWebhookOut"
-      },
-      {
-        "reason": "Same shape as PayableOut; decoded as Payable. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayableUpdateWebhookOut"
-      },
-      {
-        "reason": "Same shape as PayableOut; decoded as Payable. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "PayableCompleteWebhookOut"
-      },
-      {
-        "reason": "Same shape as CustomerOut (+ webhook_event); decoded as Customer. Covered by the CustomerOut mapping and the webhook fixture tests. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "CustomerNewWebhookOut"
-      },
-      {
-        "reason": "Same shape as CustomerOut; decoded as Customer. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "CustomerUpdateWebhookOut"
-      },
-      {
-        "reason": "Same shape as BankAccountOut (+ webhook_event); decoded as BankAccount. Covered by the BankAccountOut mapping and the webhook fixture tests. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "BankAccountWebhookOut"
-      },
-      {
-        "reason": "Same shape as BlockchainWalletOut; decoded as BlockchainWallet. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "BlockchainWalletWebhookOut"
-      },
-      {
-        "reason": "Same shape as BlockchainWalletOut; decoded as BlockchainWallet. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "BlockchainWalletUpdateWebhookOut"
-      },
-      {
-        "reason": "Same shape as a limit increase request; decoded as LimitIncreaseRequest. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "LimitIncreaseNewWebhookOut"
-      },
-      {
-        "reason": "Same shape as a limit increase request; decoded as LimitIncreaseRequest. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "LimitIncreaseUpdateWebhookOut"
-      },
-      {
-        "reason": "Same shape as TransferOut; decoded as Transfer. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "TransferNewWebhookOut"
-      },
-      {
-        "reason": "Same shape as TransferOut; decoded as Transfer. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "TransferUpdateWebhookOut"
-      },
-      {
-        "reason": "Same shape as TransferOut; decoded as Transfer. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "TransferCompleteWebhookOut"
-      },
-      {
-        "reason": "Same shape as VirtualAccountOut; decoded as VirtualAccount. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "VirtualAccountNewWebhookOut"
-      },
-      {
-        "reason": "Same shape as VirtualAccountOut; decoded as VirtualAccount. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "VirtualAccountCompleteWebhookOut"
-      },
-      {
-        "reason": "Same shape as WalletOut; decoded as CustodialWallet. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "WalletNewWebhookOut"
-      },
-      {
-        "reason": "Same shape as WalletOut; decoded as CustodialWallet. Decoded by WebhookEvent; see WebhookEventDecodingTests.",
-        "schema": "WalletUpdateWebhookOut"
       }
     ]
   },
@@ -1965,6 +1873,672 @@
         }
       ],
       "spec": "PayoutOnEvmOut.tracking_documents"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookPayloads.swift",
+          "symbol": "PayoutWebhook"
+        }
+      ],
+      "spec": "PayoutUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingComplete"
+        }
+      ],
+      "spec": "PayoutUpdateWebhookOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingPayment"
+        }
+      ],
+      "spec": "PayoutUpdateWebhookOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingTransaction"
+        }
+      ],
+      "spec": "PayoutUpdateWebhookOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingLiquidity"
+        }
+      ],
+      "spec": "PayoutUpdateWebhookOut.tracking_liquidity"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingDocuments"
+        }
+      ],
+      "spec": "PayoutUpdateWebhookOut.tracking_documents"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookPayloads.swift",
+          "symbol": "PayoutWebhook"
+        }
+      ],
+      "spec": "PayoutCompleteWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingComplete"
+        }
+      ],
+      "spec": "PayoutCompleteWebhookOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingPayment"
+        }
+      ],
+      "spec": "PayoutCompleteWebhookOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingTransaction"
+        }
+      ],
+      "spec": "PayoutCompleteWebhookOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingLiquidity"
+        }
+      ],
+      "spec": "PayoutCompleteWebhookOut.tracking_liquidity"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingDocuments"
+        }
+      ],
+      "spec": "PayoutCompleteWebhookOut.tracking_documents"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookPayloads.swift",
+          "symbol": "PayoutWebhook"
+        }
+      ],
+      "spec": "PayoutPartnerFeeWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingComplete"
+        }
+      ],
+      "spec": "PayoutPartnerFeeWebhookOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingPayment"
+        }
+      ],
+      "spec": "PayoutPartnerFeeWebhookOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingTransaction"
+        }
+      ],
+      "spec": "PayoutPartnerFeeWebhookOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingLiquidity"
+        }
+      ],
+      "spec": "PayoutPartnerFeeWebhookOut.tracking_liquidity"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payout.swift",
+          "symbol": "PayoutTrackingDocuments"
+        }
+      ],
+      "spec": "PayoutPartnerFeeWebhookOut.tracking_documents"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookPayloads.swift",
+          "symbol": "PayinWebhook"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingComplete"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingPayment"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingTransaction"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuoteCardInstruction"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_transaction.card_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinPseInstruction"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_transaction.pse_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTedInstruction"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_transaction.ted_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTransfersInstruction"
+        }
+      ],
+      "spec": "PayinUpdateWebhookOut.tracking_transaction.transfers_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookPayloads.swift",
+          "symbol": "PayinWebhook"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingComplete"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingPayment"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingTransaction"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuoteCardInstruction"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_transaction.card_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinPseInstruction"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_transaction.pse_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTedInstruction"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_transaction.ted_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTransfersInstruction"
+        }
+      ],
+      "spec": "PayinCompleteWebhookOut.tracking_transaction.transfers_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/WebhookPayloads.swift",
+          "symbol": "PayinWebhook"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingComplete"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_complete"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingPayment"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_payment"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTrackingTransaction"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_transaction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/PayinQuote.swift",
+          "symbol": "PayinQuoteCardInstruction"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_transaction.card_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinPseInstruction"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_transaction.pse_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTedInstruction"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_transaction.ted_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payin.swift",
+          "symbol": "PayinTransfersInstruction"
+        }
+      ],
+      "spec": "PayinPartnerFeeWebhookOut.tracking_transaction.transfers_instruction"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payable.swift",
+          "symbol": "Payable"
+        }
+      ],
+      "spec": "PayableNewWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payable.swift",
+          "symbol": "Payable"
+        }
+      ],
+      "spec": "PayableUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Payable.swift",
+          "symbol": "Payable"
+        }
+      ],
+      "spec": "PayableCompleteWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Customer.swift",
+          "symbol": "Customer"
+        }
+      ],
+      "spec": "CustomerNewWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Customer.swift",
+          "symbol": "Customer"
+        }
+      ],
+      "spec": "CustomerUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BankAccount.swift",
+          "symbol": "BankAccount"
+        }
+      ],
+      "spec": "BankAccountWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BlockchainWallet.swift",
+          "symbol": "BlockchainWallet"
+        }
+      ],
+      "spec": "BlockchainWalletWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/BlockchainWallet.swift",
+          "symbol": "BlockchainWallet"
+        }
+      ],
+      "spec": "BlockchainWalletUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+          "symbol": "LimitIncreaseRequest"
+        }
+      ],
+      "spec": "LimitIncreaseNewWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustomerLimits.swift",
+          "symbol": "LimitIncreaseRequest"
+        }
+      ],
+      "spec": "LimitIncreaseUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "Transfer"
+        }
+      ],
+      "spec": "TransferNewWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "TransferTrackingStep"
+        }
+      ],
+      "spec": "TransferNewWebhookOut.tracking_partner_fee"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "Transfer"
+        }
+      ],
+      "spec": "TransferUpdateWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "TransferTrackingStep"
+        }
+      ],
+      "spec": "TransferUpdateWebhookOut.tracking_partner_fee"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "Transfer"
+        }
+      ],
+      "spec": "TransferCompleteWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/Transfer.swift",
+          "symbol": "TransferTrackingStep"
+        }
+      ],
+      "spec": "TransferCompleteWebhookOut.tracking_partner_fee"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccount"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountCO"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut.co"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountMX"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut.mx"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountBreB"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut.co.bre_b"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountSpei"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut.mx.spei"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountNamedBeneficiary"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut.co.beneficiary"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountNamedBeneficiary"
+        }
+      ],
+      "spec": "VirtualAccountNewWebhookOut.mx.beneficiary"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccount"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountCO"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut.co"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountMX"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut.mx"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountBreB"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut.co.bre_b"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountSpei"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut.mx.spei"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountNamedBeneficiary"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut.co.beneficiary"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/VirtualAccount.swift",
+          "symbol": "VirtualAccountNamedBeneficiary"
+        }
+      ],
+      "spec": "VirtualAccountCompleteWebhookOut.mx.beneficiary"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustodialWallet.swift",
+          "symbol": "CustodialWallet"
+        }
+      ],
+      "spec": "WalletNewWebhookOut"
+    },
+    {
+      "sdk": [
+        {
+          "file": "Sources/BlindPay/Models/CustodialWallet.swift",
+          "symbol": "CustodialWallet"
+        }
+      ],
+      "spec": "WalletUpdateWebhookOut"
     }
   ]
 }
