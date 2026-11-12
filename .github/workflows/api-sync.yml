@@ -122,7 +122,9 @@ jobs:
       - name: Build and test the patched SDK
         if: steps.sync.outputs.applied != '0'
         run: |
-          # ErrorCode.swift is generated from the refreshed snapshot's error table.
+          # ErrorCode.swift is generated from the refreshed snapshot's error
+          # table. --apply counts a change to that table as applied (a new
+          # code bumps the minor), so an Errors-only spec change gets here too.
           swift .api-sync/check-contract.swift --write-error-codes
           swift build
           swift test

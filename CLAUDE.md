@@ -40,10 +40,14 @@ blindpay-swift/
     PaginationTests.swift, WebhookTests.swift, OpenEnumTests.swift, RedactionTests.swift, PathEncodingTests.swift, ...
     RequestOptionsGuardTests.swift      # Source scan: every public API method takes and forwards `options`.
     SyncScriptTests.swift               # Tests for .api-sync/sync.swift.
+    ErrorCodeTests.swift                # ErrorCode vs the shared oracle (Vectors/error-codes.json); check-contract's error-code gate.
+    FieldCoverageTests.swift            # Fields added in 5.1: request keys encode, response fields decode from fixtures.
+    WebhookDriftTests.swift             # A webhook-only spec field fails `sync.swift --check` (webhook schemas are mapped).
     Support/MockServer.swift            # URLProtocol mock: one host per MockServer; records requests and sleeps.
     Support/Fixtures.swift              # Loader for Fixtures/ by "METHOD /v1/path" and variant.
     Fixtures/                           # Verbatim copy of the shared spec fixtures. Don't hand-edit; re-copy.
     Vectors/webhook-vectors.json        # The 14 shared Svix vectors.
+    Vectors/error-codes.json            # Shared error-code oracle (sdk-parity reference/error-codes.json).
 ```
 
 ### Service hierarchy (access path from client)
@@ -489,7 +493,9 @@ only) that verifies the SDK doesn't lie about the wire contract:
 - **Direction C (hard failure)**: `Sources/BlindPay/Core/ErrorCode.swift` is generated from
   the error-code table in the snapshot's `Errors` tag (`| \`CODE\` | status | retry | description |`).
   A code added to or removed from the spec, or a table with zero rows, fails the check.
-  Regenerate with `swift .api-sync/check-contract.swift --write-error-codes`; never edit
+  `sync.swift --apply` treats a table change as applied (new code: minor bump; changed row:
+  patch; removed code: needs-human), and `api-sync.yml` then regenerates the file.
+  Regenerate by hand with `swift .api-sync/check-contract.swift --write-error-codes`; never edit
   `ErrorCode.swift` by hand (`RetryClass`, `ErrorCodeInfo` and the `APIError` accessors live
   in the hand-written `ErrorCodeInfo.swift`).
 
