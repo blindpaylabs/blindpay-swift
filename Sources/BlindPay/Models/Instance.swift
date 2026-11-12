@@ -47,6 +47,9 @@ public struct InstanceMember: Codable, Sendable, Equatable {
     /// Role assigned to the member
     public let role: InstanceMemberRole
     
+    /// Whether the member has registered a passkey.
+    public let hasPasskey: Bool?
+
     public init(
         id: String,
         email: String,
@@ -55,7 +58,8 @@ public struct InstanceMember: Codable, Sendable, Equatable {
         lastName: String,
         imageUrl: String,
         createdAt: String? = nil,
-        role: InstanceMemberRole
+        role: InstanceMemberRole,
+        hasPasskey: Bool? = nil
     ) {
         self.id = id
         self.email = email
@@ -65,6 +69,7 @@ public struct InstanceMember: Codable, Sendable, Equatable {
         self.imageUrl = imageUrl
         self.createdAt = createdAt
         self.role = role
+        self.hasPasskey = hasPasskey
     }
     
     enum CodingKeys: String, CodingKey {
@@ -76,6 +81,7 @@ public struct InstanceMember: Codable, Sendable, Equatable {
         case imageUrl = "image_url"
         case createdAt = "created_at"
         case role
+        case hasPasskey = "has_passkey"
     }
 }
 
@@ -106,6 +112,12 @@ public struct UpdateInstanceInput: Codable, Sendable {
 
     public let partnerTosTermsAccepted: Bool?
 
+    /// When non-empty, compliance Request for Information emails are sent only to these addresses instead of all instance members
+    public let complianceEmails: [String]?
+
+    /// Whether customer (customer) Request for Information notification emails are sent for this instance. Omit to leave unchanged.
+    public let customerRfiEmailsEnabled: Bool?
+
     public init(
         name: String,
         customerInviteRedirectUrl: String? = nil,
@@ -115,7 +127,9 @@ public struct UpdateInstanceInput: Codable, Sendable {
         logoUrl: String? = nil,
         partnerTosLink: String? = nil,
         partnerTosScreenshot: String? = nil,
-        partnerTosTermsAccepted: Bool? = nil
+        partnerTosTermsAccepted: Bool? = nil,
+        complianceEmails: [String]? = nil,
+        customerRfiEmailsEnabled: Bool? = nil
     ) {
         self.name = name
         self.customerInviteRedirectUrl = customerInviteRedirectUrl
@@ -126,6 +140,8 @@ public struct UpdateInstanceInput: Codable, Sendable {
         self.partnerTosLink = partnerTosLink
         self.partnerTosScreenshot = partnerTosScreenshot
         self.partnerTosTermsAccepted = partnerTosTermsAccepted
+        self.complianceEmails = complianceEmails
+        self.customerRfiEmailsEnabled = customerRfiEmailsEnabled
     }
 
     enum CodingKeys: String, CodingKey {
@@ -138,6 +154,8 @@ public struct UpdateInstanceInput: Codable, Sendable {
         case partnerTosLink = "partner_tos_link"
         case partnerTosScreenshot = "partner_tos_screenshot"
         case partnerTosTermsAccepted = "partner_tos_terms_accepted"
+        case complianceEmails = "compliance_emails"
+        case customerRfiEmailsEnabled = "customer_rfi_emails_enabled"
     }
 }
 

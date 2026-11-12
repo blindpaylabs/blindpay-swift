@@ -228,6 +228,30 @@ public struct BankAccount: Codable, Sendable, Equatable {
 
     public let swiftIntermediaryBankRoutingNumber: String?
 
+    /// NAICS code of the beneficiary business.
+    public let businessIndustry: String?
+
+    /// Beneficiary date of birth (ISO 8601).
+    public let dateOfBirth: String?
+
+    /// Beneficiary phone number.
+    public let phoneNumber: String?
+
+    /// How the customer relates to the beneficiary.
+    public let recipientRelationship: RecipientRelationship?
+
+    /// Review status of the bank account.
+    public let status: BankAccountStatus?
+
+    /// IFSC branch code for India SWIFT payouts (e.g. `BARB0AHIMCI`).
+    public let swiftIfscBranchCode: String?
+
+    /// Country-specific SWIFT payment purpose code.
+    public let swiftPaymentCode: String?
+
+    /// Beneficiary tax id.
+    public let taxId: String?
+
     public init(
         id: String,
         name: String,
@@ -304,7 +328,15 @@ public struct BankAccount: Codable, Sendable, Equatable {
         fasterPaymentsBeneficiaryStateProvinceRegion: String? = nil,
         fasterPaymentsSortCode: String? = nil,
         plaidConnectedAt: String? = nil,
-        swiftIntermediaryBankRoutingNumber: String? = nil
+        swiftIntermediaryBankRoutingNumber: String? = nil,
+        businessIndustry: String? = nil,
+        dateOfBirth: String? = nil,
+        phoneNumber: String? = nil,
+        recipientRelationship: RecipientRelationship? = nil,
+        status: BankAccountStatus? = nil,
+        swiftIfscBranchCode: String? = nil,
+        swiftPaymentCode: String? = nil,
+        taxId: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -382,6 +414,14 @@ public struct BankAccount: Codable, Sendable, Equatable {
         self.fasterPaymentsSortCode = fasterPaymentsSortCode
         self.plaidConnectedAt = plaidConnectedAt
         self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
+        self.businessIndustry = businessIndustry
+        self.dateOfBirth = dateOfBirth
+        self.phoneNumber = phoneNumber
+        self.recipientRelationship = recipientRelationship
+        self.status = status
+        self.swiftIfscBranchCode = swiftIfscBranchCode
+        self.swiftPaymentCode = swiftPaymentCode
+        self.taxId = taxId
     }
     
     enum CodingKeys: String, CodingKey {
@@ -461,6 +501,14 @@ public struct BankAccount: Codable, Sendable, Equatable {
         case fasterPaymentsSortCode = "faster_payments_sort_code"
         case plaidConnectedAt = "plaid_connected_at"
         case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
+        case businessIndustry = "business_industry"
+        case dateOfBirth = "date_of_birth"
+        case phoneNumber = "phone_number"
+        case recipientRelationship = "recipient_relationship"
+        case status
+        case swiftIfscBranchCode = "swift_ifsc_branch_code"
+        case swiftPaymentCode = "swift_payment_code"
+        case taxId = "tax_id"
     }
 }
 
@@ -754,6 +802,13 @@ public struct CreateBankAccountInput: Codable, Sendable {
 
     public let swiftIntermediaryBankRoutingNumber: String?
 
+    /// Force CPF/CNPJ validation for PIX key
+    public let forceCpfCnpj: Bool?
+
+
+    /// IFSC branch code, required for India (`international_swift` to INR): four letters, `0`, then six characters (e.g. `BARB0AHIMCI`).
+    public let swiftIfscBranchCode: String?
+
     public init(
         name: String,
         type: Rail,
@@ -831,7 +886,9 @@ public struct CreateBankAccountInput: Codable, Sendable {
         fasterPaymentsBeneficiaryPostalCode: String? = nil,
         fasterPaymentsBeneficiaryStateProvinceRegion: String? = nil,
         fasterPaymentsSortCode: String? = nil,
-        swiftIntermediaryBankRoutingNumber: String? = nil
+        swiftIntermediaryBankRoutingNumber: String? = nil,
+        forceCpfCnpj: Bool? = nil,
+        swiftIfscBranchCode: String? = nil
     ) {
         self.name = name
         self.type = type
@@ -910,6 +967,8 @@ public struct CreateBankAccountInput: Codable, Sendable {
         self.fasterPaymentsBeneficiaryStateProvinceRegion = fasterPaymentsBeneficiaryStateProvinceRegion
         self.fasterPaymentsSortCode = fasterPaymentsSortCode
         self.swiftIntermediaryBankRoutingNumber = swiftIntermediaryBankRoutingNumber
+        self.forceCpfCnpj = forceCpfCnpj
+        self.swiftIfscBranchCode = swiftIfscBranchCode
     }
 
     enum CodingKeys: String, CodingKey {
@@ -990,6 +1049,8 @@ public struct CreateBankAccountInput: Codable, Sendable {
         case fasterPaymentsBeneficiaryStateProvinceRegion = "faster_payments_beneficiary_state_province_region"
         case fasterPaymentsSortCode = "faster_payments_sort_code"
         case swiftIntermediaryBankRoutingNumber = "swift_intermediary_bank_routing_number"
+        case forceCpfCnpj = "force_cpf_cnpj"
+        case swiftIfscBranchCode = "swift_ifsc_branch_code"
     }
 }
 

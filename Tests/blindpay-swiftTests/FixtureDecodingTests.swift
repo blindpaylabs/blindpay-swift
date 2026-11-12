@@ -149,3 +149,40 @@ struct FixtureDecodingTests {
         #expect(roundTrip == decoded)
     }
 }
+
+/// `review_reason` (round-2 spec drift) decodes on the limit-increase GET and
+/// on both `limitIncrease.*` webhooks, and is `nil` when absent or null.
+struct ReviewReasonDecodingTests {
+    private static let listOperation = "GET /v1/instances/{instance_id}/customers/{customer_id}/limit-increase"
+
+    private func listItems(_ variant: String) throws -> [LimitIncreaseRequest] {
+        try JSONDecoder().decode([LimitIncreaseRequest].self, from: Fixtures.response(Self.listOperation, variant: variant))
+    }
+
+    private func webhook(_ event: String, _ variant: String) throws -> LimitIncreaseRequest {
+        let file = try Fixtures.json(at: Fixtures.root.appendingPathComponent("webhooks/\(event).json"))
+        let body = try #require((file["variants"] as? [String: Any])?[variant])
+        switch try WebhookEvent.decode(from: JSONSerialization.data(withJSONObject: body)) {
+        case .limitIncreaseNew(let request), .limitIncreaseUpdate(let request): return request
+        default: throw Fixtures.Missing(description: "\(event) [\(variant)] did not decode to a limit-increase case")
+        }
+    }
+
+    @Test func theGetCarriesReviewReason() throws {
+        let full = try listItems("full")
+        #expect(!full.isEmpty)
+        for item in full {
+            #expect(item.reviewReason?.isEmpty == false)
+        }
+        for item in try listItems("nullables_null") + listItems("required_only") {
+            #expect(item.reviewReason == nil)
+        }
+    }
+
+    @Test(arguments: ["limitIncrease.new", "limitIncrease.update"])
+    func theWebhooksCarryReviewReason(event: String) throws {
+        #expect(try webhook(event, "full").reviewReason?.isEmpty == false)
+        #expect(try webhook(event, "nullables_null").reviewReason == nil)
+        #expect(try webhook(event, "required_only").reviewReason == nil)
+    }
+}

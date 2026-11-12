@@ -259,6 +259,9 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
 
     public let partnerFeeId: String?
 
+    /// The customer that owns the virtual account.
+    public let customerId: String?
+
     public init(
         id: String,
         bankingPartner: BankingPartner? = nil,
@@ -269,7 +272,8 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         blockchainWallet: BlockchainWalletRef? = nil,
         co: VirtualAccountCO? = nil,
         mx: VirtualAccountMX? = nil,
-        partnerFeeId: String? = nil
+        partnerFeeId: String? = nil,
+        customerId: String? = nil
     ) {
         self.id = id
         self.bankingPartner = bankingPartner
@@ -281,6 +285,7 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         self.co = co
         self.mx = mx
         self.partnerFeeId = partnerFeeId
+        self.customerId = customerId
     }
     
     enum CodingKeys: String, CodingKey {
@@ -294,6 +299,7 @@ public struct VirtualAccount: Codable, Sendable, Equatable {
         case co
         case mx
         case partnerFeeId = "partner_fee_id"
+        case customerId = "customer_id"
     }
 }
 

@@ -89,7 +89,26 @@ _ = try await blindpay.instances.payouts.createEvm(data: input, options: options
 - **Client errors** are thrown as `BlindPayError`: `.networkError` (no response; carries the idempotency key), `.timeout`, `.invalidRequest` (rejected before sending, e.g. an empty idempotency key), `.decodingError`, `.encodingError`, `.webhookVerificationFailed`.
 - A successful response with no body (204) has `data == nil` and no error.
 
-Errors never contain your API key or the request body, and `dump(blindpay)` shows the key as `<redacted>`.
+Branch on `errorCode`, a typed `ErrorCode` (an open enum generated from the API's error table, so a code this SDK version doesn't know still compares by its raw string). `retryClass` says how to react (`.retryable`, `.terminal`, `.actionable`, or `.unknown` when there is no code), and `errorCode?.info` gives the documented status. Some errors carry no `code` (idempotency conflicts, non-JSON bodies), so keep `message` as the fallback:
+
+```swift
+let response = try await blindpay.instances.transferQuotes.create(data: quoteInput)
+if let error = response.error {
+    switch error.errorCode {
+    case .transfersSwapAmountBelowMinimum?:
+        // Swaps between different tokens need at least 100 USDC.
+        print("Raise the amount: \(error.description ?? error.message)")
+    case .quotesExpired?:
+        print("Request a new quote")
+    default:
+        if error.retryClass == .actionable { print("Fix the request: \(error.description ?? error.message)") }
+    }
+}
+```
+
+`retryClass` is advisory: the client's own retries follow `retryable` (see below).
+
+Errors never contain your API key, the request body or the request's query string, and `dump(blindpay)` shows the key as `<redacted>`.
 
 ## Idempotency and retries
 
@@ -104,6 +123,8 @@ The SDK retries, with exponential backoff and jitter (`Retry-After` is honoured 
 
 Task cancellation stops in-flight attempts and backoff sleeps.
 
+Indicative FX quote endpoints are rate limited per instance; a limited call returns 429 `AUTH_RATE_LIMITED` with a `Retry-After` header, which the SDK honours when it retries.
+
 ## Amounts
 
 All amount inputs are **integer cents** (`1999` is 19.99): quote, payin quote, transfer quote and FX `requestAmount`, limits, payable line items. Partner percentage fees are basis points (`100` = 1%); flat fees are cents. Wallet balances are whole tokens (decimal). Convert a major-unit value without float truncation:
@@ -116,6 +137,12 @@ Some inputs take exactly one of two fields; the API answers 400 otherwise:
 
 - `CreateQuoteInput`: `bankAccountId` (bank payout) or `payableId` (pay a payable).
 - Payout inputs: `senderWalletAddress` or `walletId` (a managed wallet).
+
+Swaps between different tokens (a transfer quote whose sender and customer tokens differ) need at least 100 USDC, measured on the USDC side; below that the API answers 400 `TRANSFERS_SWAP_AMOUNT_BELOW_MINIMUM` (see [Errors](#errors)).
+
+## Limit increases
+
+`customers(customerId:).listLimitIncreases()` and the `limitIncrease.new` / `limitIncrease.update` webhooks return `LimitIncreaseRequest`. When compliance rejects a request, or approves lower limits than requested, `reviewReason` says why and what to send to get the full amount; the granted limits are in `approvedPerTransaction`, `approvedDaily` and `approvedMonthly` (cents).
 
 ## Pagination
 
@@ -199,13 +226,22 @@ Uploads are `multipart/form-data`, are never retried, and require a finished onb
 - Payout amounts `66600` end as failed and `77700` as refunded.
 - Development payins complete after about 30 seconds.
 - Quotes expire after 5 minutes (OTC payin quotes after 10 seconds; SEPA quotes may expire earlier).
-- Development instances are limited to 40 requests per minute (429 with `Retry-After`, which the SDK honours).
+- Development instances are rate limited per instance on every route (429 `AUTH_RATE_LIMITED` with `Retry-After`, which the SDK honours).
 - The `getTrack` methods call public tracking endpoints meant for BlindPay's web and iOS apps; server-side calls get 401 in production. Use `get` instead.
+
+## Examples
+
+Compile-checked programs in [`Examples/`](Examples):
+
+- [`WebhookReceiver`](Examples/WebhookReceiver/main.swift): verify a delivery against the raw body, dispatch on the event type and drop redeliveries by `svix-id`.
+- [`ManagedWalletPayout`](Examples/ManagedWalletPayout/main.swift): fund a managed wallet with a payin, then pay a bank account from it with `walletId`.
 
 ## Documentation
 
-- [BlindPay API documentation](https://blindpay.com/docs/getting-started/overview)
+- [BlindPay API documentation](https://blindpay.com/docs/introduction)
 - [API reference](https://api.blindpay.com/reference)
+
+Maintainers: the release process is in [RELEASING.md](RELEASING.md).
 
 ## Support
 

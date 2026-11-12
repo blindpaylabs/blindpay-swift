@@ -1,47 +1,5 @@
 [
   {
-    "schema": "PartnerFee",
-    "field": "evm_wallet_address",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "PartnerFee",
-    "field": "stellar_wallet_address",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePartnerFeeInput",
-    "field": "evm_wallet_address",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePartnerFeeInput",
-    "field": "stellar_wallet_address",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePartnerFeeResponse",
-    "field": "evm_wallet_address",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePartnerFeeResponse",
-    "field": "stellar_wallet_address",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "Payin",
-    "field": "tracking_partner_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
     "schema": "Payin",
     "field": "billing_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
@@ -49,31 +7,7 @@
   },
   {
     "schema": "CreatePayinResponse",
-    "field": "tracking_partner_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePayinResponse",
     "field": "billing_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "Payout",
-    "field": "tracking_partner_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "CreatePayoutResponse",
-    "field": "tracking_partner_fee",
-    "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
-    "owner": "sdk-maintainers"
-  },
-  {
-    "schema": "Transfer",
-    "field": "tracking_partner_fee",
     "reason": "Not present in the OpenAPI spec (neither today's nor the post-#1799 target). Pre-existing divergence, unrelated to the customers rename.",
     "owner": "sdk-maintainers"
   },

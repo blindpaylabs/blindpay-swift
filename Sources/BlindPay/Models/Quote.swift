@@ -80,6 +80,7 @@ public struct Currency: OpenEnum {
     public static let cop = Currency(rawValue: "COP")
     public static let ars = Currency(rawValue: "ARS")
     public static let gbp = Currency(rawValue: "GBP")
+    public static let eur = Currency(rawValue: "EUR")
 }
 
 // MARK: - Create Quote
@@ -257,6 +258,9 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     /// Description
     public let description: String?
 
+    /// Billing fee in cents (charged via invoice at the end of the month)
+    public let billingFeeAmount: Int?
+
     public init(
         id: String,
         expiresAt: Int? = nil,
@@ -268,7 +272,8 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         flatFee: Double? = nil,
         contract: QuoteContract? = nil,
         customerLocalAmount: Int? = nil,
-        description: String? = nil
+        description: String? = nil,
+        billingFeeAmount: Int? = nil
     ) {
         self.id = id
         self.expiresAt = expiresAt
@@ -281,6 +286,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         self.contract = contract
         self.customerLocalAmount = customerLocalAmount
         self.description = description
+        self.billingFeeAmount = billingFeeAmount
     }
 
     enum CodingKeys: String, CodingKey {
@@ -295,6 +301,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         case contract
         case customerLocalAmount = "customer_local_amount"
         case description
+        case billingFeeAmount = "billing_fee_amount"
     }
 }
 

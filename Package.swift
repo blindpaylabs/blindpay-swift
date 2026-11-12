@@ -36,7 +36,21 @@ let package = Package(
             name: "GetRails",
             dependencies: ["BlindPay"],
             path: "Examples",
+            exclude: ["WebhookReceiver", "ManagedWalletPayout"],
             sources: ["GetRails.swift"]
+        ),
+        // Compile-checked workflow examples (CI builds every target):
+        // E1 verifies, dispatches and dedupes webhooks; E2 funds a managed
+        // wallet with a payin and pays out from it with `walletId`.
+        .executableTarget(
+            name: "WebhookReceiver",
+            dependencies: ["BlindPay"],
+            path: "Examples/WebhookReceiver"
+        ),
+        .executableTarget(
+            name: "ManagedWalletPayout",
+            dependencies: ["BlindPay"],
+            path: "Examples/ManagedWalletPayout"
         ),
         .testTarget(
             name: "blindpay-swiftTests",

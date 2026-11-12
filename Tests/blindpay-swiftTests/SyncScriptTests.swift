@@ -482,7 +482,8 @@ private func commonArgs(_ dir: String) -> [String] {
     let apply = runSync(in: dir, args)
     #expect(apply.exitCode == 0)
     let bump = try #require(readReportBump(dir))
-    let expected = bump == "minor" ? "5.1.0" : "5.0.10"
+    #expect(bump == "minor")
+    let expected = "5.1.0"
     let report = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: dir + "/report.json"))) as? [String: Any]
     #expect(report?["version"] as? String == expected)
     #expect(try String(contentsOfFile: dir + "/Version.swift", encoding: .utf8).contains("public static let version = \"\(expected)\""))
@@ -1176,7 +1177,8 @@ private func commonArgs(_ dir: String) -> [String] {
     #expect(readReportBump(dir) == "minor")
 }
 
-@Test func bumpIsPatchForFieldOnlyAdditions() {
+/// A new optional field is a new public init parameter: additive, so minor.
+@Test func bumpIsMinorForFieldOnlyAdditions() {
     let dir = makeFixtureDir()
     var spec = baseSpec()
     var comps = spec["components"] as! [String: Any]
@@ -1192,7 +1194,55 @@ private func commonArgs(_ dir: String) -> [String] {
 
     let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json"] + commonArgs(dir))
     #expect(apply.exitCode == 0)
+    #expect(readReportBump(dir) == "minor")
+}
+
+// MARK: - Error-code table
+
+/// A spec whose `Errors` tag holds the given table rows.
+private func specWithErrorRows(_ rows: [String]) -> [String: Any] {
+    let table = "| Code | Status | Retry | Description |\n| --- | --- | --- | --- |\n" + rows.joined(separator: "\n") + "\n"
+    return baseSpec(extraTopLevel: ["tags": [["name": "Errors", "description": table]]])
+}
+
+private let quotesExpiredRow = "| `QUOTES_EXPIRED` | 400 | actionable | This quote has expired. |"
+
+private func readReport(_ dir: String) -> [String: Any] {
+    guard let data = FileManager.default.contents(atPath: dir + "/report.json"),
+          let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
+    return obj
+}
+
+/// A spec change that only adds an error code still applies (so api-sync.yml
+/// regenerates ErrorCode.swift and opens a PR) and bumps the minor.
+@Test func anErrorTableOnlyAdditionAppliesAndBumpsMinor() {
+    let dir = makeFixtureDir()
+    setupBaseline(dir, spec: specWithErrorRows([quotesExpiredRow]))
+    writeJSON(dir + "/spec-current.json", specWithErrorRows([quotesExpiredRow, "| `ZZ_NEW_CODE` | 400 | terminal | New. |"]))
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(apply.stdout.contains("ZZ_NEW_CODE"))
+    #expect(readReport(dir)["appliedCount"] as? Int == 1)
+    #expect(readReportBump(dir) == "minor")
+}
+
+@Test func aChangedErrorRowAppliesAsAPatch() {
+    let dir = makeFixtureDir()
+    setupBaseline(dir, spec: specWithErrorRows([quotesExpiredRow]))
+    writeJSON(dir + "/spec-current.json", specWithErrorRows(["| `QUOTES_EXPIRED` | 400 | actionable | Request a new quote. |"]))
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 0)
+    #expect(readReport(dir)["appliedCount"] as? Int == 1)
     #expect(readReportBump(dir) == "patch")
+}
+
+@Test func aRemovedErrorCodeIsNeedsHuman() {
+    let dir = makeFixtureDir()
+    setupBaseline(dir, spec: specWithErrorRows([quotesExpiredRow, "| `ZZ_OLD_CODE` | 400 | terminal | Old. |"]))
+    writeJSON(dir + "/spec-current.json", specWithErrorRows([quotesExpiredRow]))
+    let apply = runSync(in: dir, ["--apply", "--snapshot", "spec-snapshot.json", "--spec", "spec-current.json", "--report", "report.json"] + commonArgs(dir))
+    #expect(apply.exitCode == 1)
+    #expect(apply.stdout.contains("ZZ_OLD_CODE"))
 }
 
 // MARK: - unmodeled.json / known-divergences.json honoring

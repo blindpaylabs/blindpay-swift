@@ -17,8 +17,11 @@
 //       Diffs .api-sync/spec-snapshot.json (old) against --spec (new, default
 //       .api-sync/spec-current.json) for version-bump/removal purposes, then
 //       reconciles source against the new spec. Hard fails (no writes) on any
-//       needs-human finding. Otherwise applies every applicable edit, refreshes
-//       the snapshot to match the new spec, and writes --report as JSON.
+//       needs-human finding. Otherwise applies every applicable edit, bumps
+//       BlindPaySDK.version (minor: every applied edit is additive), refreshes
+//       the snapshot by copying the spec file verbatim (pass a 2-space
+//       pretty-printed spec, e.g. `jq --indent 2 .`, so the diff stays small),
+//       and writes --report as JSON.
 //   swift .api-sync/sync.swift --validate-map
 //       Verifies every spec-map.json entry resolves: SDK file exists, SDK
 //       symbol is found in source, and the spec locator resolves against the
@@ -612,7 +615,7 @@ func fieldSwiftType(_ nodeIn: [String: Any], spec: [String: Any]) -> String {
 
 // MARK: - Findings
 
-enum FindingKind: String { case applicableEnumCase = "applicable-enum-case", applicableField = "applicable-field", operationInsert = "operation-insert", needsHuman = "needs-human" }
+enum FindingKind: String { case applicableEnumCase = "applicable-enum-case", applicableField = "applicable-field", operationInsert = "operation-insert", errorCodesAdded = "error-codes-added", errorCodesChanged = "error-codes-changed", needsHuman = "needs-human" }
 
 struct Finding {
     let kind: FindingKind
@@ -1932,6 +1935,52 @@ func classifyBump(old: [String: Any], new: [String: Any]) -> Bump {
     return .patch
 }
 
+// MARK: - Error-code table (the spec's `Errors` tag)
+//
+// Sources/BlindPay/Core/ErrorCode.swift is generated from this table by
+// `check-contract.swift --write-error-codes` (api-sync.yml runs it after
+// --apply). --apply only has to notice that the table changed, so a spec
+// change that touches nothing but the table still counts as applied and
+// bumps the version: a new code is a new `ErrorCode` constant (minor), a
+// changed status/retry/description only regenerates doc comments and the
+// lookup table (patch), and a removed code drops a public constant
+// (needs-human).
+
+/// Each row of the Errors tag table, keyed by code, as its trimmed line.
+func errorCodeTable(_ spec: [String: Any]) -> [String: String] {
+    guard let tags = spec["tags"] as? [[String: Any]],
+          let text = tags.first(where: { $0.str("name") == "Errors" })?.str("description") else { return [:] }
+    let row = try! NSRegularExpression(pattern: #"^\|\s*`([A-Z0-9_]+)`\s*\|"#)
+    var rows: [String: String] = [:]
+    for line in text.components(separatedBy: "\n") {
+        if let g = matchGroups(row, line) { rows[g[1]] = line.trimmingCharacters(in: .whitespaces) }
+    }
+    return rows
+}
+
+func errorCodeFindings(old: [String: Any], new: [String: Any]) -> (applicable: [Finding], needsHuman: [Finding]) {
+    let before = errorCodeTable(old), after = errorCodeTable(new)
+    if before == after { return ([], []) }
+    if after.isEmpty {
+        return ([], [Finding(kind: .needsHuman, message: "the spec's Errors tag has no error-code rows any more (ErrorCode.swift would lose every constant) -- needs a human decision")])
+    }
+    var applicable: [Finding] = []
+    var needsHuman: [Finding] = []
+    let removed = Set(before.keys).subtracting(after.keys).sorted()
+    if !removed.isEmpty {
+        needsHuman.append(Finding(kind: .needsHuman, message: "error code(s) removed from the spec: \(removed.joined(separator: ", ")) -- removing an ErrorCode constant is breaking, needs a human decision (major bump)"))
+    }
+    let added = Set(after.keys).subtracting(before.keys).sorted()
+    if !added.isEmpty {
+        applicable.append(Finding(kind: .errorCodesAdded, message: "error code(s) added to the spec: \(added.joined(separator: ", ")) (regenerate ErrorCode.swift)"))
+    }
+    let changed = before.keys.filter { after[$0] != nil && after[$0] != before[$0] }.sorted()
+    if !changed.isEmpty {
+        applicable.append(Finding(kind: .errorCodesChanged, message: "error code row(s) changed in the spec: \(changed.joined(separator: ", ")) (regenerate ErrorCode.swift)"))
+    }
+    return (applicable, needsHuman)
+}
+
 // MARK: - Apply
 
 func indentOf(_ line: String) -> String {
@@ -2481,8 +2530,10 @@ case .apply:
     let scanned = scanSources(under: sourcesPath)
 
     let structuralFindings = detectStructuralChanges(old: snapshot, new: newSpec)
-    let (applicable, reconFindings) = reconcile(spec: newSpec, scanned: scanned)
-    let needsHuman = structuralFindings + reconFindings
+    let (reconApplicable, reconFindings) = reconcile(spec: newSpec, scanned: scanned)
+    let (errorApplicable, errorNeedsHuman) = errorCodeFindings(old: snapshot, new: newSpec)
+    let applicable = reconApplicable + errorApplicable
+    let needsHuman = structuralFindings + reconFindings + errorNeedsHuman
 
     var report: [String: Any] = [:]
     if !needsHuman.isEmpty {
@@ -2506,13 +2557,15 @@ case .apply:
     } else {
         applyFindings(applicable)
         applyOperationInsertions(applicable, spec: newSpec, scanned: scanned)
-        let hasOperationInsert = applicable.contains { $0.kind == .operationInsert }
-        // A brand-new endpoint is a new backward-compatible capability, so
-        // operation-insert always forces at least a minor bump -- even in
-        // the (structurally impossible in practice, since a new operation
-        // implies new paths) edge case where classifyBump's own paths-diff
-        // check wouldn't otherwise notice.
-        let bump = hasOperationInsert ? Bump.minor : classifyBump(old: snapshot, new: newSpec)
+        // Every edit --apply makes is additive public API: a new optional
+        // field (a new init parameter), a new enum constant, a new operation
+        // or a new ErrorCode constant. Additive changes are a minor release
+        // (CLAUDE.md "Versioning"), so any of them forces a minor bump;
+        // classifyBump decides for the rest (an error-code row whose text
+        // changed is a patch).
+        let additiveKinds: Set<FindingKind> = [.applicableField, .applicableEnumCase, .operationInsert, .errorCodesAdded]
+        let isAdditive = applicable.contains { additiveKinds.contains($0.kind) }
+        let bump = isAdditive ? Bump.minor : classifyBump(old: snapshot, new: newSpec)
         print("sync --apply: applied \(applicable.count) change(s), bump=\(bump.rawValue)")
         for f in applicable { print("  - \(f.message)") }
         report["appliedCount"] = applicable.count

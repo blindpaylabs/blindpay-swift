@@ -8,6 +8,9 @@ name: Release
 on:
   push:
     branches: [main]
+  # Re-run a release that failed after the merge (see RELEASING.md). The
+  # check is idempotent: an existing tag means nothing to do.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,6 +22,8 @@ concurrency:
 jobs:
   release:
     name: Tag and release
+    # A dispatch can name any ref; only main's constant is ever released.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -30,6 +30,7 @@ public struct TrackingStep: OpenEnum {
     public static let onHold = TrackingStep(rawValue: "on_hold")
     public static let completed = TrackingStep(rawValue: "completed")
     public static let pendingRefundReview = TrackingStep(rawValue: "pending_refund_review")
+    public static let pendingReview = TrackingStep(rawValue: "pending_review")
 }
 
 /// Provider status for liquidity tracking
@@ -69,6 +70,7 @@ public struct PaymentType: OpenEnum {
     public static let rtp = PaymentType(rawValue: "rtp")
     public static let ted = PaymentType(rawValue: "ted")
     public static let fasterPayments = PaymentType(rawValue: "faster_payments")
+    public static let sepa = PaymentType(rawValue: "sepa")
 }
 
 /// Account type
@@ -104,6 +106,7 @@ public struct EstimatedTimeOfArrival: OpenEnum {
     public static let oneBusinessDay = EstimatedTimeOfArrival(rawValue: "1_business_day")
     public static let twoBusinessDays = EstimatedTimeOfArrival(rawValue: "2_business_days")
     public static let fiveBusinessDays = EstimatedTimeOfArrival(rawValue: "5_business_days")
+    public static let fiveToThirtyMin = EstimatedTimeOfArrival(rawValue: "5_30_min")
 }
 
 /// Tracking complete status
@@ -160,16 +163,36 @@ public struct PayoutTrackingTransaction: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
+  /// Ledger transaction ID for the IN (crypto deposit) transaction
+  public let ledgerInTransactionId: String?
+
+  /// Ledger transaction ID for the OUT (fiat withdrawal) transaction
+  public let ledgerOutTransactionId: String?
+
+  /// Provider error reason when the crypto collection fails (e.g. erc20_allowance_insufficient, ESTIMATION_ERROR: execution reverted)
+  public let providerErrorReason: String?
+
+  /// Provider-side handle for the on-chain leg (e.g. Circle CPN payment id).
+  public let providerTransactionId: String?
+
   public init(
     step: TrackingStep,
     status: TrackingTransactionStatus? = nil,
     transactionHash: String? = nil,
-    completedAt: String? = nil
+    completedAt: String? = nil,
+    ledgerInTransactionId: String? = nil,
+    ledgerOutTransactionId: String? = nil,
+    providerErrorReason: String? = nil,
+    providerTransactionId: String? = nil
   ) {
     self.step = step
     self.status = status
     self.transactionHash = transactionHash
     self.completedAt = completedAt
+    self.ledgerInTransactionId = ledgerInTransactionId
+    self.ledgerOutTransactionId = ledgerOutTransactionId
+    self.providerErrorReason = providerErrorReason
+    self.providerTransactionId = providerTransactionId
   }
 
   enum CodingKeys: String, CodingKey {
@@ -177,6 +200,10 @@ public struct PayoutTrackingTransaction: Codable, Sendable, Equatable {
     case status
     case transactionHash = "transaction_hash"
     case completedAt = "completed_at"
+    case ledgerInTransactionId = "ledger_in_transaction_id"
+    case ledgerOutTransactionId = "ledger_out_transaction_id"
+    case providerErrorReason = "provider_error_reason"
+    case providerTransactionId = "provider_transaction_id"
   }
 }
 
@@ -246,6 +273,27 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
 
 
 
+  /// COELSA transaction reference ID for ARS transfers (Argentine national banking system)
+  public let coelsaId: String?
+
+  /// BACEN Pix end-to-end transaction ID (govt Pix ID)
+  public let endToEndId: String?
+
+  /// Clearing system that processed the payment (e.g. FED, CHIPS, ACH, SWIFT).
+  public let providerClearingSystem: String?
+
+  /// Provider error reason when payment fails (e.g. invalid_key, wrong_parameters)
+  public let providerErrorReason: String?
+
+  /// Fed Input Message Accountability Data (IMAD). Domestic Fedwire payments only; null on ACH and SWIFT.
+  public let providerImad: String?
+
+  /// Bank payment reference. Present for some ACH/wire payouts; a bank-side reference, not the formal ACH network trace number.
+  public let providerReference: String?
+
+  /// Unique end-to-end transaction reference (UETR). Populated once the wire is confirmed by the network; null while the payment is in flight or when the rail does not expose it (e.g. ACH).
+  public let providerUetr: String?
+
   public init(
     step: TrackingStep,
     providerName: String? = nil,
@@ -265,7 +313,14 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     returnedAmount: Int? = nil,
     reviewContext: [String: AnyCodable]? = nil,
     reviewSource: String? = nil,
-    reviewSources: [String]? = nil
+    reviewSources: [String]? = nil,
+    coelsaId: String? = nil,
+    endToEndId: String? = nil,
+    providerClearingSystem: String? = nil,
+    providerErrorReason: String? = nil,
+    providerImad: String? = nil,
+    providerReference: String? = nil,
+    providerUetr: String? = nil
   ) {
     self.step = step
     self.providerName = providerName
@@ -286,6 +341,13 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     self.reviewContext = reviewContext
     self.reviewSource = reviewSource
     self.reviewSources = reviewSources
+    self.coelsaId = coelsaId
+    self.endToEndId = endToEndId
+    self.providerClearingSystem = providerClearingSystem
+    self.providerErrorReason = providerErrorReason
+    self.providerImad = providerImad
+    self.providerReference = providerReference
+    self.providerUetr = providerUetr
   }
 
   enum CodingKeys: String, CodingKey {
@@ -308,6 +370,13 @@ public struct PayoutTrackingPayment: Codable, Sendable, Equatable {
     case reviewContext = "review_context"
     case reviewSource = "review_source"
     case reviewSources = "review_sources"
+    case coelsaId = "coelsa_id"
+    case endToEndId = "end_to_end_id"
+    case providerClearingSystem = "provider_clearing_system"
+    case providerErrorReason = "provider_error_reason"
+    case providerImad = "provider_imad"
+    case providerReference = "provider_reference"
+    case providerUetr = "provider_uetr"
   }
 }
 
@@ -365,16 +434,26 @@ public struct PayoutTrackingComplete: Codable, Sendable, Equatable {
   /// Completion timestamp
   public let completedAt: String?
 
+  /// Provider-side handle for the refund transaction (e.g. Circle transaction id)
+  public let providerTransactionId: String?
+
+  /// Reason for refund when tokens are returned to sender
+  public let refundReason: String?
+
   public init(
     step: TrackingStep,
     status: TrackingCompleteStatus? = nil,
     transactionHash: String? = nil,
-    completedAt: String? = nil
+    completedAt: String? = nil,
+    providerTransactionId: String? = nil,
+    refundReason: String? = nil
   ) {
     self.step = step
     self.status = status
     self.transactionHash = transactionHash
     self.completedAt = completedAt
+    self.providerTransactionId = providerTransactionId
+    self.refundReason = refundReason
   }
 
   enum CodingKeys: String, CodingKey {
@@ -382,6 +461,8 @@ public struct PayoutTrackingComplete: Codable, Sendable, Equatable {
     case status
     case transactionHash = "transaction_hash"
     case completedAt = "completed_at"
+    case providerTransactionId = "provider_transaction_id"
+    case refundReason = "refund_reason"
   }
 }
 
@@ -663,6 +744,18 @@ public struct Payout: Codable, Sendable, Equatable {
 
   public let sepaIban: String?
 
+  /// Payout partner fee amount in cents (can be negative for rebates)
+  public let partnerFee: Int?
+
+  /// Legal name of the sending instance (originator), shown on the receipt
+  public let senderLegalName: String?
+
+  /// Supporting-document review step (SWIFT payouts that need documents).
+  public let trackingDocuments: PayoutTrackingDocuments?
+
+  /// Transaction fee in cents (percentage-based fee)
+  public let transactionFeeAmount: Int?
+
   public init(
     id: String,
     customerId: String,
@@ -750,7 +843,11 @@ public struct Payout: Codable, Sendable, Equatable {
     sepaBeneficiaryCountry: Country? = nil,
     sepaBeneficiaryLegalName: String? = nil,
     sepaBeneficiaryPostalCode: String? = nil,
-    sepaIban: String? = nil
+    sepaIban: String? = nil,
+    partnerFee: Int? = nil,
+    senderLegalName: String? = nil,
+    trackingDocuments: PayoutTrackingDocuments? = nil,
+    transactionFeeAmount: Int? = nil
   ) {
     self.id = id
     self.customerId = customerId
@@ -839,6 +936,10 @@ public struct Payout: Codable, Sendable, Equatable {
     self.sepaBeneficiaryLegalName = sepaBeneficiaryLegalName
     self.sepaBeneficiaryPostalCode = sepaBeneficiaryPostalCode
     self.sepaIban = sepaIban
+    self.partnerFee = partnerFee
+    self.senderLegalName = senderLegalName
+    self.trackingDocuments = trackingDocuments
+    self.transactionFeeAmount = transactionFeeAmount
   }
 
   enum CodingKeys: String, CodingKey {
@@ -929,6 +1030,10 @@ public struct Payout: Codable, Sendable, Equatable {
     case sepaBeneficiaryLegalName = "sepa_beneficiary_legal_name"
     case sepaBeneficiaryPostalCode = "sepa_beneficiary_postal_code"
     case sepaIban = "sepa_iban"
+    case partnerFee = "partner_fee"
+    case senderLegalName = "sender_legal_name"
+    case trackingDocuments = "tracking_documents"
+    case transactionFeeAmount = "transaction_fee_amount"
   }
 }
 
@@ -971,6 +1076,24 @@ public struct CreatePayoutResponse: Codable, Sendable {
 
   public let payableId: String?
 
+  /// The bank account the payout pays.
+  public let bankAccountId: String?
+
+  /// Billing fee in cents (charged via invoice at the end of the month)
+  public let billingFeeAmount: Int?
+
+  /// The offramp wallet that funded the payout, when one did.
+  public let offrampWalletId: String?
+
+  /// Payout partner fee amount in cents (can be negative for rebates)
+  public let partnerFee: Int?
+
+  /// Supporting-document review step (SWIFT payouts that need documents).
+  public let trackingDocuments: PayoutTrackingDocuments?
+
+  /// Transaction fee in cents (percentage-based fee)
+  public let transactionFeeAmount: Int?
+
   public init(
     id: String,
     status: PayoutStatus,
@@ -981,7 +1104,13 @@ public struct CreatePayoutResponse: Codable, Sendable {
     trackingPartnerFee: PayoutTrackingPartnerFee? = nil,
     trackingLiquidity: PayoutTrackingLiquidity? = nil,
     customerId: String? = nil,
-    payableId: String? = nil
+    payableId: String? = nil,
+    bankAccountId: String? = nil,
+    billingFeeAmount: Int? = nil,
+    offrampWalletId: String? = nil,
+    partnerFee: Int? = nil,
+    trackingDocuments: PayoutTrackingDocuments? = nil,
+    transactionFeeAmount: Int? = nil
   ) {
     self.id = id
     self.status = status
@@ -993,6 +1122,12 @@ public struct CreatePayoutResponse: Codable, Sendable {
     self.trackingLiquidity = trackingLiquidity
     self.customerId = customerId
     self.payableId = payableId
+    self.bankAccountId = bankAccountId
+    self.billingFeeAmount = billingFeeAmount
+    self.offrampWalletId = offrampWalletId
+    self.partnerFee = partnerFee
+    self.trackingDocuments = trackingDocuments
+    self.transactionFeeAmount = transactionFeeAmount
   }
 
   enum CodingKeys: String, CodingKey {
@@ -1006,6 +1141,12 @@ public struct CreatePayoutResponse: Codable, Sendable {
     case trackingLiquidity = "tracking_liquidity"
     case customerId = "customer_id"
     case payableId = "payable_id"
+    case bankAccountId = "bank_account_id"
+    case billingFeeAmount = "billing_fee_amount"
+    case offrampWalletId = "offramp_wallet_id"
+    case partnerFee = "partner_fee"
+    case trackingDocuments = "tracking_documents"
+    case transactionFeeAmount = "transaction_fee_amount"
   }
 }
 

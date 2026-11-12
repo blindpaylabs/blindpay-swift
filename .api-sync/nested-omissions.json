@@ -190,5 +190,203 @@
     "field": "blindpay_bank_details",
     "reason": "SDK models this shape (Payin.swift's BlindPayBankDetails struct, itself with further-nested ach/wire/rtp/beneficiary/receiving_bank sub-shapes and a pre-existing gap: no swift_receiving_bank/swift_account_number field) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
     "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut.tracking_transaction",
+    "field": "card_evidence",
+    "reason": "Card 3-D Secure/AVS evidence; decoded as a free-form object ([String: AnyCodable]).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinUpdateWebhookOut",
+    "field": "blindpay_bank_details",
+    "reason": "SDK models this shape (Payin.swift's BlindPayBankDetails struct, itself with further-nested ach/wire/rtp/beneficiary/receiving_bank sub-shapes and a pre-existing gap: no swift_receiving_bank/swift_account_number field) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut.tracking_transaction",
+    "field": "card_evidence",
+    "reason": "Card 3-D Secure/AVS evidence; decoded as a free-form object ([String: AnyCodable]).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinCompleteWebhookOut",
+    "field": "blindpay_bank_details",
+    "reason": "SDK models this shape (Payin.swift's BlindPayBankDetails struct, itself with further-nested ach/wire/rtp/beneficiary/receiving_bank sub-shapes and a pre-existing gap: no swift_receiving_bank/swift_account_number field) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut.tracking_transaction",
+    "field": "card_evidence",
+    "reason": "Card 3-D Secure/AVS evidence; decoded as a free-form object ([String: AnyCodable]).",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "PayinPartnerFeeWebhookOut",
+    "field": "blindpay_bank_details",
+    "reason": "SDK models this shape (Payin.swift's BlindPayBankDetails struct, itself with further-nested ach/wire/rtp/beneficiary/receiving_bank sub-shapes and a pre-existing gap: no swift_receiving_bank/swift_account_number field) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerNewWebhookOut",
+    "field": "aml_hits",
+    "reason": "SDK models this shape (Customer.swift's AmlHits struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry, so its own fields are not mechanically field-diffed. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff (and its own nested sub-shapes) into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerNewWebhookOut",
+    "field": "fraud_warnings",
+    "reason": "SDK models this shape (Customer.swift's FraudWarning struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync/nullability diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerNewWebhookOut",
+    "field": "kyc_warnings",
+    "reason": "SDK models this shape (Customer.swift's KYCWarning struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerNewWebhookOut",
+    "field": "limit",
+    "reason": "SDK models this shape (Customer.swift's CustomerLimits struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerNewWebhookOut",
+    "field": "owners",
+    "reason": "SDK models this shape (Customer.swift's CustomerOwner struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerUpdateWebhookOut",
+    "field": "aml_hits",
+    "reason": "SDK models this shape (Customer.swift's AmlHits struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry, so its own fields are not mechanically field-diffed. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff (and its own nested sub-shapes) into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerUpdateWebhookOut",
+    "field": "fraud_warnings",
+    "reason": "SDK models this shape (Customer.swift's FraudWarning struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync/nullability diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerUpdateWebhookOut",
+    "field": "kyc_warnings",
+    "reason": "SDK models this shape (Customer.swift's KYCWarning struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerUpdateWebhookOut",
+    "field": "limit",
+    "reason": "SDK models this shape (Customer.swift's CustomerLimits struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "CustomerUpdateWebhookOut",
+    "field": "owners",
+    "reason": "SDK models this shape (Customer.swift's CustomerOwner struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "BankAccountWebhookOut",
+    "field": "offramp_wallets",
+    "reason": "SDK models this shape (OfframpWallet.swift's OfframpWallet struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, to avoid pulling an unrelated field-sync diff into an infra-only change.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "tracking_bridge_swap",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "tracking_complete",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "tracking_paymaster",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferNewWebhookOut",
+    "field": "tracking_transaction_monitoring",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingTransactionMonitoring struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "tracking_bridge_swap",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "tracking_complete",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "tracking_paymaster",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferUpdateWebhookOut",
+    "field": "tracking_transaction_monitoring",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingTransactionMonitoring struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "tracking_bridge_swap",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "tracking_complete",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "tracking_paymaster",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingStep struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "TransferCompleteWebhookOut",
+    "field": "tracking_transaction_monitoring",
+    "reason": "SDK models this shape (Transfer.swift's TransferTrackingTransactionMonitoring struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "VirtualAccountNewWebhookOut",
+    "field": "blockchain_wallet",
+    "reason": "SDK models this shape (VirtualAccount.swift's BlockchainWalletRef struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "VirtualAccountNewWebhookOut",
+    "field": "us",
+    "reason": "SDK models this shape (VirtualAccount.swift's VirtualAccountUS struct, itself with further-nested ach/beneficiary/receiving_bank/rtp/swift_intermediary_bank/swift_receiving_bank/wire sub-shapes -- some of which the SDK does not yet model at all, e.g. swift_intermediary_bank/swift_receiving_bank/swift_account_number) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, since wiring it in would also surface those pre-existing field gaps as new sync findings.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "VirtualAccountCompleteWebhookOut",
+    "field": "blockchain_wallet",
+    "reason": "SDK models this shape (VirtualAccount.swift's BlockchainWalletRef struct) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR.",
+    "owner": "sdk-maintainers"
+  },
+  {
+    "schema": "VirtualAccountCompleteWebhookOut",
+    "field": "us",
+    "reason": "SDK models this shape (VirtualAccount.swift's VirtualAccountUS struct, itself with further-nested ach/beneficiary/receiving_bank/rtp/swift_intermediary_bank/swift_receiving_bank/wire sub-shapes -- some of which the SDK does not yet model at all, e.g. swift_intermediary_bank/swift_receiving_bank/swift_account_number) but it isn't wired into spec-map.json's types[] as its own dotted-locator entry. Recorded here rather than wired in during this coverage-check PR, since wiring it in would also surface those pre-existing field gaps as new sync findings.",
+    "owner": "sdk-maintainers"
   }
 ]

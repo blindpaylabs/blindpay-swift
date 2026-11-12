@@ -89,8 +89,12 @@ jobs:
       - name: Run the deterministic sync patcher
         id: sync
         run: |
+          # The snapshot is a verbatim copy of the spec file, so normalise it to
+          # 2-space pretty JSON first (jq keeps key order): a refresh then diffs
+          # only the lines that changed.
+          jq --indent 2 . /tmp/api-sync-spec-current.json > /tmp/api-sync-spec-pretty.json
           set +e
-          swift .api-sync/sync.swift --apply --spec /tmp/api-sync-spec-current.json --report /tmp/sync-report.json
+          swift .api-sync/sync.swift --apply --spec /tmp/api-sync-spec-pretty.json --report /tmp/sync-report.json
           status=$?
           set -e
           echo "=== sync report ==="
@@ -101,9 +105,9 @@ jobs:
           fi
           applied=$(jq -r '.appliedCount' /tmp/sync-report.json)
           bump=$(jq -r '.bump' /tmp/sync-report.json)
-          # --apply bumps BlindPaySDK.version (patch, or minor when the report
-          # says so) and reports the new version; release.yml tags it once
-          # this PR merges.
+          # --apply bumps BlindPaySDK.version (minor for any applied change,
+          # since every applied change is additive) and reports the new
+          # version; release.yml tags it once this PR merges.
           version=$(jq -r '.version // empty' /tmp/sync-report.json)
           if [ "$applied" != "0" ] && [ -z "$version" ]; then
             echo "::error::sync.swift applied changes but did not bump BlindPaySDK.version"
@@ -118,6 +122,10 @@ jobs:
       - name: Build and test the patched SDK
         if: steps.sync.outputs.applied != '0'
         run: |
+          # ErrorCode.swift is generated from the refreshed snapshot's error
+          # table. --apply counts a change to that table as applied (a new
+          # code bumps the minor), so an Errors-only spec change gets here too.
+          swift .api-sync/check-contract.swift --write-error-codes
           swift build
           swift test
           swift .api-sync/check-contract.swift
