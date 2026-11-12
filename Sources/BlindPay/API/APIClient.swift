@@ -195,7 +195,7 @@ internal final class APIClient: Sendable {
                 if status >= 400 {
                     return APIResponse(data: nil, error: makeAPIError(data: Data(), response: response, method: method, idempotencyKey: idempotencyKey))
                 }
-                throw BlindPayError.incompleteResponse(status: status, underlying: redactingQueries(in: underlying), idempotencyKey: idempotencyKey)
+                throw BlindPayError.incompleteResponse(status: status, underlying: errorRedactingURLQueries(underlying), idempotencyKey: idempotencyKey)
             } catch let error as BlindPayError {
                 // Raised by this client (decoding, cancellation after an API
                 // error, ...): never retried.
@@ -209,7 +209,7 @@ internal final class APIClient: Sendable {
                 case let urlError as URLError where urlError.code == .timedOut:
                     failure = .timeout(idempotencyKey: idempotencyKey)
                 default:
-                    failure = .networkError(redactingQueries(in: error), idempotencyKey: idempotencyKey)
+                    failure = .networkError(errorRedactingURLQueries(error), idempotencyKey: idempotencyKey)
                 }
                 if canRetry, RetryPolicy.shouldRetry(method: method, isMultipart: isMultipart, hasIdempotencyKey: idempotencyKey != nil, outcome: .noResponse) {
                     try await configuration.sleep(RetryPolicy.delay(attempt: attempt, retryAfter: nil, jitter: configuration.jitter()))
@@ -336,16 +336,17 @@ extension APIClient: CustomReflectable, CustomStringConvertible, CustomDebugStri
 }
 
 /// A transport error with every URL in its `userInfo` stripped of its query
-/// and fragment (see ``redactingQueries(_:)``). Other errors pass through.
-func redactingQueries(in error: Error) -> Error {
+/// and fragment (see ``userInfoRedactingURLQueries(_:)``). Other errors pass
+/// through unchanged.
+func errorRedactingURLQueries(_ error: Error) -> Error {
     if let urlError = error as? URLError {
-        return URLError(urlError.code, userInfo: redactingQueries(urlError.userInfo))
+        return URLError(urlError.code, userInfo: userInfoRedactingURLQueries(urlError.userInfo))
     }
     let nsError = error as NSError
     // Linux URLSession can surface URL-loading failures as plain NSErrors.
     // Errors from a custom transport keep their own type.
     if nsError.domain == NSURLErrorDomain {
-        return NSError(domain: nsError.domain, code: nsError.code, userInfo: redactingQueries(nsError.userInfo))
+        return nsErrorRedactingURLQueries(nsError)
     }
     return error
 }
@@ -354,16 +355,16 @@ func redactingQueries(in error: Error) -> Error {
 /// fragment removed. URLSession puts the full request URL in the failing-URL
 /// keys, and list filters (names, emails) travel in the query, so printing a
 /// raw `URLError` would leak them into logs.
-func redactingQueries(_ userInfo: [String: Any]) -> [String: Any] {
+func userInfoRedactingURLQueries(_ userInfo: [String: Any]) -> [String: Any] {
     var result: [String: Any] = [:]
     for (key, value) in userInfo {
         switch value {
         case let url as URL:
             result[key] = withoutQuery(url)
         case let string as String where key == NSURLErrorFailingURLStringErrorKey:
-            result[key] = string.split(separator: "?", maxSplits: 1).first.map { String($0.split(separator: "#", maxSplits: 1).first ?? $0) } ?? string
+            result[key] = withoutQuery(string)
         case let error as NSError:
-            result[key] = NSError(domain: error.domain, code: error.code, userInfo: redactingQueries(error.userInfo))
+            result[key] = nsErrorRedactingURLQueries(error)
         default:
             result[key] = value
         }
@@ -371,9 +372,20 @@ func redactingQueries(_ userInfo: [String: Any]) -> [String: Any] {
     return result
 }
 
+private func nsErrorRedactingURLQueries(_ error: NSError) -> NSError {
+    NSError(domain: error.domain, code: error.code, userInfo: userInfoRedactingURLQueries(error.userInfo))
+}
+
 private func withoutQuery(_ url: URL) -> URL {
     guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url }
     components.query = nil
     components.fragment = nil
     return components.url ?? url
+}
+
+/// ``withoutQuery(_:)-URL`` for a URL held as a string. A string `URL` can't
+/// parse is cut at its first `?` or `#`, so even `?a=b` loses its query.
+private func withoutQuery(_ string: String) -> String {
+    if let url = URL(string: string) { return withoutQuery(url).absoluteString }
+    return String(string.prefix { $0 != "?" && $0 != "#" })
 }

@@ -102,6 +102,31 @@ struct SecretHygieneTests {
         }
     }
 
+    /// The failing-URL string is stripped through URL parsing, so a bare
+    /// query (`?a=b`), a fragment and an unparseable string all lose it.
+    @Test func failingURLStringsLoseTheirQueryInEveryShape() {
+        // nil: Foundation versions disagree on whether (and how) a string with
+        // spaces parses as a URL, so only the absence of the query is checked.
+        let cases: [(String, String?)] = [
+            ("https://api.example.com/v1/customers?full_name=Jane#top", "https://api.example.com/v1/customers"),
+            ("?full_name=Jane", ""),
+            ("/v1/customers?full_name=Jane", "/v1/customers"),
+            ("not a url?full_name=Jane", nil),
+        ]
+        for (input, expected) in cases {
+            let redacted = userInfoRedactingURLQueries([NSURLErrorFailingURLStringErrorKey: input])
+            let value = redacted[NSURLErrorFailingURLStringErrorKey] as? String
+            if let expected { #expect(value == expected, "\(input)") }
+            #expect(value != nil, "\(input)")
+            #expect(value?.contains("Jane") == false, "\(input)")
+            #expect(value?.contains("full_name") == false, "\(input)")
+        }
+        let nested = userInfoRedactingURLQueries([NSUnderlyingErrorKey: NSError(domain: NSURLErrorDomain, code: -1, userInfo: [
+            NSURLErrorFailingURLStringErrorKey: "?full_name=Jane",
+        ])])
+        #expect(!"\(nested)".contains("Jane"))
+    }
+
     @Test func theConfigurationAndServicesNeverPrintTheKey() {
         let client = BlindPay(apiKey: key, instanceId: "in_000000000000", configuration: Configuration(baseURL: "https://api.example.com"))
         var dumped = ""
