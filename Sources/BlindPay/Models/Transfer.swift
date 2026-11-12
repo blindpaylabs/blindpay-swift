@@ -256,7 +256,11 @@ public typealias ListTransfersResponse = ListResult<Transfer>
 
 // MARK: - Input Types
 
-/// Input for creating a transfer quote
+/// Input for creating a transfer quote.
+///
+/// A swap between different tokens (`senderToken` differs from
+/// `customerToken`) needs at least 100 USDC, measured on the USDC side;
+/// smaller amounts fail with 400 ``ErrorCode/transfersSwapAmountBelowMinimum``.
 public struct CreateTransferQuoteInput: Codable, Sendable {
     /// Wallet ID to send from
     public let walletId: String
