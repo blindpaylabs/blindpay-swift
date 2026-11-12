@@ -748,7 +748,7 @@ public struct Payin: Codable, Sendable, Equatable {
   public let payerRules: PayinQuotePayerRules?
 
   /// BlindPay fee in cents deducted from the transaction at the time it is processed. Virtual account deposits of $100.00 or more are charged here (unless your instance is configured for end-of-month billing, in which case every fee accrues to billing_fee_amount).
-  public let transactionFeeAmount: Double?
+  public let transactionFeeAmount: Int?
 
   public init(
     id: String,
@@ -796,7 +796,7 @@ public struct Payin: Codable, Sendable, Equatable {
     manualConcludedBy: String? = nil,
     partnerFee: Int? = nil,
     payerRules: PayinQuotePayerRules? = nil,
-    transactionFeeAmount: Double? = nil
+    transactionFeeAmount: Int? = nil
   ) {
     self.id = id
     self.customerId = customerId
@@ -1055,13 +1055,13 @@ public struct CreatePayinResponse: Codable, Sendable {
   public let senderAmount: Int?
 
   /// BlindPay fee in cents accrued to your billing cycle (charged at the end of the month). Virtual account deposits below $100.00 always accrue here, so small deposits are delivered in full.
-  public let billingFeeAmount: Double?
+  public let billingFeeAmount: Int?
 
   /// Payin partner fee amount in cents
   public let partnerFee: Int?
 
   /// BlindPay fee in cents deducted from the transaction at the time it is processed. Virtual account deposits of $100.00 or more are charged here (unless your instance is configured for end-of-month billing, in which case every fee accrues to billing_fee_amount).
-  public let transactionFeeAmount: Double?
+  public let transactionFeeAmount: Int?
 
   public init(
     id: String,
@@ -1079,9 +1079,9 @@ public struct CreatePayinResponse: Codable, Sendable {
     paymentMethod: PaymentMethod? = nil,
     billingFee: Int? = nil,
     senderAmount: Int? = nil,
-    billingFeeAmount: Double? = nil,
+    billingFeeAmount: Int? = nil,
     partnerFee: Int? = nil,
-    transactionFeeAmount: Double? = nil
+    transactionFeeAmount: Int? = nil
   ) {
     self.id = id
     self.status = status

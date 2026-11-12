@@ -259,7 +259,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
     public let description: String?
 
     /// Billing fee in cents (charged via invoice at the end of the month)
-    public let billingFeeAmount: Double?
+    public let billingFeeAmount: Int?
 
     public init(
         id: String,
@@ -273,7 +273,7 @@ public struct CreateQuoteResponse: Codable, Equatable, @unchecked Sendable {
         contract: QuoteContract? = nil,
         customerLocalAmount: Int? = nil,
         description: String? = nil,
-        billingFeeAmount: Double? = nil
+        billingFeeAmount: Int? = nil
     ) {
         self.id = id
         self.expiresAt = expiresAt

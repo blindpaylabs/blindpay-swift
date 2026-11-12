@@ -754,7 +754,7 @@ public struct Payout: Codable, Sendable, Equatable {
   public let trackingDocuments: PayoutTrackingDocuments?
 
   /// Transaction fee in cents (percentage-based fee)
-  public let transactionFeeAmount: Double?
+  public let transactionFeeAmount: Int?
 
   public init(
     id: String,
@@ -847,7 +847,7 @@ public struct Payout: Codable, Sendable, Equatable {
     partnerFee: Int? = nil,
     senderLegalName: String? = nil,
     trackingDocuments: PayoutTrackingDocuments? = nil,
-    transactionFeeAmount: Double? = nil
+    transactionFeeAmount: Int? = nil
   ) {
     self.id = id
     self.customerId = customerId
@@ -1080,7 +1080,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
   public let bankAccountId: String?
 
   /// Billing fee in cents (charged via invoice at the end of the month)
-  public let billingFeeAmount: Double?
+  public let billingFeeAmount: Int?
 
   /// The offramp wallet that funded the payout, when one did.
   public let offrampWalletId: String?
@@ -1092,7 +1092,7 @@ public struct CreatePayoutResponse: Codable, Sendable {
   public let trackingDocuments: PayoutTrackingDocuments?
 
   /// Transaction fee in cents (percentage-based fee)
-  public let transactionFeeAmount: Double?
+  public let transactionFeeAmount: Int?
 
   public init(
     id: String,
@@ -1106,11 +1106,11 @@ public struct CreatePayoutResponse: Codable, Sendable {
     customerId: String? = nil,
     payableId: String? = nil,
     bankAccountId: String? = nil,
-    billingFeeAmount: Double? = nil,
+    billingFeeAmount: Int? = nil,
     offrampWalletId: String? = nil,
     partnerFee: Int? = nil,
     trackingDocuments: PayoutTrackingDocuments? = nil,
-    transactionFeeAmount: Double? = nil
+    transactionFeeAmount: Int? = nil
   ) {
     self.id = id
     self.status = status
