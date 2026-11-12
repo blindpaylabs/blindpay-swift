@@ -29,7 +29,7 @@ public struct RetryClass: OpenEnum {
 /// The documented HTTP status and retry class of an ``ErrorCode``. The
 /// status is the one the code typically comes with; an endpoint may answer
 /// a given code with a different one, so branch on the code.
-public struct ErrorCodeInfo: Sendable, Equatable, Hashable {
+public struct ErrorCodeInfo: Codable, Sendable, Equatable, Hashable {
     public let status: Int
     public let retry: RetryClass
 

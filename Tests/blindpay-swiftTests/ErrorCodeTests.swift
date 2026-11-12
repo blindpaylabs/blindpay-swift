@@ -61,6 +61,13 @@ struct ErrorCodeTests {
         #expect(reaction(APIError(status: 409, message: "idempotency_key_in_flight")) == "other")
     }
 
+    @Test func errorCodeInfoIsCodable() throws {
+        let info = try #require(ErrorCode.quotesExpired.info)
+        let data = try JSONEncoder().encode(info)
+        #expect(try JSONDecoder().decode(ErrorCodeInfo.self, from: data) == info)
+        #expect(String(decoding: data, as: UTF8.self).contains(#""retry":"actionable""#))
+    }
+
     @Test func unknownAndMissingCodesStayOpen() {
         let unknown = APIError(status: 400, code: "SOMETHING_NEW", message: "x")
         #expect(unknown.errorCode?.rawValue == "SOMETHING_NEW")
