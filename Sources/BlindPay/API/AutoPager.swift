@@ -20,6 +20,11 @@ public protocol CursorPaginatedInput: Sendable {
 /// Pull-based: a page is fetched only when the consumer has read every item
 /// of the previous one, so breaking out of the loop stops the requests. Each
 /// page goes through the normal request path (options, retries, timeouts).
+///
+/// If the server answers `has_more: true` with the same `next_page` cursor
+/// it was just sent, the stream yields that page's items and then throws
+/// ``BlindPayError/invalidResponse`` instead of requesting it forever (the
+/// Node SDK's "pagination did not advance" error).
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 enum AutoPager {
     /// Page size used when the caller sets none; valid in every limit enum.
@@ -47,6 +52,9 @@ enum AutoPager {
         private var buffer: [Element] = []
         private var index = 0
         private var finished = false
+        /// The server repeated the cursor it was sent: throw once this page's
+        /// items are read.
+        private var stalled = false
 
         init(params: Input, fetch: @escaping @Sendable (Input) async throws -> APIResponse<ListResult<Element>>) {
             self.params = params
@@ -59,6 +67,10 @@ enum AutoPager {
                     defer { index += 1 }
                     return buffer[index]
                 }
+                if stalled {
+                    stalled = false
+                    throw BlindPayError.invalidResponse
+                }
                 if finished { return nil }
                 let response = try await fetch(params)
                 if let error = response.error {
@@ -69,6 +81,11 @@ enum AutoPager {
                 buffer = page.data
                 index = 0
                 if let pagination = page.pagination, pagination.hasMore, let next = pagination.nextPage {
+                    // A cursor that didn't advance would refetch this page forever.
+                    if next == params.startingAfter {
+                        finished = true
+                        stalled = true
+                    }
                     params.startingAfter = next
                 } else {
                     finished = true

@@ -154,6 +154,33 @@ struct AutoPagingTests {
         #expect(server.requests.isEmpty)
     }
 
+    /// A server that repeats `next_page` with `has_more: true` would loop
+    /// forever; the pager throws after the first repeat instead.
+    @Test func stopsWithAnErrorWhenTheCursorDoesNotAdvance() async throws {
+        let server = MockServer(respondWith: page(["cu_1", "cu_2"], hasMore: true, next: "cu_2", of: customersOp))
+        var seen: [String] = []
+        do {
+            for try await customer in server.client.instances.customers.listAutoPaging() { seen.append(customer.id) }
+            Issue.record("expected the pager to throw")
+        } catch BlindPayError.invalidResponse {
+        }
+        #expect(seen == ["cu_1", "cu_2", "cu_1", "cu_2"])
+        #expect(server.requests.count == 2)
+        #expect(server.requests[1].queryItems.contains(URLQueryItem(name: "starting_after", value: "cu_2")))
+    }
+
+    @Test func aCallersCursorEchoedBackAlsoStops() async throws {
+        let server = MockServer(respondWith: page(["cu_9"], hasMore: true, next: "pi_123", of: customersOp))
+        var seen: [String] = []
+        await #expect(throws: BlindPayError.self) {
+            for try await customer in server.client.instances.customers.listAutoPaging(params: ListCustomersInput(limit: 1, startingAfter: "pi_123")) {
+                seen.append(customer.id)
+            }
+        }
+        #expect(seen == ["cu_9"])
+        #expect(server.requests.count == 1)
+    }
+
     @Test func surfacesAnAPIErrorAndStops() async throws {
         let server = MockServer(sequence: [
             page(["pa_1"], hasMore: true, next: "pa_1", of: payoutsOp),

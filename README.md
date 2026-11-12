@@ -158,7 +158,7 @@ for try await payout in blindpay.instances.payouts.listAutoPaging(params: ListPa
 }
 ```
 
-Auto-pagers exist for payouts, payins, customers, transfers, payables and managed-wallet deposits (`custodialWallets.getDepositsAutoPaging(id:)`). They only go forward, so `endingBefore` is rejected. Every list input takes all the filters the API supports and never sends unset values.
+Auto-pagers exist for payouts, payins, customers, transfers, payables and managed-wallet deposits (`custodialWallets.getDepositsAutoPaging(id:)`). They only go forward, so `endingBefore` is rejected. If the server ever repeats the cursor it was sent (`hasMore` with the same `nextPage`), the loop throws `BlindPayError.invalidResponse` after that page instead of requesting it forever. Every list input takes all the filters the API supports and never sends unset values.
 
 ## Enums
 
